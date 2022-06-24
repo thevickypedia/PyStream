@@ -1,14 +1,33 @@
+import logging
+import mimetypes
+import os
 import pathlib
+import warnings
 
 from fastapi import FastAPI, Request, Response, Header
 from fastapi.templating import Jinja2Templates
 
-video_path = pathlib.Path("video.mp4")
+from models.filters import VideoFilter
+
+video_path = pathlib.Path(os.path.join(os.getcwd(), "video.mp4"))
+if not os.path.isfile(video_path):
+    raise FileNotFoundError(
+        f"{video_path} does not exist."
+    )
+media_type = mimetypes.guess_type(video_path, strict=True)[0]
+if not media_type:
+    warnings.warn(
+        message=f"Unable to guess the media type for {video_path}. Using 'video/mp4' instead."
+    )
+    media_type = "video/mp4"
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory=os.path.join(os.getcwd(), "templates"))
 
 CHUNK_SIZE = 1024 * 1024
+BROWSER = {}
+
+logging.getLogger("uvicorn.access").addFilter(VideoFilter())
 
 
 @app.get("/")
@@ -22,9 +41,11 @@ async def read_root(request: Request) -> templates.TemplateResponse:
         templates.TemplateResponse:
         Template response.
     """
+    BROWSER["agent"] = request.headers.get("sec-ch-ua")
     return templates.TemplateResponse("index.htm", context={"request": request})
 
 
+# noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(range: str = Header(None)) -> Response:
     """Opens the video file to stream the content.
@@ -41,13 +62,16 @@ async def video_endpoint(range: str = Header(None)) -> Response:
     end = int(end) if end else start + CHUNK_SIZE
     with open(video_path, "rb") as video:
         video.seek(start)
-        data = video.read(end - start)
+        if BROWSER.get("agent") and "chrome" in BROWSER["agent"].lower():
+            data = video.read()
+        else:
+            data = video.read(end - start)
         file_size = str(video_path.stat().st_size)
         headers = {
             'Content-Range': f'bytes {str(start)}-{str(end)}/{file_size}',
             'Accept-Ranges': 'bytes'
         }
-        return Response(content=data, status_code=206, headers=headers, media_type="video/mp4")
+        return Response(content=data, status_code=206, headers=headers, media_type=media_type)
 
 
 if __name__ == '__main__':
