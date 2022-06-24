@@ -1,2 +1,2 @@
-# video_streaming
+# Video Streaming
 Video streaming using FastAPI
