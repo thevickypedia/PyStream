@@ -1,80 +1,71 @@
+import contextlib
 import logging
-import mimetypes
-import os
-import pathlib
-import warnings
+import sys
+from multiprocessing import Process
+from typing import NoReturn
 
-from fastapi import FastAPI, Request, Response, Header
-from fastapi.templating import Jinja2Templates
+import uvicorn
+from uvicorn.config import LOGGING_CONFIG
 
-from models.filters import VideoFilter
+from models.logger import get_logger, get_stream_handler
 
-video_path = pathlib.Path(os.path.join(os.getcwd(), "video.mp4"))
-if not os.path.isfile(video_path):
-    raise FileNotFoundError(
-        f"{video_path} does not exist."
-    )
-media_type = mimetypes.guess_type(video_path, strict=True)[0]
-if not media_type:
-    warnings.warn(
-        message=f"Unable to guess the media type for {video_path}. Using 'video/mp4' instead."
-    )
-    media_type = "video/mp4"
-
-app = FastAPI()
-templates = Jinja2Templates(directory=os.path.join(os.getcwd(), "templates"))
-
-CHUNK_SIZE = 1024 * 1024
-BROWSER = {}
-
-logging.getLogger("uvicorn.access").addFilter(VideoFilter())
+handler = get_stream_handler(formatter=logging.Formatter(fmt=None))
+logger = get_logger(name="uvicorn.default", handler=handler)
 
 
-@app.get("/")
-async def read_root(request: Request) -> templates.TemplateResponse:
-    """Reads the root request to render HTMl page.
+class APIServer(uvicorn.Server):
+    """Shared servers state that is available between all protocol instances.
 
-    Args:
-        request: Request class.
+    >>> APIServer
 
-    Returns:
-        templates.TemplateResponse:
-        Template response.
+    See Also:
+        Overrides `uvicorn.server.Server <https://github.com/encode/uvicorn/blob/master/uvicorn/server.py#L48>`__
+
+    References:
+        https://github.com/encode/uvicorn/issues/742#issuecomment-674411676
     """
-    BROWSER["agent"] = request.headers.get("sec-ch-ua")
-    return templates.TemplateResponse("index.htm", context={"request": request})
+
+    def install_signal_handlers(self) -> NoReturn:
+        """Overrides ``install_signal_handlers`` in ``uvicorn.Server`` module."""
+        pass
+
+    @contextlib.contextmanager
+    def run_in_parallel(self) -> None:
+        """Initiates ``Server.run`` in a dedicated process."""
+        self.run()
 
 
-# noinspection PyShadowingBuiltins
-@app.get("/video")
-async def video_endpoint(range: str = Header(None)) -> Response:
-    """Opens the video file to stream the content.
+class APIHandler(Process):
+    """Initiates the fast API in a dedicated process using uvicorn server.
 
-    Args:
-        range: Header information.
+    >>> APIHandler
 
-    Returns:
-        Response:
-        Response class.
     """
-    start, end = range.replace("bytes=", "").split("-")
-    start = int(start)
-    end = int(end) if end else start + CHUNK_SIZE
-    with open(video_path, "rb") as video:
-        video.seek(start)
-        if BROWSER.get("agent") and "chrome" in BROWSER["agent"].lower():
-            data = video.read()
-        else:
-            data = video.read(end - start)
-        file_size = str(video_path.stat().st_size)
-        headers = {
-            'Content-Range': f'bytes {str(start)}-{str(end)}/{file_size}',
-            'Accept-Ranges': 'bytes'
+
+    def __init__(self):
+        """Instantiates the class as a sub process."""
+        super(APIHandler, self).__init__()
+
+    def run(self) -> NoReturn:
+        """Creates a custom log wrapper and triggers the server."""
+        log_config = LOGGING_CONFIG
+        log_config['disable_existing_loggers'] = True
+        log_config['handlers']['access']['stream'] = sys.stdout
+        log_config['handlers']['default']['stream'] = sys.stdout
+        log_config['loggers']['uvicorn']['level'] = logging.DEBUG
+
+        argument_dict = {
+            "app": "fast:app",
+            "reload": True,
+            "log_config": log_config
         }
-        return Response(content=data, status_code=206, headers=headers, media_type=media_type)
+
+        config = uvicorn.Config(**argument_dict)
+        try:
+            APIServer(config=config).run_in_parallel()
+        except KeyboardInterrupt:
+            logger.error("Manual interruption.")
 
 
 if __name__ == '__main__':
-    import uvicorn
-
-    uvicorn.run(reload=True, app=app)
+    APIHandler().run()
