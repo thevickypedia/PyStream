@@ -1,7 +1,7 @@
 import socket
-
-from pydantic import Field, PositiveInt, BaseSettings
 from typing import AnyStr
+
+from pydantic import BaseSettings, Field, PositiveInt
 
 
 class EnvConfig(BaseSettings):

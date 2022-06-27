@@ -5,7 +5,7 @@ import pathlib
 import warnings
 
 import jinja2
-from fastapi import FastAPI, Request, Response, Header
+from fastapi import FastAPI, Header, Request, Response
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 
@@ -34,9 +34,10 @@ CHUNK_SIZE = 1024 * 1024
 BROWSER = {}
 
 logging.getLogger("uvicorn.access").addFilter(VideoFilter())
-template = CustomTemplate.source.strip()
-rendered = jinja2.Template(template).render(TITLE=env.video_title,
-                                            VIDEO_HOST_URL=f"http://{env.video_host}:{env.video_port}/video")
+rendered = jinja2.Template(source=CustomTemplate.source.strip()).render(
+    TITLE=env.video_title,
+    VIDEO_HOST_URL=f"http://{env.video_host}:{env.video_port}/video"
+)
 with open(file=os.path.join(os.getcwd(), "templates", "index.html"), mode="w") as file:
     file.write(rendered)
 
