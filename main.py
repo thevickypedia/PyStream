@@ -8,6 +8,7 @@ import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 
 from models.logger import get_logger, get_stream_handler
+from models.config import env
 
 handler = get_stream_handler(formatter=logging.Formatter(fmt=None))
 logger = get_logger(name="uvicorn.default", handler=handler)
@@ -56,6 +57,8 @@ class APIHandler(Process):
 
         argument_dict = {
             "app": "fast:app",
+            "host": env.video_host,
+            "port": env.video_port,
             "reload": True,
             "log_config": log_config
         }

@@ -4,11 +4,14 @@ import os
 import pathlib
 import warnings
 
+import jinja2
 from fastapi import FastAPI, Request, Response, Header
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 
 from models.filters import VideoFilter
+from models.config import env
+from templates.template import CustomTemplate
 
 video_path = pathlib.Path(os.path.join(os.getcwd(), "video.mp4"))
 if not os.path.isfile(video_path):
@@ -29,6 +32,10 @@ CHUNK_SIZE = 1024 * 1024
 BROWSER = {}
 
 logging.getLogger("uvicorn.access").addFilter(VideoFilter())
+template = CustomTemplate.source.strip()
+rendered = jinja2.Template(template).render(VIDEO_HOST_URL=f"http://{env.video_host}:{env.video_port}/video")
+with open(file=os.path.join(os.getcwd(), "templates", "index.html"), mode="w") as file:
+    file.write(rendered)
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)

@@ -1,3 +1,5 @@
 .idea
 venv
 *.mp4
+*.html
+.env
