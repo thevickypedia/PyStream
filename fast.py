@@ -9,9 +9,11 @@ from fastapi import FastAPI, Request, Response, Header
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 
-from models.filters import VideoFilter
 from models.config import env
+from models.filters import VideoFilter
 from templates.template import CustomTemplate
+
+logger = logging.getLogger(name="uvicorn.default")
 
 video_path = pathlib.Path(os.path.join(os.getcwd(), "video.mp4"))
 if not os.path.isfile(video_path):
@@ -68,16 +70,19 @@ async def read_root(request: Request) -> templates.TemplateResponse:
 
 # noinspection PyShadowingBuiltins
 @app.get("/video")
-async def video_endpoint(range: str = Header(None)) -> Response:
+async def video_endpoint(request: Request, range: str = Header(None)) -> Response:
     """Opens the video file to stream the content.
 
     Args:
+        request: Takes the ``Request`` class as an argument.
         range: Header information.
 
     Returns:
         Response:
         Response class.
     """
+    logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
+    logger.info(f"User agent: {request.headers.get('user-agent')}")
     start, end = range.replace("bytes=", "").split("-")
     start = int(start)
     end = int(end) if end else start + CHUNK_SIZE

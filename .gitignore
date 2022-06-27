@@ -3,3 +3,5 @@ venv
 *.mp4
 *.html
 .env
+temp.py
+test.py

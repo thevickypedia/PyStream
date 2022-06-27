@@ -7,11 +7,9 @@ from typing import NoReturn
 import uvicorn
 from uvicorn.config import LOGGING_CONFIG
 
-from models.logger import get_logger, get_stream_handler
 from models.config import env
 
-handler = get_stream_handler(formatter=logging.Formatter(fmt=None))
-logger = get_logger(name="uvicorn.default", handler=handler)
+logger = logging.getLogger(name="uvicorn.default")
 
 
 class APIServer(uvicorn.Server):
