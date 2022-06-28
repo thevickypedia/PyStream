@@ -6,11 +6,12 @@ import warnings
 
 import jinja2
 from fastapi import FastAPI, Header, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.templating import Jinja2Templates
 
 from models.config import env
-from models.filters import VideoFilter
+from models.filters import RootFilter, VideoFilter
 from templates.template import CustomTemplate
 
 logger = logging.getLogger(name="uvicorn.default")
@@ -32,14 +33,39 @@ templates = Jinja2Templates(directory=os.path.join(os.getcwd(), "templates"))
 
 CHUNK_SIZE = 1024 * 1024
 BROWSER = {}
+HOSTS = []
 
 logging.getLogger("uvicorn.access").addFilter(VideoFilter())
+logging.getLogger("uvicorn.access").addFilter(RootFilter())
 rendered = jinja2.Template(source=CustomTemplate.source.strip()).render(
     TITLE=env.video_title,
     VIDEO_HOST_URL=f"http://{env.video_host}:{env.video_port}/video"
 )
 with open(file=os.path.join(os.getcwd(), "templates", "index.html"), mode="w") as file:
     file.write(rendered)
+
+
+@app.on_event(event_type='startup')
+async def enable_cors() -> None:
+    """Allow ``CORS: Cross-Origin Resource Sharing`` to allow restricted resources on the API."""
+    logger.info('Setting CORS policy.')
+    origins = [
+        "http://localhost.com",
+        "https://localhost.com",
+        f"http://{env.website}",
+        f"https://{env.website}",
+        f"http://{env.website}/*",
+        f"https://{env.website}/*",
+    ]
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)
@@ -82,8 +108,11 @@ async def video_endpoint(request: Request, range: str = Header(None)) -> Respons
         Response:
         Response class.
     """
-    logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
-    logger.info(f"User agent: {request.headers.get('user-agent')}")
+    if request.client.host not in HOSTS:
+        HOSTS.append(request.client.host)
+        logger.info(f"Connection received from {request.client.host} via {host}") \
+            if (host := request.headers.get('host')) else None
+        logger.info(f"User agent: {ua}") if (ua := request.headers.get('user-agent')) else None
     start, end = range.replace("bytes=", "").split("-")
     start = int(start)
     end = int(end) if end else start + CHUNK_SIZE

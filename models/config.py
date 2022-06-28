@@ -15,6 +15,7 @@ class EnvConfig(BaseSettings):
     video_title: AnyStr = Field(default="Video Streaming via FastAPI", env="VIDEO_TITLE")
     video_host: str = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
+    website: str = Field(default="vigneshrao.com", env="WEBSITE")
 
     class Config:
         """Environment variables configuration."""
