@@ -1,54 +1,59 @@
+import base64
 import logging
 import mimetypes
 import os
 import pathlib
+import time
+import uuid
 import warnings
+from datetime import datetime, timezone
+from typing import Optional
 
-import jinja2
-from fastapi import FastAPI, Header, Request, Response
+from fastapi import Cookie, FastAPI, Header, Request, Response, Security
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
+from uvicorn._logging import ColourizedFormatter
 
-from models.config import env
-from models.filters import RootFilter, VideoFilter
-from templates.template import CustomTemplate
+from models.config import env, fileio, settings
+from models.settings import verify_auth
+
+LOCAL_TIMEZONE = datetime.now(tz=timezone.utc).astimezone().tzinfo
 
 logger = logging.getLogger(name="uvicorn.default")
 
-video_path = pathlib.Path(os.path.join(os.getcwd(), "video.mp4"))
+video_path = pathlib.Path(os.path.join(os.getcwd(), env.video_file))
 if not os.path.isfile(video_path):
     raise FileNotFoundError(
         f"{video_path} does not exist."
     )
-media_type = mimetypes.guess_type(video_path, strict=True)[0]
-if not media_type:
+if not (media_type := mimetypes.guess_type(video_path, strict=True)[0]):
     warnings.warn(
         message=f"Unable to guess the media type for {video_path}. Using 'video/mp4' instead."
     )
     media_type = "video/mp4"
 
 app = FastAPI()
-templates = Jinja2Templates(directory=os.path.join(os.getcwd(), "templates"))
-
-CHUNK_SIZE = 1024 * 1024
-BROWSER = {}
-HOSTS = []
-
-logging.getLogger("uvicorn.access").addFilter(VideoFilter())
-logging.getLogger("uvicorn.access").addFilter(RootFilter())
-rendered = jinja2.Template(source=CustomTemplate.source.strip()).render(
-    TITLE=env.video_title,
-    VIDEO_HOST_URL=f"http://{env.video_host}:{env.video_port}/video"
-)
-with open(file=os.path.join(os.getcwd(), "templates", "index.html"), mode="w") as file:
-    file.write(rendered)
+templates = Jinja2Templates(directory=fileio.templates)
+security = HTTPBasic(realm="simple")
 
 
-@app.on_event(event_type='startup')
+@app.on_event(event_type="startup")
+async def custom_logger() -> None:
+    """Disable existing logging propagation and override uvicorn access log using colorized log format."""
+    logger.propagate = False  # Disable existing default logging and wrap a new one
+    console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
+                                            use_colors=True)
+    handler = logging.StreamHandler()
+    handler.setFormatter(fmt=console_formatter)
+    logger.addHandler(hdlr=handler)
+    logger.info('Setting CORS policy.')
+
+
+@app.on_event(event_type="startup")
 async def enable_cors() -> None:
     """Allow ``CORS: Cross-Origin Resource Sharing`` to allow restricted resources on the API."""
-    logger.info('Setting CORS policy.')
     origins = [
         "http://localhost.com",
         "https://localhost.com",
@@ -80,45 +85,95 @@ async def get_favicon() -> FileResponse:
         return FileResponse('favicon.ico')
 
 
-@app.get("/")
-async def read_root(request: Request) -> templates.TemplateResponse:
+@app.get("/", include_in_schema=False)
+async def root() -> RedirectResponse:
     """Reads the root request to render HTMl page.
+
+    Returns:
+        RedirectResponse:
+        Redirects to login page.
+    """
+    return RedirectResponse(url="/login", headers=None)
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login(request: Request,
+                credentials: HTTPBasicCredentials = Security(security),
+                refresh_token: Optional[str] = Cookie(None),
+                timestamp: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
+    """Login request handler.
 
     Args:
         request: Request class.
+        credentials: HTTPBasicCredentials for authentication.
+        refresh_token: Token stored in cookies.
+        timestamp: Refresh token generate time.
 
     Returns:
         templates.TemplateResponse:
         Template response.
     """
-    BROWSER["agent"] = request.headers.get("sec-ch-ua")
-    return templates.TemplateResponse("index.html", context={"request": request})
+    if refresh_token == settings.session_token and time.time() - int(timestamp) < env.auth_timeout:
+        logger.info(f"Refresh token: {refresh_token} authenticated at {timestamp}")
+    else:
+        logger.warning(f"Refresh token doesn't match: {refresh_token}")
+        await verify_auth(credentials=credentials)
+
+    response = templates.TemplateResponse(fileio.name, context={"request": request}, headers=None)
+    settings.session_token = base64.urlsafe_b64encode(uuid.uuid1().bytes).rstrip(b'=').decode('ascii')
+    response.set_cookie(
+        key="refresh_token",
+        value=str(settings.session_token),
+        httponly=True
+    )
+    response.set_cookie(
+        key="timestamp",
+        value=str(int(time.time())),
+        httponly=True
+    )
+    return response
 
 
 # noinspection PyShadowingBuiltins
 @app.get("/video")
-async def video_endpoint(request: Request, range: str = Header(None)) -> Response:
+async def video_endpoint(request: Request, range: Optional[str] = Header(None),
+                         credentials: HTTPBasicCredentials = Security(security),
+                         refresh_token: Optional[str] = Cookie(None),
+                         timestamp: Optional[str] = Cookie(None)) -> Response:
     """Opens the video file to stream the content.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         range: Header information.
+        credentials: HTTPBasicCredentials for authentication.
+        refresh_token: Token stored in cookies.
+        timestamp: Refresh token generate time.
 
     Returns:
         Response:
         Response class.
     """
-    if request.client.host not in HOSTS:
-        HOSTS.append(request.client.host)
+    if not range:
+        logger.info("/video endpoint accessed directly. Redirecting to login page.")
+        return RedirectResponse(url="/login", headers=None)
+
+    if refresh_token == settings.session_token and time.time() - int(timestamp) < env.auth_timeout:
+        logger.info(f"Refresh token: {refresh_token} authenticated at {timestamp}")
+    else:
+        logger.warning(f"Refresh token doesn't match: {refresh_token}")
+        await verify_auth(credentials=credentials)
+
+    if request.client.host not in settings.HOSTS:
+        settings.HOSTS.append(request.client.host)
         logger.info(f"Connection received from {request.client.host} via {host}") \
             if (host := request.headers.get('host')) else None
         logger.info(f"User agent: {ua}") if (ua := request.headers.get('user-agent')) else None
     start, end = range.replace("bytes=", "").split("-")
     start = int(start)
-    end = int(end) if end else start + CHUNK_SIZE
+    end = int(end) if end else start + settings.CHUNK_SIZE
     with open(video_path, "rb") as video:
         video.seek(start)
-        if BROWSER.get("agent") and "chrome" in BROWSER["agent"].lower():
+        if "chrome" in request.headers.get("sec-ch-ua", "NO_MATCH").lower():
             data = video.read()
         else:
             data = video.read(end - start)

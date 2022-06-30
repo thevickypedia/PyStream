@@ -1,15 +1,11 @@
 import contextlib
-import logging
-import sys
+import os
 from multiprocessing import Process
 from typing import NoReturn
 
 import uvicorn
-from uvicorn.config import LOGGING_CONFIG
 
-from models.config import env
-
-logger = logging.getLogger(name="uvicorn.default")
+from models.config import env, fileio
 
 
 class APIServer(uvicorn.Server):
@@ -45,13 +41,14 @@ class APIHandler(Process):
         """Instantiates the class as a sub process."""
         super(APIHandler, self).__init__()
 
+    def __del__(self):
+        """Removes the html file."""
+        os.remove(fileio.html) if os.path.isfile(fileio.html) else None
+
     def run(self) -> NoReturn:
         """Creates a custom log wrapper and triggers the server."""
-        log_config = LOGGING_CONFIG
-        log_config['disable_existing_loggers'] = True
-        log_config['handlers']['access']['stream'] = sys.stdout
-        log_config['handlers']['default']['stream'] = sys.stdout
-        log_config['loggers']['uvicorn']['level'] = logging.DEBUG
+        log_config = uvicorn.config.LOGGING_CONFIG
+        log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
 
         argument_dict = {
             "app": "fast:app",
@@ -65,7 +62,7 @@ class APIHandler(Process):
         try:
             APIServer(config=config).run_in_parallel()
         except KeyboardInterrupt:
-            logger.error("Manual interruption.")
+            pass
 
 
 if __name__ == '__main__':
