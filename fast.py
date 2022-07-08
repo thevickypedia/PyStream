@@ -1,12 +1,8 @@
-import base64
 import logging
 import mimetypes
 import os
 import pathlib
-import time
-import uuid
 import warnings
-from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import Cookie, FastAPI, Header, Request, Response, Security
@@ -14,12 +10,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
-from uvicorn._logging import ColourizedFormatter
+from starlette.middleware.sessions import SessionMiddleware
+from uvicorn._logging import ColourizedFormatter  # noqa: PyProtectedMember
 
 from models.config import env, fileio, settings
 from models.settings import verify_auth
-
-LOCAL_TIMEZONE = datetime.now(tz=timezone.utc).astimezone().tzinfo
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -35,6 +30,7 @@ if not (media_type := mimetypes.guess_type(video_path, strict=True)[0]):
     media_type = "video/mp4"
 
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_TOKEN)
 templates = Jinja2Templates(directory=fileio.templates)
 security = HTTPBasic(realm="simple")
 
@@ -99,47 +95,34 @@ async def root() -> RedirectResponse:
 @app.get("/login", response_class=HTMLResponse)
 async def login(request: Request,
                 credentials: HTTPBasicCredentials = Security(security),
-                refresh_token: Optional[str] = Cookie(None),
-                timestamp: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
+                refresh_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
     """Login request handler.
 
     Args:
         request: Request class.
         credentials: HTTPBasicCredentials for authentication.
         refresh_token: Token stored in cookies.
-        timestamp: Refresh token generate time.
 
     Returns:
         templates.TemplateResponse:
         Template response.
     """
-    if refresh_token == settings.session_token and time.time() - int(timestamp) < env.auth_timeout:
-        logger.info(f"Refresh token: {refresh_token} authenticated at {timestamp}")
-    else:
-        logger.warning(f"Refresh token doesn't match: {refresh_token}")
-        await verify_auth(credentials=credentials)
-
+    await verify_auth(credentials=credentials)
     response = templates.TemplateResponse(fileio.name, context={"request": request}, headers=None)
-    settings.session_token = base64.urlsafe_b64encode(uuid.uuid1().bytes).rstrip(b'=').decode('ascii')
-    response.set_cookie(
-        key="refresh_token",
-        value=str(settings.session_token),
-        httponly=True
-    )
-    response.set_cookie(
-        key="timestamp",
-        value=str(int(time.time())),
-        httponly=True
-    )
+    if not refresh_token:
+        response.set_cookie(
+            key="refresh_token",
+            value=settings.SESSION_TOKEN,
+            httponly=True
+        )
     return response
 
 
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         credentials: HTTPBasicCredentials = Security(security),
                          refresh_token: Optional[str] = Cookie(None),
-                         timestamp: Optional[str] = Cookie(None)) -> Response:
+                         credentials: HTTPBasicCredentials = Security(security)) -> Response:
     """Opens the video file to stream the content.
 
     Args:
@@ -147,27 +130,23 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         range: Header information.
         credentials: HTTPBasicCredentials for authentication.
         refresh_token: Token stored in cookies.
-        timestamp: Refresh token generate time.
 
     Returns:
         Response:
         Response class.
     """
-    if not range:
+    if refresh_token != settings.SESSION_TOKEN:
+        await verify_auth(credentials=credentials)
+    if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)
 
-    if refresh_token == settings.session_token and time.time() - int(timestamp) < env.auth_timeout:
-        logger.info(f"Refresh token: {refresh_token} authenticated at {timestamp}")
-    else:
-        logger.warning(f"Refresh token doesn't match: {refresh_token}")
-        await verify_auth(credentials=credentials)
-
     if request.client.host not in settings.HOSTS:
         settings.HOSTS.append(request.client.host)
-        logger.info(f"Connection received from {request.client.host} via {host}") \
-            if (host := request.headers.get('host')) else None
-        logger.info(f"User agent: {ua}") if (ua := request.headers.get('user-agent')) else None
+        if host := request.headers.get('host'):
+            logger.info(f"Connection received from {request.client.host} via {host}")
+        if ua := request.headers.get('user-agent'):
+            logger.info(f"User agent: {ua}")
     start, end = range.replace("bytes=", "").split("-")
     start = int(start)
     end = int(end) if end else start + settings.CHUNK_SIZE

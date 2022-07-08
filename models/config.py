@@ -1,10 +1,10 @@
+import base64
 import getpass
 import os
 import pwd
 import socket
-import time
+import uuid
 from typing import Union
-from uuid import UUID
 
 from pydantic import BaseSettings, DirectoryPath, Field, FilePath, PositiveInt
 
@@ -46,17 +46,15 @@ class FileIO(BaseSettings):
 
 
 class Settings(BaseSettings):
-    """Loads all the files' path required/created.
+    """Creates a class for the hosts and chunk size of the video.
 
-    >>> FileIO
+    >>> Settings
 
     """
 
-    first_run: bool = True
-    session_time: int = int(time.time())
-    session_token: Union[str, UUID] = None
-    CHUNK_SIZE: PositiveInt = 1024 * 1024
     HOSTS: list = []
+    CHUNK_SIZE: PositiveInt = 1024 * 1024
+    SESSION_TOKEN: Union[uuid.UUID, str] = base64.urlsafe_b64encode(uuid.uuid1().bytes).rstrip(b'=').decode('ascii')
 
 
 env = EnvConfig()
