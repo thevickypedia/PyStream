@@ -5,7 +5,7 @@ import pathlib
 import warnings
 from typing import Optional
 
-from fastapi import Cookie, FastAPI, Header, Request, Response, Security
+from fastapi import Cookie, Depends, FastAPI, Header, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -94,14 +94,14 @@ async def root() -> RedirectResponse:
 
 @app.get("/login", response_class=HTMLResponse)
 async def login(request: Request,
-                credentials: HTTPBasicCredentials = Security(security),
-                refresh_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
+                credentials: HTTPBasicCredentials = Depends(security),
+                session_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
     """Login request handler.
 
     Args:
         request: Request class.
         credentials: HTTPBasicCredentials for authentication.
-        refresh_token: Token stored in cookies.
+        session_token: Token stored in cookies.
 
     Returns:
         templates.TemplateResponse:
@@ -109,9 +109,9 @@ async def login(request: Request,
     """
     await verify_auth(credentials=credentials)
     response = templates.TemplateResponse(fileio.name, context={"request": request}, headers=None)
-    if not refresh_token:
+    if not session_token:
         response.set_cookie(
-            key="refresh_token",
+            key="session_token",
             value=settings.SESSION_TOKEN,
             httponly=True
         )
@@ -121,21 +121,21 @@ async def login(request: Request,
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         refresh_token: Optional[str] = Cookie(None),
-                         credentials: HTTPBasicCredentials = Security(security)) -> Response:
+                         session_token: Optional[str] = Cookie(None),
+                         credentials: HTTPBasicCredentials = Depends(security)) -> Response:
     """Opens the video file to stream the content.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         range: Header information.
         credentials: HTTPBasicCredentials for authentication.
-        refresh_token: Token stored in cookies.
+        session_token: Token stored in cookies.
 
     Returns:
         Response:
         Response class.
     """
-    if refresh_token != settings.SESSION_TOKEN:
+    if session_token != settings.SESSION_TOKEN:
         await verify_auth(credentials=credentials)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")

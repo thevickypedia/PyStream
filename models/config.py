@@ -1,7 +1,5 @@
 import base64
-import getpass
 import os
-import pwd
 import socket
 import uuid
 from typing import Union
@@ -16,14 +14,14 @@ class EnvConfig(BaseSettings):
 
     """
 
+    username: str = Field(default=..., env="USERNAME")
+    password: str = Field(..., env="PASSWORD")
+
     video_file: str = Field(default="video.mp4", env="VIDEO_FILE")
     video_title: str = Field(default="Video Streaming via FastAPI", env="VIDEO_TITLE")
     video_host: str = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
     website: str = Field(default="vigneshrao.com", env="WEBSITE")
-    username: str = Field(default=os.environ.get("USER") or getpass.getuser() or pwd.getpwuid(os.getuid())[0],
-                          env="USERNAME")
-    password: str = Field(..., env="PASSWORD")
     auth_timeout: PositiveInt = Field(default=900, env="AUTH_TIMEOUT")
 
     class Config:

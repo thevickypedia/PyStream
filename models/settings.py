@@ -1,4 +1,5 @@
 import logging
+import secrets
 
 import jinja2
 from fastapi import HTTPException, status
@@ -39,7 +40,10 @@ async def verify_auth(credentials: HTTPBasicCredentials) -> JSONResponse:
             headers=None
         )
 
-    if credentials.username == env.username and credentials.password == env.password:
+    username_validation = secrets.compare_digest(credentials.username, env.username)
+    password_validation = secrets.compare_digest(credentials.password, env.password)
+
+    if username_validation and password_validation:
         return JSONResponse(
             content={
                 "authenticated": True
