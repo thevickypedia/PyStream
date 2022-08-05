@@ -1,7 +1,6 @@
 import logging
 import mimetypes
 import os
-import pathlib
 import warnings
 from typing import Optional
 
@@ -18,14 +17,13 @@ from models.settings import verify_auth
 
 logger = logging.getLogger(name="uvicorn.default")
 
-video_path = pathlib.Path(os.path.join(os.getcwd(), env.video_file))
-if not os.path.isfile(video_path):
+if not os.path.isfile(env.video_file):
     raise FileNotFoundError(
-        f"{video_path} does not exist."
+        f"{env.video_file} does not exist."
     )
-if not (media_type := mimetypes.guess_type(video_path, strict=True)[0]):
+if not (media_type := mimetypes.guess_type(env.video_file, strict=True)[0]):
     warnings.warn(
-        message=f"Unable to guess the media type for {video_path}. Using 'video/mp4' instead."
+        message=f"Unable to guess the media type for {env.video_file}. Using 'video/mp4' instead."
     )
     media_type = "video/mp4"
 
@@ -150,13 +148,13 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
     start, end = range.replace("bytes=", "").split("-")
     start = int(start)
     end = int(end) if end else start + settings.CHUNK_SIZE
-    with open(video_path, "rb") as video:
+    with open(env.video_file, "rb") as video:
         video.seek(start)
         if "chrome" in request.headers.get("sec-ch-ua", "NO_MATCH").lower():
             data = video.read()
         else:
             data = video.read(end - start)
-        file_size = str(video_path.stat().st_size)
+        file_size = str(env.video_file.stat().st_size)
         headers = {
             'Content-Range': f'bytes {str(start)}-{str(end)}/{file_size}',
             'Accept-Ranges': 'bytes'
