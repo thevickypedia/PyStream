@@ -223,6 +223,7 @@ async def logout(request: Request):
         HTTPException:
         401 with a logout message.
     """
+    logger.info("Logout successful")
     if request.headers.get('authorization'):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -230,6 +231,7 @@ async def logout(request: Request):
             headers=None
         )
     else:
+        logger.info("Redirecting to login page")
         return RedirectResponse(url="/login", headers=None)
 
 
@@ -260,6 +262,7 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
             logger.info(f"Connection received from {request.client.host} via {host}")
         if ua := request.headers.get('user-agent'):
             logger.info(f"User agent: {ua}")
+    logger.info(f"Streaming: {request.query_params['vid_name']}")
     return range_requests_response(
         range_header=range, file_path=os.path.join(env.video_source, request.query_params['vid_name'])
     )
