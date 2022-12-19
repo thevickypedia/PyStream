@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>FastAPI video streaming</title>
+    <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+    <meta content="no-cache" http-equiv="Pragma"/>
+    <meta content="0" http-equiv="Expires"/>
+    <meta property="og:type" content="VideoStreaming">
+    <meta name="keywords" content="Python, streaming, fastapi, JavaScript, HTML, CSS">
+    <meta name="author" content="Vignesh Sivanandha Rao">
+    <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style type="text/css">
+        a:hover, a:active {font-size: 150%; opacity: 0.5; background-color: #F5F5F5;}
+        a:link { color: blue; }
+        a:visited { color: blue; }
+        ol {
+          list-style: none;
+          counter-reset: list-counter;
+        }
+        li {
+          counter-increment: list-counter;
+          margin: 0.25rem;
+        }
+        li::before {
+          content: counter(list-counter);
+          background: #4169E1;
+          width: 2rem;
+          height: 2rem;
+          border-radius: 50%;
+          display: inline-block;
+          line-height: 2rem;
+          color: white;
+          text-align: center;
+          margin-right: 0.5rem;
+        }
+        .logout {
+            position: absolute; /* relative or fixed or absolute; */
+            top: 3.8%;
+            right: 30px;
+            background-color: #4169E1;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        @import url('//netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css');
+        body{
+            font-family: 'PT Serif', serif;
+            background-color: #ececec;
+            /* IF You Need Transition -webkit-transition: all 0.2s;
+            -moz-transition: all 0.2s;
+            transition: all 0.2s;
+            */
+        }
+            .night{
+            background-color: #151515;
+        }
+        .toggler{
+            font-size: 28px;
+            border-radius: 100px;
+            background-color: #111111;
+            padding: 15px;
+            color:#fcfcfc;
+            box-shadow: 1px 2px 6px rgba(0,0,0,.3);
+            cursor: pointer;
+            position: fixed;
+            bottom:20px;
+            right: 20px;
+            -webkit-transition: all 0.2s;
+            -moz-transition: all 0.2s;
+            transition: all 0.2s;
+        }
+        .fa-moon-o:before{
+            padding:0 2px;
+        }
+        .fa-sun-o{
+            background-color: #212121;
+            color:#ccc;
+        }
+        /* Optional */
+        .content{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 24px 0 #ddd;
+            box-sizing: border-box;
+            padding: 20px;
+            font-family: arial;
+        }
+        .content h1{
+            font-size: 58px;
+            font-weight: 100;
+            margin: 0 0 20px;
+        }
+        .content .text{
+            line-height: 23px;
+            font-size: 15px;
+            color: #444;
+        }
+        .night *{
+            color: #999 !important;
+            box-shadow: none;
+        }
+        .night .content{
+            border: 1px solid #999;
+        }
+
+
+
+    </style>
+</head>
+<body translate="no">
+<div class="toggler fa fa-moon-o"></div>
+<h1>Video Dump</h1>
+<hr>
+<button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
+<ol>
+    {% for file in files %}
+    <li><a href="{{file}}">{{file}}</a></li>
+    {% endfor %}
+</ol>
+<hr>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script id="rendered-js">
+        var theme = window.localStorage.currentTheme;
+        $('body').addClass(theme);
+        if ($("body").hasClass("night")) {
+            $('.toggler').addClass('fa-sun-o');
+            $('.toggler').removeClass('fa-moon-o');
+        } else {
+            $('.toggler').removeClass('fa-sun-o');
+            $('.toggler').addClass('fa-moon-o');
+        }
+        $('.toggler').click(function () {
+        $('.toggler').toggleClass('fa-sun-o');
+        $('.toggler').toggleClass('fa-moon-o');
+        if ($("body").hasClass("night")) {
+             $('body').toggleClass('night');
+             localStorage.removeItem('currentTheme');
+             localStorage.currentTheme = "day";
+        } else {
+             $('body').toggleClass('night');
+             localStorage.removeItem('currentTheme');
+             localStorage.currentTheme = "night";
+        }
+        });
+        //# sourceURL=pen.js
+
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+        function logOut() {
+            window.location.href = window.location.origin + '/logout';
+        }
+
+</script>
+</body>
+</html>

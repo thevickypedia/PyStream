@@ -1,22 +1,20 @@
-class CustomTemplate:
-    """Initiates Template object which has the template for static html file stored.
-
-    >>> CustomTemplate
-
-    """
-
-    source = """
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>FastAPI video streaming</title>
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-        <meta http-equiv="Pragma" content="no-cache">
-        <meta http-equiv="Expires" content="0">
-        <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
-        <link rel="shortcut icon" href="#">
-    </head>
-    <style type="text/css">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>FastAPI video streaming</title>
+    <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
+    <meta content="no-cache" http-equiv="Pragma"/>
+    <meta content="0" http-equiv="Expires"/>
+    <meta property="og:type" content="VideoStreaming">
+    <meta name="keywords" content="Python, streaming, fastapi, JavaScript, HTML, CSS">
+    <meta name="author" content="Vignesh Sivanandha Rao">
+    <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
+    <link rel="shortcut icon" href="#">
+</head>
+<style type="text/css">
         @import url('//netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css');
         body{
             font-family: 'PT Serif', serif;
@@ -80,8 +78,9 @@ class CustomTemplate:
         .night .content{
             border: 1px solid #999;
         }
-    </style>
-    <style>
+
+</style>
+<style>
         .tab {
             margin-left: 40px;
         }
@@ -100,15 +99,16 @@ class CustomTemplate:
             text-align: center;
             font-size: 120%;
         }
-    </style>
-    <body translate="no">
-        <div class="toggler fa fa-moon-o"></div>
-        <p class="center">{{ TITLE }}</p>
-        <video width="1200" controls muted="muted">
-            <source src={{ VIDEO_HOST_URL }} type="video/mp4" />
-        </video>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script id="rendered-js">
+
+</style>
+<body translate="no">
+<div class="toggler fa fa-moon-o"></div>
+<p class="center">{{ TITLE }}</p>
+<video width="1200" controls muted="muted">
+    <source src={{ VIDEO_HOST_URL }} type="video/mp4"/>
+</video>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script id="rendered-js">
         var theme = window.localStorage.currentTheme;
         $('body').addClass(theme);
         if ($("body").hasClass("night")) {
@@ -132,7 +132,7 @@ class CustomTemplate:
         }
         });
         //# sourceURL=pen.js
-    </script>
-    </body>
+
+</script>
+</body>
 </html>
-"""

@@ -1,13 +1,15 @@
 import logging
 import mimetypes
 import os
-import warnings
-from typing import Optional, BinaryIO, Tuple, Union, ByteString, AsyncIterable
+from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 
-from fastapi import Cookie, Depends, FastAPI, Header, Request, Response, HTTPException, status
+from fastapi import (Cookie, Depends, FastAPI, Header, HTTPException, Request,
+                     status)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, StreamingResponse
+from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse,
+                               RedirectResponse, StreamingResponse)
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from uvicorn._logging import ColourizedFormatter  # noqa: PyProtectedMember
@@ -17,12 +19,9 @@ from models.settings import verify_auth
 
 logger = logging.getLogger(name="uvicorn.default")
 
-if not (content_type := mimetypes.guess_type(env.video_file, strict=True)[0]):
-    warnings.warn(message=f"Unable to guess the media type for {env.video_file}. Using 'video/mp4' instead.")
-    content_type = "video/mp4"
-
 app = FastAPI()
 app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_TOKEN)
+app.mount(f"/{env.video_source}", StaticFiles(directory=env.video_source), name="Video Dump")
 templates = Jinja2Templates(directory=fileio.templates)
 security = HTTPBasic(realm="simple")
 
@@ -97,16 +96,47 @@ async def login(request: Request,
 
     Returns:
         templates.TemplateResponse:
-        Template response.
+        Template response for listing page.
     """
-    await verify_auth(credentials=credentials)
-    response = templates.TemplateResponse(fileio.name, context={"request": request}, headers=None)
+    if session_token != settings.SESSION_TOKEN:
+        await verify_auth(credentials=credentials)
+    file_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}")]
+    file_path.sort(key=lambda a: a.lower())
+    response = templates.TemplateResponse(
+        name=fileio.list_files, context={"request": request, "files": file_path}
+    )
     if not session_token:
         response.set_cookie(
             key="session_token",
             value=settings.SESSION_TOKEN,
             httponly=True
         )
+    return response
+
+
+@app.get("/stream/{video_name}")
+async def stream(request: Request, video_name: str,
+                 credentials: HTTPBasicCredentials = Depends(security),
+                 session_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
+    """Checks if session is valid and returns the template for streaming page.
+
+    Args:
+        request: Takes the ``Request`` class as an argument.
+        session_token: Token stored in cookies.
+        video_name: Name of the video file that has to be rendered.
+        credentials: HTTPBasicCredentials for authentication.
+
+    Returns:
+        templates.TemplateResponse:
+        Template response for streaming page.
+    """
+    if session_token != settings.SESSION_TOKEN:
+        await verify_auth(credentials=credentials)
+    response = templates.TemplateResponse(name=fileio.name,
+                                          context={"request": request, "TITLE": env.video_title,
+                                                   "VIDEO_HOST_URL": f"http://{env.video_host}:{env.video_port}/video"},
+                                          headers=None)
+    response.set_cookie(key='video_name', value=video_name, httponly=True)
     return response
 
 
@@ -123,11 +153,11 @@ def send_bytes_range_requests(file_obj: BinaryIO,
         ByteString:
         Bytes as iterable.
     """
-    with file_obj as stream:
-        stream.seek(start)
-        while (pos := stream.tell()) <= end:
+    with file_obj as streamer:
+        streamer.seek(start)
+        while (pos := streamer.tell()) <= end:
             read_size = min(settings.CHUNK_SIZE, end + 1 - pos)
-            yield stream.read(read_size)
+            yield streamer.read(read_size)
 
 
 def _get_range_header(range_header: str,
@@ -171,7 +201,7 @@ def range_requests_response(range_header: str,
     """
     file_size = os.stat(file_path).st_size
     headers = {
-        "content-type": content_type,
+        "content-type": mimetypes.guess_type(os.path.basename(file_path), strict=True)[0],
         "accept-ranges": "bytes",
         "content-encoding": "identity",
         "content-length": file_size,
@@ -198,23 +228,30 @@ def range_requests_response(range_header: str,
     )
 
 
+@app.get("/logout")
+async def logout():
+    """Yet to be implemented."""
+    return JSONResponse(content={'message': 'functionality yet to be implemented'})
+
+
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         session_token: Optional[str] = Cookie(None),
+                         session_token: Optional[str] = Cookie(None), video_name: Optional[str] = Cookie(None),
                          credentials: HTTPBasicCredentials = Depends(security)) -> Union[RedirectResponse,
                                                                                          StreamingResponse]:
-    """Opens the video file to stream the content.
+    """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
         request: Takes the ``Request`` class as an argument.
+        session_token: Token stored in cookies.
+        video_name: Name of the video file that has to be rendered.
         range: Header information.
         credentials: HTTPBasicCredentials for authentication.
-        session_token: Token stored in cookies.
 
     Returns:
-        Response:
-        Response class.
+        Union[RedirectResponse, StreamingResponse]:
+        Streams the video name received as cookie if session token is valid, redirects to login page otherwise.
     """
     if session_token != settings.SESSION_TOKEN:
         await verify_auth(credentials=credentials)
@@ -229,5 +266,5 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         if ua := request.headers.get('user-agent'):
             logger.info(f"User agent: {ua}")
     return range_requests_response(
-        range_header=range, file_path=env.video_file
+        range_header=range, file_path=os.path.join(env.video_source, video_name)
     )

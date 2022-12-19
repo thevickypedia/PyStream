@@ -1,11 +1,10 @@
 import contextlib
-import os
 from multiprocessing import Process
 from typing import NoReturn
 
 import uvicorn
 
-from models.config import env, fileio
+from models.config import env
 
 
 class APIServer(uvicorn.Server):
@@ -40,10 +39,6 @@ class APIHandler(Process):
     def __init__(self):
         """Instantiates the class as a sub process."""
         super(APIHandler, self).__init__()
-
-    def __del__(self):
-        """Removes the html file."""
-        os.remove(fileio.html) if os.path.isfile(fileio.html) else None
 
     def run(self) -> NoReturn:
         """Creates a custom log wrapper and triggers the server."""
