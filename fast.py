@@ -3,7 +3,7 @@ import mimetypes
 import os
 from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 
-from fastapi import (Cookie, Depends, FastAPI, Header, HTTPException, Request,
+from fastapi import (Depends, FastAPI, Header, HTTPException, Request,
                      status)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (FileResponse, HTMLResponse, RedirectResponse,
@@ -120,12 +120,12 @@ async def stream(request: Request, video_name: str,
         Template response for streaming page.
     """
     await verify_auth(credentials=credentials)
-    response = templates.TemplateResponse(name=fileio.name,
-                                          context={"request": request, "title": video_name,
-                                                   "url": f"http://{env.video_host}:{env.video_port}/video"},
-                                          headers=None)
-    response.set_cookie(key='video_name', value=video_name, httponly=True)
-    return response
+    return templates.TemplateResponse(name=fileio.name,
+                                      context={
+                                          "request": request, "title": video_name,
+                                          "url": f"http://{env.video_host}:{env.video_port}/video?vid_name={video_name}"
+                                      },
+                                      headers=None)
 
 
 def send_bytes_range_requests(file_obj: BinaryIO,
@@ -215,50 +215,33 @@ def range_requests_response(range_header: str, file_path: str) -> StreamingRespo
     )
 
 
-@app.get("/clear-session")
-async def initial_log(request: Request) -> RedirectResponse:
-    """Clears all cookies and redirects to log out page.
-
-    Args:
-        request: Request class.
-
-    Returns:
-        RedirectResponse:
-        Redirect response to ``/logout`` endpoint.
-    """
-    response = RedirectResponse(url="/logout", headers=None)
-    for cookie in request.cookies:
-        logger.info(f"Deleting cookie: {cookie}")
-        response.delete_cookie(key=cookie)
-    return response
-
-
 @app.get("/logout")
-async def logout():
+async def logout(request: Request):
     """Raises a 401 with no headers to log out the user.
 
     Raises:
         HTTPException:
         401 with a logout message.
     """
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Logged out successfully.",
-        headers=None
-    )
+    if request.headers.get('authorization'):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Logged out successfully. Refresh the page to navigate to login.",
+            headers=None
+        )
+    else:
+        return RedirectResponse(url="/login", headers=None)
 
 
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         video_name: Optional[str] = Cookie(None),
                          credentials: HTTPBasicCredentials = Depends(security)) -> Union[RedirectResponse,
                                                                                          StreamingResponse]:
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
         request: Takes the ``Request`` class as an argument.
-        video_name: Name of the video file that has to be rendered.
         range: Header information.
         credentials: HTTPBasicCredentials for authentication.
 
@@ -278,5 +261,5 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         if ua := request.headers.get('user-agent'):
             logger.info(f"User agent: {ua}")
     return range_requests_response(
-        range_header=range, file_path=os.path.join(env.video_source, video_name)
+        range_header=range, file_path=os.path.join(env.video_source, request.query_params['vid_name'])
     )
