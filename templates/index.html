@@ -78,9 +78,6 @@
         .night .content{
             border: 1px solid #999;
         }
-
-</style>
-<style>
         .tab {
             margin-left: 40px;
         }
@@ -104,8 +101,8 @@
 <body translate="no">
 <div class="toggler fa fa-moon-o"></div>
 <p class="center">{{ TITLE }}</p>
-<video width="1200" controls muted="muted">
-    <source src={{ VIDEO_HOST_URL }} type="video/mp4"/>
+<video width="1000" controls muted="muted" style="position: relative">
+    <source src="{{ VIDEO_HOST_URL }}" type="video/mp4"/>
 </video>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script id="rendered-js">

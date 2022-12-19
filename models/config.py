@@ -1,8 +1,5 @@
-import base64
 import os
 import socket
-import uuid
-from typing import Union
 
 from pydantic import (BaseSettings, DirectoryPath, Field, HttpUrl,
                       IPvAnyAddress, PositiveInt)
@@ -52,7 +49,6 @@ class Settings(BaseSettings):
 
     HOSTS: list = []
     CHUNK_SIZE: PositiveInt = 1024 * 1024
-    SESSION_TOKEN: Union[uuid.UUID, str] = base64.urlsafe_b64encode(uuid.uuid1().bytes).rstrip(b'=').decode('ascii')
 
 
 env = EnvConfig()

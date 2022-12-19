@@ -6,12 +6,11 @@ from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 from fastapi import (Cookie, Depends, FastAPI, Header, HTTPException, Request,
                      status)
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import (FileResponse, HTMLResponse, JSONResponse,
-                               RedirectResponse, StreamingResponse)
+from fastapi.responses import (FileResponse, HTMLResponse, RedirectResponse,
+                               StreamingResponse)
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
 from uvicorn._logging import ColourizedFormatter  # noqa: PyProtectedMember
 
 from models.config import env, fileio, settings
@@ -20,10 +19,14 @@ from models.settings import verify_auth
 logger = logging.getLogger(name="uvicorn.default")
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=settings.SESSION_TOKEN)
 app.mount(f"/{env.video_source}", StaticFiles(directory=env.video_source), name="Video Dump")
+
 templates = Jinja2Templates(directory=fileio.templates)
+
 security = HTTPBasic(realm="simple")
+
+file_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}") if not f.startswith(".")]
+file_path.sort(key=lambda a: a.lower())
 
 
 @app.on_event(event_type="startup")
@@ -85,44 +88,30 @@ async def root() -> RedirectResponse:
 
 @app.get("/login", response_class=HTMLResponse)
 async def login(request: Request,
-                credentials: HTTPBasicCredentials = Depends(security),
-                session_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
+                credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Login request handler.
 
     Args:
         request: Request class.
         credentials: HTTPBasicCredentials for authentication.
-        session_token: Token stored in cookies.
 
     Returns:
         templates.TemplateResponse:
         Template response for listing page.
     """
-    if session_token != settings.SESSION_TOKEN:
-        await verify_auth(credentials=credentials)
-    file_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}")]
-    file_path.sort(key=lambda a: a.lower())
-    response = templates.TemplateResponse(
+    await verify_auth(credentials=credentials)
+    return templates.TemplateResponse(
         name=fileio.list_files, context={"request": request, "files": file_path}
     )
-    if not session_token:
-        response.set_cookie(
-            key="session_token",
-            value=settings.SESSION_TOKEN,
-            httponly=True
-        )
-    return response
 
 
 @app.get("/stream/{video_name}")
 async def stream(request: Request, video_name: str,
-                 credentials: HTTPBasicCredentials = Depends(security),
-                 session_token: Optional[str] = Cookie(None)) -> templates.TemplateResponse:
-    """Checks if session is valid and returns the template for streaming page.
+                 credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
+    """Returns the template for streaming page.
 
     Args:
         request: Takes the ``Request`` class as an argument.
-        session_token: Token stored in cookies.
         video_name: Name of the video file that has to be rendered.
         credentials: HTTPBasicCredentials for authentication.
 
@@ -130,8 +119,7 @@ async def stream(request: Request, video_name: str,
         templates.TemplateResponse:
         Template response for streaming page.
     """
-    if session_token != settings.SESSION_TOKEN:
-        await verify_auth(credentials=credentials)
+    await verify_auth(credentials=credentials)
     response = templates.TemplateResponse(name=fileio.name,
                                           context={"request": request, "TITLE": env.video_title,
                                                    "VIDEO_HOST_URL": f"http://{env.video_host}:{env.video_port}/video"},
@@ -228,33 +216,58 @@ def range_requests_response(range_header: str,
     )
 
 
+@app.get("/clear-session")
+async def initial_log(request: Request) -> RedirectResponse:
+    """Clears all cookies and redirects to log out page.
+
+    Args:
+        request: Request class.
+
+    Returns:
+        RedirectResponse:
+        Redirect response to ``/logout`` endpoint.
+    """
+    response = RedirectResponse(url="/logout", headers=None)
+    for cookie in request.cookies:
+        logger.info(f"Deleting cookie: {cookie}")
+        response.delete_cookie(key=cookie)
+    return response
+
+
 @app.get("/logout")
 async def logout():
-    """Yet to be implemented."""
-    return JSONResponse(content={'message': 'functionality yet to be implemented'})
+    """Raises a 401 with no headers to log out the user.
+
+    Raises:
+        HTTPException:
+        401 with a logout message.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Logged out successfully.",
+        headers=None
+    )
 
 
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         session_token: Optional[str] = Cookie(None), video_name: Optional[str] = Cookie(None),
+                         video_name: Optional[str] = Cookie(None),
                          credentials: HTTPBasicCredentials = Depends(security)) -> Union[RedirectResponse,
                                                                                          StreamingResponse]:
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
         request: Takes the ``Request`` class as an argument.
-        session_token: Token stored in cookies.
         video_name: Name of the video file that has to be rendered.
         range: Header information.
         credentials: HTTPBasicCredentials for authentication.
 
     Returns:
         Union[RedirectResponse, StreamingResponse]:
-        Streams the video name received as cookie if session token is valid, redirects to login page otherwise.
+        Streams the video name received as cookie.
     """
-    if session_token != settings.SESSION_TOKEN:
-        await verify_auth(credentials=credentials)
+    await verify_auth(credentials=credentials)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)
