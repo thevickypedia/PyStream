@@ -14,6 +14,7 @@
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Button CSS -->
     <style>
         .home {
             position: absolute; /* relative or fixed or absolute; */
@@ -49,7 +50,8 @@
             cursor: pointer;
         }
     </style>
-    <style type="text/css">
+    <!-- Video, title and body CSS -->
+    <style>
         video {
             margin-left: auto;
             margin-right: auto;
@@ -58,25 +60,8 @@
         body {
             font-family: 'PT Serif', serif;
         }
-        .content{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 4px 24px 0 #ddd;
-            box-sizing: border-box;
-            padding: 20px;
-            font-family: arial;
-        }
-        .content h1{
-            font-size: 58px;
-            font-weight: 100;
-            margin: 0 0 20px;
-        }
-        .content .text{
-            line-height: 23px;
-            font-size: 15px;
-            color: #444;
+        h1 {
+            text-align: center;
         }
     </style>
     <!-- Night mode CSS -->
@@ -126,39 +111,38 @@
 </head>
 <body translate="no">
 <div class="toggler fa fa-moon-o"></div>
-<h1 class="center">{{ TITLE }}</h1>
+<h1>{{title}}</h1>
 <hr>
 <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
 <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
 <video width="1000" controls muted="muted" style="position: relative">
-    <source src="{{ VIDEO_HOST_URL }}" type="video/mp4"/>
+    <source src="{{url}}" type="video/mp4"/>
 </video>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script id="rendered-js">
-        var theme = window.localStorage.currentTheme;
-        $('body').addClass(theme);
-        if ($("body").hasClass("night")) {
-            $('.toggler').addClass('fa-sun-o');
-            $('.toggler').removeClass('fa-moon-o');
-        } else {
-            $('.toggler').removeClass('fa-sun-o');
-            $('.toggler').addClass('fa-moon-o');
-        }
-        $('.toggler').click(function () {
-        $('.toggler').toggleClass('fa-sun-o');
-        $('.toggler').toggleClass('fa-moon-o');
-        if ($("body").hasClass("night")) {
-            $('body').toggleClass('night');
-            localStorage.removeItem('currentTheme');
-            localStorage.currentTheme = "day";
-        } else {
-            $('body').toggleClass('night');
-            localStorage.removeItem('currentTheme');
-            localStorage.currentTheme = "night";
-        }
-        });
-        //# sourceURL=pen.js
+    var theme = window.localStorage.currentTheme;
+    $('body').addClass(theme);
+    if ($("body").hasClass("night")) {
+        $('.toggler').addClass('fa-sun-o');
+        $('.toggler').removeClass('fa-moon-o');
+    } else {
+        $('.toggler').removeClass('fa-sun-o');
+        $('.toggler').addClass('fa-moon-o');
+    }
+    $('.toggler').click(function () {
+    $('.toggler').toggleClass('fa-sun-o');
+    $('.toggler').toggleClass('fa-moon-o');
+    if ($("body").hasClass("night")) {
+         $('body').toggleClass('night');
+         localStorage.removeItem('currentTheme');
+         localStorage.currentTheme = "day";
+    } else {
+         $('body').toggleClass('night');
+         localStorage.removeItem('currentTheme');
+         localStorage.currentTheme = "night";
+    }
+    });
 
 </script>
 <script>

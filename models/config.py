@@ -15,7 +15,6 @@ class EnvConfig(BaseSettings):
     username: str = Field(default=..., env="USERNAME")
     password: str = Field(default=..., env="PASSWORD")
 
-    video_title: str = Field(default="Video Streaming via FastAPI", env="VIDEO_TITLE")
     video_host: IPvAnyAddress = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
     video_source: DirectoryPath = Field(default="source", env="VIDEO_SOURCE")
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")

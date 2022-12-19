@@ -121,8 +121,8 @@ async def stream(request: Request, video_name: str,
     """
     await verify_auth(credentials=credentials)
     response = templates.TemplateResponse(name=fileio.name,
-                                          context={"request": request, "TITLE": env.video_title,
-                                                   "VIDEO_HOST_URL": f"http://{env.video_host}:{env.video_port}/video"},
+                                          context={"request": request, "title": video_name,
+                                                   "url": f"http://{env.video_host}:{env.video_port}/video"},
                                           headers=None)
     response.set_cookie(key='video_name', value=video_name, httponly=True)
     return response
