@@ -21,12 +21,12 @@ logger = logging.getLogger(name="uvicorn.default")
 app = FastAPI()
 app.mount(f"/{env.video_source}", StaticFiles(directory=env.video_source), name="Video Dump")
 
-templates = Jinja2Templates(directory=fileio.templates)
+templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
-file_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}") if not f.startswith(".")]
-file_path.sort(key=lambda a: a.lower())
+source_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}") if not f.startswith(".")]
+source_path.sort(key=lambda a: a.lower())
 
 
 @app.on_event(event_type="startup")
@@ -101,7 +101,7 @@ async def login(request: Request,
     """
     await verify_auth(credentials=credentials)
     return templates.TemplateResponse(
-        name=fileio.list_files, context={"request": request, "files": file_path}
+        name=fileio.list_files, context={"request": request, "files": source_path}
     )
 
 
@@ -175,8 +175,7 @@ def _get_range_header(range_header: str,
     return start, end
 
 
-def range_requests_response(range_header: str,
-                            file_path: str) -> StreamingResponse:
+def range_requests_response(range_header: str, file_path: str) -> StreamingResponse:
     """Returns StreamingResponse using Range Requests of a given file.
 
     Args:

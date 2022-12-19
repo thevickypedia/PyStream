@@ -13,17 +13,81 @@
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
-</head>
-<style type="text/css">
-        @import url('//netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css');
-        body{
-            font-family: 'PT Serif', serif;
-            background-color: #ececec;
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .home {
+            position: absolute; /* relative or fixed or absolute; */
+            top: 3.8%;
+            right: 218px;
+            background-color: #4169E1;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
         }
+        .back {
+            position: absolute; /* relative or fixed or absolute; */
+            top: 3.8%;
+            right: 130px;
+            background-color: #4169E1;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .logout {
+            position: absolute; /* relative or fixed or absolute; */
+            top: 3.8%;
+            right: 30px;
+            background-color: #4169E1;
+            border: none;
+            color: white;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <style type="text/css">
         video {
             margin-left: auto;
             margin-right: auto;
             display: block
+        }
+        body {
+            font-family: 'PT Serif', serif;
+        }
+        .content{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 24px 0 #ddd;
+            box-sizing: border-box;
+            padding: 20px;
+            font-family: arial;
+        }
+        .content h1{
+            font-size: 58px;
+            font-weight: 100;
+            margin: 0 0 20px;
+        }
+        .content .text{
+            line-height: 23px;
+            font-size: 15px;
+            color: #444;
+        }
+    </style>
+    <!-- Night mode CSS -->
+    <style>
+        @import url('//netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css');
+        body{
+            background-color: #ececec;
+            /* IF You Need Transition -webkit-transition: all 0.2s;
+            -moz-transition: all 0.2s;
+            transition: all 0.2s;
+            */
         }
         .night{
             background-color: #151515;
@@ -50,57 +114,23 @@
             background-color: #212121;
             color:#ccc;
         }
-        /* Optional */
-        .content{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 4px 24px 0 #ddd;
-            box-sizing: border-box;
-            padding: 20px;
-            font-family: arial;
-        }
-        .content h1{
-            font-size: 58px;
-            font-weight: 100;
-            margin: 0 0 20px;
-        }
-        .content .text{
-            line-height: 23px;
-            font-size: 15px;
-            color: #444;
-        }
         .night *{
-            color: #f0f0f0 !important;
+            color: #999 !important;
             box-shadow: none;
         }
         .night .content{
             border: 1px solid #999;
         }
-        .tab {
-            margin-left: 40px;
-        }
-        p.center {
-            text-align: center;
-        }
-        div {
-            height: 1em;
-        }
-        .dotted {
-            border-bottom: 3px dotted #757575;
-            margin-bottom: 1px;
-        }
-        .cent {
-            margin-top: 1%;
-            text-align: center;
-            font-size: 120%;
-        }
 
-</style>
+    </style>
+</head>
 <body translate="no">
 <div class="toggler fa fa-moon-o"></div>
-<p class="center">{{ TITLE }}</p>
+<h1 class="center">{{ TITLE }}</h1>
+<hr>
+<button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
+<button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
+<button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
 <video width="1000" controls muted="muted" style="position: relative">
     <source src="{{ VIDEO_HOST_URL }}" type="video/mp4"/>
 </video>
@@ -129,6 +159,18 @@
         }
         });
         //# sourceURL=pen.js
+
+</script>
+<script>
+    function logOut() {
+        window.location.href = window.location.origin + '/clear-session';
+    }
+    function goHome() {
+        window.location.href = window.location.origin;
+    }
+    function goBack() {
+        window.history.back();
+    }
 
 </script>
 </body>

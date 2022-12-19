@@ -50,7 +50,8 @@ class APIHandler(Process):
             "host": env.video_host,
             "port": env.video_port,
             "reload": True,
-            "log_config": log_config
+            "log_config": log_config,
+            "workers": env.workers
         }
 
         config = uvicorn.Config(**argument_dict)

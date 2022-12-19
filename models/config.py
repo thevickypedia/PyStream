@@ -13,13 +13,14 @@ class EnvConfig(BaseSettings):
     """
 
     username: str = Field(default=..., env="USERNAME")
-    password: str = Field(..., env="PASSWORD")
+    password: str = Field(default=..., env="PASSWORD")
 
     video_title: str = Field(default="Video Streaming via FastAPI", env="VIDEO_TITLE")
     video_host: IPvAnyAddress = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
     video_source: DirectoryPath = Field(default="source", env="VIDEO_SOURCE")
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
     website: HttpUrl = Field(default="https://vigneshrao.com", env="WEBSITE")
+    workers: int = Field(default=1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
 
     class Config:
         """Environment variables configuration."""
@@ -37,7 +38,6 @@ class FileIO(BaseSettings):
 
     name: str = "index.html"
     list_files: str = "list_files.html"
-    templates: DirectoryPath = os.path.join(os.getcwd(), "templates")
 
 
 class Settings(BaseSettings):
