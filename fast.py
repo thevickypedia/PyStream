@@ -25,7 +25,7 @@ templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
-source_path = [f"stream/{f}" for f in os.listdir(f"./{env.video_source}") if not f.startswith(".")]
+source_path = [os.path.join("stream", file) for file in os.listdir(env.video_source) if not file.startswith(".")]
 source_path.sort(key=lambda a: a.lower())
 
 
