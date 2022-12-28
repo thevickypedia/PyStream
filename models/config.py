@@ -18,7 +18,7 @@ class EnvConfig(BaseSettings):
     video_host: IPvAnyAddress = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
     video_source: DirectoryPath = Field(default="source", env="VIDEO_SOURCE")
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
-    website: HttpUrl = Field(default="https://vigneshrao.com", env="WEBSITE")
+    website: HttpUrl = Field(default=None, env="WEBSITE")
     workers: int = Field(default=1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
 
     class Config:
@@ -48,11 +48,15 @@ class Settings(BaseSettings):
 
     HOSTS: list = []
     CHUNK_SIZE: PositiveInt = 1024 * 1024
+    FAKE_DIR: str = "stream"
 
 
 env = EnvConfig()
 fileio = FileIO()
 settings = Settings()
 
-env.website = env.website.lstrip(f"{env.website.scheme}://")
+if not os.listdir(env.video_source):
+    raise FileNotFoundError(f"no files found in {env.video_source!r}")
+if env.website:
+    env.website = env.website.lstrip(f"{env.website.scheme}://")
 env.video_host = str(env.video_host)

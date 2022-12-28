@@ -3,8 +3,7 @@ import mimetypes
 import os
 from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 
-from fastapi import (Depends, FastAPI, Header, HTTPException, Request,
-                     status)
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (FileResponse, HTMLResponse, RedirectResponse,
                                StreamingResponse)
@@ -25,7 +24,8 @@ templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
-source_path = [os.path.join("stream", file) for file in os.listdir(env.video_source) if not file.startswith(".")]
+source_path = [os.path.join(settings.FAKE_DIR, file) for file in os.listdir(env.video_source)
+               if not file.startswith(".")]
 source_path.sort(key=lambda a: a.lower())
 
 
@@ -46,12 +46,16 @@ async def enable_cors() -> None:
     """Allow ``CORS: Cross-Origin Resource Sharing`` to allow restricted resources on the API."""
     origins = [
         "http://localhost.com",
-        "https://localhost.com",
-        f"http://{env.website}",
-        f"https://{env.website}",
-        f"http://{env.website}/*",
-        f"https://{env.website}/*",
+        "https://localhost.com"
     ]
+
+    if env.website:
+        origins.extend([
+            f"http://{env.website}",
+            f"https://{env.website}",
+            f"http://{env.website}/*",
+            f"https://{env.website}/*"
+        ])
 
     app.add_middleware(
         CORSMiddleware,
@@ -105,7 +109,7 @@ async def login(request: Request,
     )
 
 
-@app.get("/stream/{video_name}")
+@app.get("/%s/{video_name}" % settings.FAKE_DIR)  # noqa: SFS101
 async def stream(request: Request, video_name: str,
                  credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Returns the template for streaming page.
