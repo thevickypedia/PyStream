@@ -13,7 +13,12 @@
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
+    <!-- Font Awesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- CSS and JS for night mode -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script type="text/javascript" src="https://vigneshrao.com/nightmode/night.js" defer></script>
+    <link rel="stylesheet" href="https://vigneshrao.com/nightmode/night.css">
     <!-- Button CSS -->
     <style>
         .home {
@@ -79,50 +84,6 @@
             font-family: 'PT Serif', serif;
         }
     </style>
-    <!-- Night mode CSS -->
-    <style>
-        @import url('//netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css');
-        body{
-            background-color: #ececec;
-            /* IF You Need Transition -webkit-transition: all 0.2s;
-            -moz-transition: all 0.2s;
-            transition: all 0.2s;
-            */
-        }
-        .night{
-            background-color: #151515;
-        }
-        .toggler{
-            font-size: 28px;
-            border-radius: 100px;
-            background-color: #111111;
-            padding: 15px;
-            color:#fcfcfc;
-            box-shadow: 1px 2px 6px rgba(0,0,0,.3);
-            cursor: pointer;
-            position: fixed;
-            bottom:20px;
-            right: 20px;
-            -webkit-transition: all 0.2s;
-            -moz-transition: all 0.2s;
-            transition: all 0.2s;
-        }
-        .fa-moon-o:before{
-            padding:0 2px;
-        }
-        .fa-sun-o{
-            background-color: #212121;
-            color:#ccc;
-        }
-        .night *{
-            color: #999 !important;
-            box-shadow: none;
-        }
-        .night .content{
-            border: 1px solid #999;
-        }
-
-    </style>
 </head>
 <body translate="no">
 <div class="toggler fa fa-moon-o"></div>
@@ -137,32 +98,6 @@
     {% endfor %}
 </ol>
 <hr>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-<script id="rendered-js">
-    var theme = window.localStorage.currentTheme;
-    $('body').addClass(theme);
-    if ($("body").hasClass("night")) {
-        $('.toggler').addClass('fa-sun-o');
-        $('.toggler').removeClass('fa-moon-o');
-    } else {
-        $('.toggler').removeClass('fa-sun-o');
-        $('.toggler').addClass('fa-moon-o');
-    }
-    $('.toggler').click(function () {
-    $('.toggler').toggleClass('fa-sun-o');
-    $('.toggler').toggleClass('fa-moon-o');
-    if ($("body").hasClass("night")) {
-         $('body').toggleClass('night');
-         localStorage.removeItem('currentTheme');
-         localStorage.currentTheme = "day";
-    } else {
-         $('body').toggleClass('night');
-         localStorage.removeItem('currentTheme');
-         localStorage.currentTheme = "night";
-    }
-    });
-
-</script>
 <script>
     function logOut() {
         window.location.href = window.location.origin + '/logout';
