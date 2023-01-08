@@ -1,8 +1,10 @@
 import logging
 import mimetypes
 import os
+from multiprocessing import Process
 from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 
+import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import (FileResponse, HTMLResponse, RedirectResponse,
@@ -14,6 +16,7 @@ from uvicorn._logging import ColourizedFormatter  # noqa: PyProtectedMember
 
 from models.config import env, fileio, settings
 from models.settings import verify_auth
+from ngrok import run_tunnel
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -27,6 +30,7 @@ security = HTTPBasic(realm="simple")
 source_path = [os.path.join(settings.FAKE_DIR, file) for file in os.listdir(env.video_source)
                if not file.startswith(".")]
 source_path.sort(key=lambda a: a.lower())
+last_log = {'log': ''}
 
 
 @app.on_event(event_type="startup")
@@ -43,7 +47,7 @@ async def custom_logger() -> None:
 
 @app.on_event(event_type="startup")
 async def enable_cors() -> None:
-    """Allow ``CORS: Cross-Origin Resource Sharing`` to allow restricted resources on the API."""
+    """Add CORSMiddleware to allow restricted resources on the API. Start reverse proxy in a dedicated process."""
     origins = [
         "http://localhost.com",
         "https://localhost.com"
@@ -65,6 +69,8 @@ async def enable_cors() -> None:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    if env.ngrok_token:
+        Process(target=run_tunnel, args=(logger,)).start()
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)
@@ -243,7 +249,7 @@ async def logout(request: Request):
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
                          credentials: HTTPBasicCredentials = Depends(security)) -> Union[RedirectResponse,
-                                                                                         StreamingResponse]:
+StreamingResponse]:
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
@@ -266,7 +272,24 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
             logger.info(f"Connection received from {request.client.host} via {host}")
         if ua := request.headers.get('user-agent'):
             logger.info(f"User agent: {ua}")
-    logger.info(f"Streaming: {request.query_params['vid_name']}")
+    if last_log['log'] != request.query_params['vid_name']:
+        last_log['log'] = request.query_params['vid_name']
+        logger.info(f"Streaming: {request.query_params['vid_name']}")
     return range_requests_response(
         range_header=range, file_path=os.path.join(env.video_source, request.query_params['vid_name'])
     )
+
+
+if __name__ == '__main__':
+    # TODO: Implement choosing videos within sub-folders
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
+    argument_dict = {
+        "app": f"{__name__}:app",
+        "host": env.video_host,
+        "port": env.video_port,
+        "reload": True,
+        "log_config": log_config,
+        "workers": env.workers
+    }
+    uvicorn.run(**argument_dict)

@@ -20,6 +20,7 @@ class EnvConfig(BaseSettings):
     video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
     website: HttpUrl = Field(default=None, env="WEBSITE")
     workers: int = Field(default=1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
+    ngrok_token: str = Field(default=None, env="NGROK_AUTH")
 
     class Config:
         """Environment variables configuration."""
