@@ -1,11 +1,11 @@
-aiofiles==22.1.0
-fastapi==0.88.0
+aiofiles==23.1.0
+fastapi==0.88.0  # Pinned due to typehint dependencies in recent updates
+uvicorn==0.18.1  # Pinned as we use colorized formatter
+starlette==0.22.0  # Dependent on fastapi version
 Jinja2==3.1.2
-uvicorn==0.18.1
-python-dotenv==0.21.0
+python-dotenv==1.0.0
 itsdangerous==2.1.2
-starlette==0.22.0
-pydantic==1.10.2
-pydantic[dotenv]==1.10.2
+pydantic[dotenv]==1.10.6
 pyngrok==5.2.1
-requests==2.28.1
+requests
+websockets
