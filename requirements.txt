@@ -9,3 +9,4 @@ pydantic[dotenv]==1.10.6
 pyngrok==5.2.1
 requests
 websockets
+python-multipart

@@ -1,5 +1,7 @@
+import pathlib
 import logging
 import mimetypes
+from collections.abc import Generator
 import os
 from multiprocessing import Process
 from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
@@ -27,8 +29,28 @@ templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
+
+def get_stream_files() -> Generator[os.PathLike]:
+    """Get files to be streamed.
+
+    Yields:
+        Path for video files.
+    """
+    for __path, __directory, __file in os.walk(env.video_source):
+        if __path.endswith('__'):
+            continue
+        for file_ in __file:
+            if file_.startswith('__'):
+                continue
+            filepath = pathlib.PurePath(file_)
+            if filepath.suffix == '.mp4':
+                path = __path.replace(str(env.video_source), "")
+                yield os.path.join(settings.FAKE_DIR, path, filepath)
+
+
+# source_path = list(get_stream_files())
 source_path = [os.path.join(settings.FAKE_DIR, file) for file in os.listdir(env.video_source)
-               if not file.startswith(".")]
+               if not file.startswith(".") and file.endswith(".mp4")]
 source_path.sort(key=lambda a: a.lower())
 last_log = {'log': ''}
 
@@ -248,8 +270,8 @@ async def logout(request: Request):
 # noinspection PyShadowingBuiltins
 @app.get("/video")
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         credentials: HTTPBasicCredentials = Depends(security)) -> Union[RedirectResponse,
-StreamingResponse]:
+                         credentials: HTTPBasicCredentials = Depends(security)) \
+        -> Union[RedirectResponse, StreamingResponse]:
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
