@@ -5,11 +5,10 @@ from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasicCredentials
 
-from models.config import env
-from models.filters import RootFilter, VideoFilter
+from models import config, filters
 
-logging.getLogger("uvicorn.access").addFilter(VideoFilter())
-logging.getLogger("uvicorn.access").addFilter(RootFilter())
+logging.getLogger("uvicorn.access").addFilter(filters.VideoFilter())
+logging.getLogger("uvicorn.access").addFilter(filters.RootFilter())
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -31,8 +30,8 @@ async def verify_auth(credentials: HTTPBasicCredentials) -> JSONResponse:
             headers=None
         )
 
-    username_validation = secrets.compare_digest(credentials.username, env.username)
-    password_validation = secrets.compare_digest(credentials.password, env.password)
+    username_validation = secrets.compare_digest(credentials.username, config.env.username)
+    password_validation = secrets.compare_digest(credentials.password, config.env.password)
 
     if username_validation and password_validation:
         return JSONResponse(
@@ -43,7 +42,7 @@ async def verify_auth(credentials: HTTPBasicCredentials) -> JSONResponse:
         )
 
     logger.error("Incorrect username or password")
-    logger.error(credentials.dict())
+    logger.error(credentials.__dict__)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Incorrect username or password",

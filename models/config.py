@@ -1,7 +1,8 @@
 import os
 import socket
 
-from pydantic import (BaseSettings, DirectoryPath, Field, HttpUrl,
+from pydantic_settings import BaseSettings
+from pydantic import (DirectoryPath, Field, HttpUrl,
                       IPvAnyAddress, PositiveInt)
 
 
@@ -12,15 +13,15 @@ class EnvConfig(BaseSettings):
 
     """
 
-    username: str = Field(default=..., env="USERNAME")
-    password: str = Field(default=..., env="PASSWORD")
+    username: str
+    password: str
 
-    video_host: IPvAnyAddress = Field(default=socket.gethostbyname("localhost"), env="VIDEO_HOST")
-    video_source: DirectoryPath = Field(default="source", env="VIDEO_SOURCE")
-    video_port: PositiveInt = Field(default=8000, env="VIDEO_PORT")
-    website: HttpUrl = Field(default=None, env="WEBSITE")
-    workers: int = Field(default=1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
-    ngrok_token: str = Field(default=None, env="NGROK_AUTH")
+    video_port: PositiveInt = 8000
+    website: HttpUrl | None = None
+    ngrok_token: str | None = None
+    video_source: DirectoryPath = "source"
+    workers: int = Field(1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
+    video_host: IPvAnyAddress = socket.gethostbyname("localhost")
 
     class Config:
         """Environment variables configuration."""
@@ -58,6 +59,4 @@ settings = Settings()
 
 if not os.listdir(env.video_source):
     raise FileNotFoundError(f"no files found in {env.video_source!r}")
-if env.website:
-    env.website = env.website.lstrip(f"{env.website.scheme}://")
 env.video_host = str(env.video_host)

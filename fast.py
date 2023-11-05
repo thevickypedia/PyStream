@@ -1,7 +1,5 @@
-import pathlib
 import logging
 import mimetypes
-from collections.abc import Generator
 import os
 from multiprocessing import Process
 from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
@@ -9,90 +7,59 @@ from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import (FileResponse, HTMLResponse, RedirectResponse,
+from fastapi.responses import (FileResponse, RedirectResponse,
                                StreamingResponse)
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from uvicorn._logging import ColourizedFormatter  # noqa: PyProtectedMember
+from uvicorn.logging import ColourizedFormatter
 
-from models.config import env, fileio, settings
-from models.settings import verify_auth
-from ngrok import run_tunnel
+from models import config, ngrok, settings, squire
 
 logger = logging.getLogger(name="uvicorn.default")
 
 app = FastAPI()
-app.mount(f"/{env.video_source}", StaticFiles(directory=env.video_source), name="Video Dump")
+app.mount(f"/{config.env.video_source}", StaticFiles(directory=config.env.video_source), name="Video Dump")
 
 templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
 
-def get_stream_files() -> Generator[os.PathLike]:
-    """Get files to be streamed.
-
-    Yields:
-        Path for video files.
-    """
-    for __path, __directory, __file in os.walk(env.video_source):
-        if __path.endswith('__'):
-            continue
-        for file_ in __file:
-            if file_.startswith('__'):
-                continue
-            filepath = pathlib.PurePath(file_)
-            if filepath.suffix == '.mp4':
-                path = __path.replace(str(env.video_source), "")
-                yield os.path.join(settings.FAKE_DIR, path, filepath)
-
-
-# source_path = list(get_stream_files())
-source_path = [os.path.join(settings.FAKE_DIR, file) for file in os.listdir(env.video_source)
+# source_path = list(squire.get_stream_files())
+source_path = [os.path.join(config.settings.FAKE_DIR, file) for file in os.listdir(config.env.video_source)
                if not file.startswith(".") and file.endswith(".mp4")]
 source_path.sort(key=lambda a: a.lower())
 last_log = {'log': ''}
 
+logger.propagate = False  # Disable existing default logging and wrap a new one
+console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
+                                        use_colors=True)
+handler = logging.StreamHandler()
+handler.setFormatter(fmt=console_formatter)
+logger.addHandler(hdlr=handler)
+logger.info('Setting CORS policy.')
 
-@app.on_event(event_type="startup")
-async def custom_logger() -> None:
-    """Disable existing logging propagation and override uvicorn access log using colorized log format."""
-    logger.propagate = False  # Disable existing default logging and wrap a new one
-    console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
-                                            use_colors=True)
-    handler = logging.StreamHandler()
-    handler.setFormatter(fmt=console_formatter)
-    logger.addHandler(hdlr=handler)
-    logger.info('Setting CORS policy.')
+origins = ["http://localhost.com", "https://localhost.com"]
 
+if config.env.website:
+    origins.extend([
+        f"http://{config.env.website.host}",
+        f"https://{config.env.website.host}",
+        f"http://{config.env.website.host}/*",
+        f"https://{config.env.website.host}/*"
+    ])
 
-@app.on_event(event_type="startup")
-async def enable_cors() -> None:
-    """Add CORSMiddleware to allow restricted resources on the API. Start reverse proxy in a dedicated process."""
-    origins = [
-        "http://localhost.com",
-        "https://localhost.com"
-    ]
-
-    if env.website:
-        origins.extend([
-            f"http://{env.website}",
-            f"https://{env.website}",
-            f"http://{env.website}/*",
-            f"https://{env.website}/*"
-        ])
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-    if env.ngrok_token:
-        Process(target=run_tunnel, args=(logger,)).start()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+if config.env.ngrok_token:
+    Process(target=ngrok.run_tunnel, args=(logger,)).start()
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)
@@ -118,7 +85,7 @@ async def root() -> RedirectResponse:
     return RedirectResponse(url="/login", headers=None)
 
 
-@app.get("/login", response_class=HTMLResponse)
+@app.get("/login", response_model=None)
 async def login(request: Request,
                 credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Login request handler.
@@ -131,13 +98,13 @@ async def login(request: Request,
         templates.TemplateResponse:
         Template response for listing page.
     """
-    await verify_auth(credentials=credentials)
+    await settings.verify_auth(credentials=credentials)
     return templates.TemplateResponse(
-        name=fileio.list_files, context={"request": request, "files": source_path}
+        name=config.fileio.list_files, context={"request": request, "files": source_path}
     )
 
 
-@app.get("/%s/{video_name}" % settings.FAKE_DIR)  # noqa: SFS101
+@app.get("/%s/{video_name}" % config.settings.FAKE_DIR, response_model=None)
 async def stream(request: Request, video_name: str,
                  credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Returns the template for streaming page.
@@ -151,13 +118,12 @@ async def stream(request: Request, video_name: str,
         templates.TemplateResponse:
         Template response for streaming page.
     """
-    await verify_auth(credentials=credentials)
-    return templates.TemplateResponse(name=fileio.name,
-                                      context={
-                                          "request": request, "title": video_name,
-                                          "url": f"http://{env.video_host}:{env.video_port}/video?vid_name={video_name}"
-                                      },
-                                      headers=None)
+    await settings.verify_auth(credentials=credentials)
+    return templates.TemplateResponse(
+        name=config.fileio.name, headers=None,
+        context={"request": request, "title": video_name,
+                 "url": f"http://{config.env.video_host}:{config.env.video_port}/video?vid_name={video_name}"},
+    )
 
 
 def send_bytes_range_requests(file_obj: BinaryIO,
@@ -176,7 +142,7 @@ def send_bytes_range_requests(file_obj: BinaryIO,
     with file_obj as streamer:
         streamer.seek(start)
         while (pos := streamer.tell()) <= end:
-            read_size = min(settings.CHUNK_SIZE, end + 1 - pos)
+            read_size = min(config.settings.CHUNK_SIZE, end + 1 - pos)
             yield streamer.read(read_size)
 
 
@@ -268,7 +234,7 @@ async def logout(request: Request):
 
 
 # noinspection PyShadowingBuiltins
-@app.get("/video")
+@app.get("/video", response_model=None)
 async def video_endpoint(request: Request, range: Optional[str] = Header(None),
                          credentials: HTTPBasicCredentials = Depends(security)) \
         -> Union[RedirectResponse, StreamingResponse]:
@@ -283,13 +249,13 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         Union[RedirectResponse, StreamingResponse]:
         Streams the video name received as cookie.
     """
-    await verify_auth(credentials=credentials)
+    await settings.verify_auth(credentials=credentials)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)
 
-    if request.client.host not in settings.HOSTS:
-        settings.HOSTS.append(request.client.host)
+    if request.client.host not in config.settings.HOSTS:
+        config.settings.HOSTS.append(request.client.host)
         if host := request.headers.get('host'):
             logger.info(f"Connection received from {request.client.host} via {host}")
         if ua := request.headers.get('user-agent'):
@@ -298,7 +264,7 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         last_log['log'] = request.query_params['vid_name']
         logger.info(f"Streaming: {request.query_params['vid_name']}")
     return range_requests_response(
-        range_header=range, file_path=os.path.join(env.video_source, request.query_params['vid_name'])
+        range_header=range, file_path=os.path.join(config.env.video_source, request.query_params['vid_name'])
     )
 
 
@@ -308,10 +274,10 @@ if __name__ == '__main__':
     log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
     argument_dict = {
         "app": f"{__name__}:app",
-        "host": env.video_host,
-        "port": env.video_port,
+        "host": config.env.video_host,
+        "port": config.env.video_port,
         "reload": True,
         "log_config": log_config,
-        "workers": env.workers
+        "workers": config.env.workers
     }
     uvicorn.run(**argument_dict)
