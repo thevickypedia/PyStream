@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from uvicorn.logging import ColourizedFormatter
 
-from models import config, ngrok, settings, squire
+from models import config, ngrok, settings
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -26,7 +26,6 @@ templates = Jinja2Templates(directory="templates")
 security = HTTPBasic(realm="simple")
 
 
-# source_path = list(squire.get_stream_files())
 source_path = [os.path.join(config.settings.FAKE_DIR, file) for file in os.listdir(config.env.video_source)
                if not file.startswith(".") and file.endswith(".mp4")]
 source_path.sort(key=lambda a: a.lower())
