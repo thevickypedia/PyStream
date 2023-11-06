@@ -264,6 +264,8 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
 
 
 if __name__ == '__main__':
+    # todo: Implement websockets to set a counter clock and logout automatically after a set timeout
+    # todo: Fix invisible buttons in light mode (index.html and list_files.html)
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
     # reload flag is set to false,
