@@ -3,9 +3,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>FastAPI video streaming</title>
-    <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-Control"/>
-    <meta content="no-cache" http-equiv="Pragma"/>
-    <meta content="0" http-equiv="Expires"/>
+    <meta content="no-cache, no-store, must-revalidate" http-equiv="content-type"/>
+    <meta content="no-cache" http-equiv="refresh"/>
     <meta property="og:type" content="VideoStreaming">
     <meta name="keywords" content="Python, streaming, fastapi, JavaScript, HTML, CSS">
     <meta name="author" content="Vignesh Rao">
@@ -72,11 +71,11 @@
 </head>
 <body translate="no">
 <div class="toggler fa fa-moon-o"></div>
-<h1>{{title}}</h1>
-<hr>
 <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
 <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
+<br><br>
+<h1>{{title}}</h1>
 <video width="1000" controls muted="muted" style="position: relative">
     <source src="{{url}}" type="video/mp4"/>
 </video>

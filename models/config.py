@@ -28,6 +28,7 @@ class EnvConfig(BaseSettings):
 
         env_prefix = ""
         env_file = ".env"
+        extra = "ignore"
 
 
 class FileIO(BaseSettings):

@@ -7,10 +7,8 @@ from typing import AsyncIterable, BinaryIO, ByteString, Optional, Tuple, Union
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import (FileResponse, RedirectResponse,
-                               StreamingResponse)
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from uvicorn.logging import ColourizedFormatter
 
@@ -19,12 +17,10 @@ from models import config, ngrok, settings
 logger = logging.getLogger(name="uvicorn.default")
 
 app = FastAPI()
-app.mount(f"/{config.env.video_source}", StaticFiles(directory=config.env.video_source), name="Video Dump")
 
 templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
-
 
 source_path = [os.path.join(config.settings.FAKE_DIR, file) for file in os.listdir(config.env.video_source)
                if not file.startswith(".") and file.endswith(".mp4")]
@@ -198,7 +194,7 @@ def range_requests_response(range_header: str, file_path: str) -> StreamingRespo
     end = file_size - 1
     status_code = status.HTTP_200_OK
 
-    if range_header is not None:
+    if range_header:
         start, end = _get_range_header(range_header=range_header, file_size=file_size)
         size = end - start + 1
         headers["content-length"] = str(size)
