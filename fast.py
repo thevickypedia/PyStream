@@ -12,7 +12,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from uvicorn.logging import ColourizedFormatter
 
-from models import config, ngrok, settings
+from models import config, ngrok, settings, squire
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -22,9 +22,7 @@ templates = Jinja2Templates(directory="templates")
 
 security = HTTPBasic(realm="simple")
 
-source_path = [os.path.join(config.settings.FAKE_DIR, file) for file in os.listdir(config.env.video_source)
-               if not file.startswith(".") and file.endswith(".mp4")]
-source_path.sort(key=lambda a: a.lower())
+source_path = list(squire.get_stream_files())
 last_log = {'log': ''}
 
 logger.propagate = False  # Disable existing default logging and wrap a new one
@@ -99,14 +97,15 @@ async def login(request: Request,
     )
 
 
-@app.get("/%s/{video_name}" % config.settings.FAKE_DIR, response_model=None)
-async def stream(request: Request, video_name: str,
-                 credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
+@app.get("/%s/{video_path:path}" % config.settings.FAKE_DIR, response_model=None)
+async def stream_video(request: Request,
+                       video_path: str,
+                       credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Returns the template for streaming page.
 
     Args:
         request: Takes the ``Request`` class as an argument.
-        video_name: Name of the video file that has to be rendered.
+        video_path: Path of the video file that has to be rendered.
         credentials: HTTPBasicCredentials for authentication.
 
     Returns:
@@ -114,11 +113,15 @@ async def stream(request: Request, video_name: str,
         Template response for streaming page.
     """
     await settings.verify_auth(credentials=credentials)
-    return templates.TemplateResponse(
-        name=config.fileio.name, headers=None,
-        context={"request": request, "title": video_name,
-                 "url": f"http://{config.env.video_host}:{config.env.video_port}/video?vid_name={video_name}"},
-    )
+    video_file = config.env.video_source / video_path
+    if video_file.exists():
+        return templates.TemplateResponse(
+            name=config.fileio.name, headers=None,
+            context={"request": request, "title": video_path,
+                     "url": f"http://{config.env.video_host}:{config.env.video_port}/video?vid_name={video_file}"},
+        )
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 
 
 def send_bytes_range_requests(file_obj: BinaryIO,
@@ -264,14 +267,16 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
 
 
 if __name__ == '__main__':
-    # TODO: Implement choosing videos within sub-folders
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
+    # reload flag is set to false,
+    #   1: reloading in the middle of streaming will make the process to wait for the connection to close
+    #   2: connection will be open as long as the streaming stops (this is a circular dependency)
     argument_dict = {
         "app": f"{__name__}:app",
         "host": config.env.video_host,
         "port": config.env.video_port,
-        "reload": True,
+        "reload": False,
         "log_config": log_config,
         "workers": config.env.workers
     }
