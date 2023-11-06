@@ -51,8 +51,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-if config.env.ngrok_token:
-    Process(target=ngrok.run_tunnel, args=(logger,)).start()
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)
@@ -117,8 +115,7 @@ async def stream_video(request: Request,
     if video_file.exists():
         return templates.TemplateResponse(
             name=config.fileio.name, headers=None,
-            context={"request": request, "title": video_path,
-                     "url": f"http://{config.env.video_host}:{config.env.video_port}/video?vid_name={video_file}"},
+            context={"request": request, "title": video_path, "path": f"video?vid_name={video_file}"}
         )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
@@ -280,4 +277,6 @@ if __name__ == '__main__':
         "log_config": log_config,
         "workers": config.env.workers
     }
+    if config.env.ngrok_token:
+        Process(target=ngrok.run_tunnel, args=(logger,)).start()
     uvicorn.run(**argument_dict)

@@ -76,9 +76,25 @@
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
 <br><br>
 <h1>{{title}}</h1>
-<video width="1000" controls muted="muted" style="position: relative">
-    <source src="{{url}}" type="video/mp4"/>
+<video id="video-player" width="1000" controls muted="muted" style="position: relative">
+    <source id="video-source" type="video/mp4" />
 </video>
+<script>
+    var path = "{{ path }}"; // Get the path variable from Jinja template
+    var origin = window.location.origin; // Get the current origin using JavaScript
+
+    // Construct the video source URL by combining origin and path
+    var videoSource = origin + '/' + path;
+
+    // Set the source URL for the video element
+    var videoElement = document.getElementById("video-source");
+    videoElement.setAttribute("src", videoSource);
+
+    // Load and play the video
+    var videoPlayer = document.getElementById("video-player");
+    videoPlayer.load(); // Load the video
+    // videoPlayer.play(); // Play the video
+</script>
 <script>
     function logOut() {
         window.location.href = window.location.origin + '/logout';
