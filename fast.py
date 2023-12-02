@@ -1,3 +1,4 @@
+import urllib.parse
 import logging
 import mimetypes
 import os
@@ -25,7 +26,6 @@ security = HTTPBasic(realm="simple")
 source_path = list(squire.get_stream_files())
 last_log = {'log': ''}
 
-logger.propagate = False  # Disable existing default logging and wrap a new one
 console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
                                         use_colors=True)
 handler = logging.StreamHandler()
@@ -115,7 +115,8 @@ async def stream_video(request: Request,
     if video_file.exists():
         return templates.TemplateResponse(
             name=config.fileio.name, headers=None,
-            context={"request": request, "title": video_path, "path": f"video?vid_name={video_file}"}
+            context={"request": request, "title": video_path,
+                     "path": f"video?vid_name={urllib.parse.quote(str(video_file))}"}
         )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
@@ -200,6 +201,8 @@ def range_requests_response(range_header: str, file_path: str) -> StreamingRespo
         headers["content-length"] = str(size)
         headers["content-range"] = f"bytes {start}-{end}/{file_size}"
         status_code = status.HTTP_206_PARTIAL_CONTENT
+
+    # todo: iterate and yield and return the iterated info
 
     return StreamingResponse(
         content=send_bytes_range_requests(open(file_path, mode="rb"), start, end),
