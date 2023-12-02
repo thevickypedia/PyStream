@@ -13,7 +13,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from uvicorn.logging import ColourizedFormatter
 
-from models import config, ngrok, settings, squire
+from models import config, ngrok, authenticator, squire
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -89,13 +89,13 @@ async def login(request: Request,
         templates.TemplateResponse:
         Template response for listing page.
     """
-    await settings.verify_auth(credentials=credentials)
+    await authenticator.verify(credentials)
     return templates.TemplateResponse(
         name=config.fileio.list_files, context={"request": request, "files": source_path}
     )
 
 
-@app.get("/%s/{video_path:path}" % config.settings.FAKE_DIR, response_model=None)
+@app.get("/%s/{video_path:path}" % config.settings.VAULT, response_model=None)
 async def stream_video(request: Request,
                        video_path: str,
                        credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
@@ -110,7 +110,7 @@ async def stream_video(request: Request,
         templates.TemplateResponse:
         Template response for streaming page.
     """
-    await settings.verify_auth(credentials=credentials)
+    await authenticator.verify(credentials)
     video_file = config.env.video_source / video_path
     if video_file.exists():
         return templates.TemplateResponse(
@@ -247,7 +247,7 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         Union[RedirectResponse, StreamingResponse]:
         Streams the video name received as cookie.
     """
-    await settings.verify_auth(credentials=credentials)
+    await authenticator.verify(credentials)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)

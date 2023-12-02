@@ -19,11 +19,11 @@ def get_stream_files() -> Generator[os.PathLike]:
             if file_.endswith('.mp4'):
                 path = __path.replace(str(config.env.video_source), "")
                 if not path:
-                    value = os.path.join(config.settings.FAKE_DIR, file_)
+                    value = os.path.join(config.settings.VAULT, file_)
                 elif path.startswith("/"):
-                    value = config.settings.FAKE_DIR + path + os.path.sep + file_
+                    value = config.settings.VAULT + path + os.path.sep + file_
                 else:
-                    value = config.settings.FAKE_DIR + os.path.sep + path + os.path.sep + file_
+                    value = config.settings.VAULT + os.path.sep + path + os.path.sep + file_
                 yield value
 
 
@@ -43,12 +43,12 @@ def get_stream_files_as_dict() -> dict:
             if file_.endswith('.mp4'):
                 path = __path.replace(str(config.env.video_source), "")
                 if not path:
-                    final_dict[os.path.join(config.settings.FAKE_DIR, file_)] = (
+                    final_dict[os.path.join(config.settings.VAULT, file_)] = (
                         os.path.join(config.env.video_source, file_))
                 elif path.startswith("/"):
-                    final_dict[config.settings.FAKE_DIR + path + os.path.sep + file_] = (
+                    final_dict[config.settings.VAULT + path + os.path.sep + file_] = (
                             str(config.env.video_source) + path + os.path.sep + file_)
                 else:
-                    final_dict[config.settings.FAKE_DIR + os.path.sep + path + os.path.sep + file_] = (
+                    final_dict[config.settings.VAULT + os.path.sep + path + os.path.sep + file_] = (
                             str(config.env.video_source) + os.path.sep + path + os.path.sep + file_)
     return final_dict

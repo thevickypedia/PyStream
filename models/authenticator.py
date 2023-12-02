@@ -13,7 +13,7 @@ logging.getLogger("uvicorn.access").addFilter(filters.RootFilter())
 logger = logging.getLogger(name="uvicorn.default")
 
 
-async def verify_auth(credentials: HTTPBasicCredentials) -> JSONResponse:
+async def verify(credentials: HTTPBasicCredentials) -> JSONResponse:
     """Verifies authentication.
 
     Args:

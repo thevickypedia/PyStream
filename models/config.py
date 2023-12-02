@@ -33,14 +33,14 @@ class EnvConfig(BaseSettings):
 
     username: str
     password: str
+    video_source: DirectoryPath
 
     ip_hosted: bool = False
     video_port: PositiveInt = 8000
     website: HttpUrl | None = None
     ngrok_token: str | None = None
-    video_source: DirectoryPath = "source"
     video_host: IPv4Address = socket.gethostbyname("localhost")
-    workers: int = Field(1, le=int(os.cpu_count() / 2), ge=1, env="WORKERS")
+    workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
 
     class Config:
         """Environment variables configuration."""
@@ -86,7 +86,7 @@ class Settings(BaseSettings):
 
     HOSTS: list = []
     CHUNK_SIZE: PositiveInt = 1024 * 1024
-    FAKE_DIR: str = "stream"
+    VAULT: str = "stream"  # Use a masked location to hide the real path in the UI
 
 
 env = EnvConfig()
