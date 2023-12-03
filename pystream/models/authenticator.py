@@ -1,16 +1,11 @@
-import logging
 import secrets
 
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasicCredentials
 
-from pystream.models import config, filters
-
-logging.getLogger("uvicorn.access").addFilter(filters.VideoFilter())
-logging.getLogger("uvicorn.access").addFilter(filters.RootFilter())
-
-logger = logging.getLogger(name="uvicorn.default")
+from pystream.logger import logger
+from pystream.models import config
 
 
 async def verify(credentials: HTTPBasicCredentials) -> JSONResponse:

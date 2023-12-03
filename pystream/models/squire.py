@@ -1,7 +1,23 @@
 import os
 from collections.abc import Generator
 
+from fastapi import Request
+
+from pystream.logger import logger
 from pystream.models import config
+
+
+def log_connection(request: Request):
+    """Logs the connection information.
+
+    See Also:
+        - Only logs the first connection from a device.
+        - This avoids multiple logs when same device requests different videos.
+    """
+    if request.client.host not in config.session.info:
+        config.session.info[request.client.host] = None
+        logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
+        logger.info(f"User agent: {request.headers.get('user-agent')}")
 
 
 def get_stream_files() -> Generator[os.PathLike]:
