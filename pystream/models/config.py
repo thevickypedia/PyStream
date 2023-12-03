@@ -1,10 +1,10 @@
 import os
 import socket
-from enum import StrEnum
 from ipaddress import IPv4Address
 from typing import Union
 
-from pydantic import (DirectoryPath, Field, HttpUrl, field_validator, PositiveInt, ValidationInfo, BaseModel)
+from pydantic import (BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt,
+                      ValidationInfo, field_validator)
 from pydantic_settings import BaseSettings
 
 
@@ -47,24 +47,25 @@ class EnvConfig(BaseSettings):
         """Environment variables configuration."""
 
         env_prefix = ""
-        env_file = ".env"
+        env_file = os.environ.get("env_file") or os.environ.get("ENV_FILE") or ".env"
         extra = "ignore"
 
     # noinspection PyMethodParameters
     @field_validator('video_host', mode='after', check_fields=True)
-    def validate_video_host(cls, var: IPv4Address, values: ValidationInfo) -> str:
-        """Set `video_host` to local IP address if `ip_hosted` flag is set to True.
+    def validate_video_host(cls, video_host: IPv4Address, values: ValidationInfo) -> str:
+        """Set `video_host` to local IP address if `ip_hosted` flag is set to True and `video_host` is set to default.
 
         Args:
-            var: Variable value of `video_host`
+            video_host: Variable value of `video_host`
             values: Values of all object.
 
         Returns:
             str:
             Local IP address as a string.
         """
-        if values.data.get('ip_hosted') and str(var) == socket.gethostbyname("localhost"):
+        if values.data.get('ip_hosted') and str(video_host) == socket.gethostbyname("localhost"):
             return ip_address()
+        return str(video_host)
 
 
 class FileIO(BaseModel):
@@ -99,11 +100,7 @@ class Session(BaseModel):
     info: dict = {}
 
 
-env = EnvConfig()
+env = EnvConfig
 fileio = FileIO()
 static = Static()
 session = Session()
-
-if not os.listdir(env.video_source):
-    raise FileNotFoundError(f"no files found in {env.video_source!r}")
-env.video_host = str(env.video_host)

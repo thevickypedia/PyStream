@@ -14,7 +14,7 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from uvicorn.logging import ColourizedFormatter
 
-from pystream.models import config, ngrok, authenticator, squire
+from pystream.models import authenticator, config, ngrok, squire
 
 logger = logging.getLogger(name="uvicorn.default")
 
@@ -25,7 +25,11 @@ templates = Jinja2Templates(directory=os.path.join(pathlib.Path(__file__).parent
 security = HTTPBasic(realm="simple")
 
 
-def startup_tasks():
+def startup_tasks() -> None:
+    """Tasks that need to run during the API startup."""
+    if not os.listdir(config.env.video_source):
+        raise FileNotFoundError(f"no files found in {config.env.video_source!r}")
+    config.env.video_host = str(config.env.video_host)
     console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
                                             use_colors=True)
     handler = logging.StreamHandler()
@@ -276,8 +280,14 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
     )
 
 
-def start():
+def start(**kwargs) -> None:
+    """Starter function for the streaming API.
+
+    Args:
+        **kwargs: Keyword arguments to load the env config.
+    """
     # todo: Implement websockets to set a counter clock and logout automatically after a set timeout
+    config.env = config.EnvConfig(**kwargs)
     startup_tasks()
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"

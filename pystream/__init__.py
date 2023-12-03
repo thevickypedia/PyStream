@@ -1,1 +1,1 @@
-from .main import start  # noqa: E402
+from .main import start  # noqa: F401
