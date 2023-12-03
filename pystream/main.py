@@ -73,6 +73,19 @@ async def root() -> RedirectResponse:
     return RedirectResponse(url="/login", headers=None)
 
 
+def log_connection(request: Request):
+    """Logs the connection information.
+
+    See Also:
+        - Only logs the first connection from a device.
+        - This avoids multiple logs when same device requests different videos.
+    """
+    if request.client.host not in config.session.info:
+        config.session.info[request.client.host] = None
+        logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
+        logger.info(f"User agent: {request.headers.get('user-agent')}")
+
+
 @app.get("/login", response_model=None)
 async def login(request: Request,
                 credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
@@ -87,11 +100,7 @@ async def login(request: Request,
         Template response for listing page.
     """
     await authenticator.verify(credentials)
-    # Only log the first connection from a device, this avoids multiple logs when same device requests different videos
-    if request.client.host not in config.session.info:
-        config.session.info[request.client.host] = None
-        logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
-        logger.info(f"User agent: {request.headers.get('user-agent')}")
+    log_connection(request)
     return templates.TemplateResponse(
         name=config.fileio.list_files, context={"request": request, "files": list(squire.get_stream_files())}
     )
@@ -113,10 +122,11 @@ async def stream_video(request: Request,
         Template response for streaming page.
     """
     await authenticator.verify(credentials)
+    log_connection(request)
     video_file = config.env.video_source / video_path
     if video_file.exists():
         return templates.TemplateResponse(
-            name=config.fileio.name, headers=None,
+            name=config.fileio.index, headers=None,
             context={"request": request, "title": video_path,
                      "path": f"video?vid_name={urllib.parse.quote(str(video_file))}"}
         )
@@ -252,11 +262,11 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         Streams the video name received as cookie.
     """
     await authenticator.verify(credentials)
+    log_connection(request)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)
 
-    # Only log the unique video requested by the device, this avoids multiple logs while streaming the same video
     if config.session.info.get(request.client.host) != request.query_params['vid_name']:
         config.session.info[request.client.host] = request.query_params['vid_name']
         logger.info(f"Streaming: {request.query_params['vid_name']}")

@@ -1,5 +1,6 @@
 import os
 import socket
+from enum import StrEnum
 from ipaddress import IPv4Address
 from typing import Union
 
@@ -73,7 +74,7 @@ class FileIO(BaseModel):
 
     """
 
-    name: str = "index.html"
+    index: str = "index.html"
     list_files: str = "list_files.html"
 
 

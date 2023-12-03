@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress JSUnresolvedLibraryURL -->
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -16,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- CSS and JS for night mode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <!-- Use defer to download in parallel to parsing the page, and execute after the page has finished parsing -->
     <script type="text/javascript" src="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.js" defer></script>
     <link rel="stylesheet" href="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.css">
     <!-- Button CSS -->
@@ -77,21 +79,21 @@
 <br><br>
 <h1>{{title}}</h1>
 <video id="video-player" width="1000" controls muted="muted" style="position: relative">
-    <source id="video-source" type="video/mp4" />
+    <source id="video-source" type="video/mp4"  src=""/>
 </video>
 <script>
-    var path = "{{ path }}"; // Get the path variable from Jinja template
-    var origin = window.location.origin; // Get the current origin using JavaScript
+    let path = "{{ path }}"; // Get the path variable from Jinja template
+    let origin = window.location.origin; // Get the current origin using JavaScript
 
     // Construct the video source URL by combining origin and path
-    var videoSource = origin + '/' + path;
+    let videoSource = origin + '/' + path;
 
     // Set the source URL for the video element
-    var videoElement = document.getElementById("video-source");
+    let videoElement = document.getElementById("video-source");
     videoElement.setAttribute("src", videoSource);
 
     // Load and play the video
-    var videoPlayer = document.getElementById("video-player");
+    let videoPlayer = document.getElementById("video-player");
     videoPlayer.load(); // Load the video
     // videoPlayer.play(); // Play the video
 </script>
