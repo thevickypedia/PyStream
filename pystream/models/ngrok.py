@@ -7,7 +7,7 @@ from pydantic import HttpUrl
 from pyngrok import ngrok
 from pyngrok.exception import PyngrokError
 
-from models import config
+from pystream.models import config
 
 
 def get_tunnel(logger: Logger) -> Union[HttpUrl, NoReturn]:

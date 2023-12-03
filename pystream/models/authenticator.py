@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBasicCredentials
 
-from models import config, filters
+from pystream.models import config, filters
 
 logging.getLogger("uvicorn.access").addFilter(filters.VideoFilter())
 logging.getLogger("uvicorn.access").addFilter(filters.RootFilter())

@@ -1,7 +1,7 @@
 import os
 from collections.abc import Generator
 
-from models import config
+from pystream.models import config
 
 
 def get_stream_files() -> Generator[os.PathLike]:

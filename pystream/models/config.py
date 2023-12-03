@@ -3,7 +3,7 @@ import socket
 from ipaddress import IPv4Address
 from typing import Union
 
-from pydantic import (DirectoryPath, Field, HttpUrl, field_validator, PositiveInt, ValidationInfo)
+from pydantic import (DirectoryPath, Field, HttpUrl, field_validator, PositiveInt, ValidationInfo, BaseModel)
 from pydantic_settings import BaseSettings
 
 
@@ -66,7 +66,7 @@ class EnvConfig(BaseSettings):
             return ip_address()
 
 
-class FileIO(BaseSettings):
+class FileIO(BaseModel):
     """Loads all the files' path required/created.
 
     >>> FileIO
@@ -77,7 +77,7 @@ class FileIO(BaseSettings):
     list_files: str = "list_files.html"
 
 
-class Settings(BaseSettings):
+class Settings(BaseModel):
     """Creates a class for the hosts and chunk size of the video.
 
     >>> Settings
