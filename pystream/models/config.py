@@ -77,21 +77,31 @@ class FileIO(BaseModel):
     list_files: str = "list_files.html"
 
 
-class Settings(BaseModel):
-    """Creates a class for the hosts and chunk size of the video.
+class Static(BaseModel):
+    """Object to store static values.
 
-    >>> Settings
+    >>> Static
 
     """
 
-    HOSTS: list = []
     CHUNK_SIZE: PositiveInt = 1024 * 1024
     VAULT: str = "stream"  # Use a masked location to hide the real path in the UI
 
 
+class Session(BaseModel):
+    """Object to store session information.
+
+    >>> Session
+
+    """
+
+    info: dict = {}
+
+
 env = EnvConfig()
 fileio = FileIO()
-settings = Settings()
+static = Static()
+session = Session()
 
 if not os.listdir(env.video_source):
     raise FileNotFoundError(f"no files found in {env.video_source!r}")

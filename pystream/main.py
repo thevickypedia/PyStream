@@ -24,34 +24,30 @@ templates = Jinja2Templates(directory=os.path.join(pathlib.Path(__file__).parent
 
 security = HTTPBasic(realm="simple")
 
-source_path = list(squire.get_stream_files())
-last_log = {'log': ''}
 
-console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
-                                        use_colors=True)
-handler = logging.StreamHandler()
-handler.setFormatter(fmt=console_formatter)
-logger.addHandler(hdlr=handler)
-logger.info('Setting CORS policy.')
-
-origins = ["http://localhost.com", "https://localhost.com"]
-
-if config.env.website:
-    origins.extend([
-        f"http://{config.env.website.host}",
-        f"https://{config.env.website.host}",
-        f"http://{config.env.website.host}/*",
-        f"https://{config.env.website.host}/*"
-    ])
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def startup_tasks():
+    console_formatter = ColourizedFormatter(fmt="{levelprefix} [{module}:{lineno}] - {message}", style="{",
+                                            use_colors=True)
+    handler = logging.StreamHandler()
+    handler.setFormatter(fmt=console_formatter)
+    logger.addHandler(hdlr=handler)
+    logger.info('Setting CORS policy.')
+    origins = ["http://localhost.com", "https://localhost.com"]
+    if config.env.website:
+        origins.extend([
+            f"http://{config.env.website.host}",
+            f"https://{config.env.website.host}",
+            f"http://{config.env.website.host}/*",
+            f"https://{config.env.website.host}/*"
+        ])
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 @app.get(path="/favicon.ico", include_in_schema=False)
@@ -91,12 +87,17 @@ async def login(request: Request,
         Template response for listing page.
     """
     await authenticator.verify(credentials)
+    # Only log the first connection from a device, this avoids multiple logs when same device requests different videos
+    if request.client.host not in config.session.info:
+        config.session.info[request.client.host] = None
+        logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
+        logger.info(f"User agent: {request.headers.get('user-agent')}")
     return templates.TemplateResponse(
-        name=config.fileio.list_files, context={"request": request, "files": source_path}
+        name=config.fileio.list_files, context={"request": request, "files": list(squire.get_stream_files())}
     )
 
 
-@app.get("/%s/{video_path:path}" % config.settings.VAULT, response_model=None)
+@app.get("/%s/{video_path:path}" % config.static.VAULT, response_model=None)
 async def stream_video(request: Request,
                        video_path: str,
                        credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
@@ -139,7 +140,7 @@ def send_bytes_range_requests(file_obj: BinaryIO,
     with file_obj as streamer:
         streamer.seek(start_range)
         while (pos := streamer.tell()) <= end_range:
-            read_size = min(config.settings.CHUNK_SIZE, end_range + 1 - pos)
+            read_size = min(config.static.CHUNK_SIZE, end_range + 1 - pos)
             yield streamer.read(read_size)
 
 
@@ -203,8 +204,6 @@ def range_requests_response(range_header: str, file_path: str) -> StreamingRespo
         headers["content-range"] = f"bytes {start_range}-{end_range}/{file_size}"
         status_code = status.HTTP_206_PARTIAL_CONTENT
 
-    # todo: iterate and yield and return the iterated info
-
     return StreamingResponse(
         content=send_bytes_range_requests(open(file_path, mode="rb"), start_range, end_range),
         headers=headers,
@@ -220,15 +219,19 @@ async def logout(request: Request):
         HTTPException:
         401 with a logout message.
     """
-    logger.info("Logout successful")
     if request.headers.get('authorization'):
+        logger.info("%s logged out", request.client.host)
+        if config.session.info.get(request.client.host):
+            del config.session.info[request.client.host]
+        else:
+            logger.warning(f"Session information for {request.client.host} was never stored.")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Logged out successfully. Refresh the page to navigate to login.",
             headers=None
         )
     else:
-        logger.info("Redirecting to login page")
+        logger.info("Redirecting connection from %s to login page", request.client.host)
         return RedirectResponse(url="/login", headers=None)
 
 
@@ -253,15 +256,11 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
         return RedirectResponse(url="/login", headers=None)
 
-    if request.client.host not in config.settings.HOSTS:
-        config.settings.HOSTS.append(request.client.host)
-        if host := request.headers.get('host'):
-            logger.info(f"Connection received from {request.client.host} via {host}")
-        if ua := request.headers.get('user-agent'):
-            logger.info(f"User agent: {ua}")
-    if last_log['log'] != request.query_params['vid_name']:
-        last_log['log'] = request.query_params['vid_name']
+    # Only log the unique video requested by the device, this avoids multiple logs while streaming the same video
+    if config.session.info.get(request.client.host) != request.query_params['vid_name']:
+        config.session.info[request.client.host] = request.query_params['vid_name']
         logger.info(f"Streaming: {request.query_params['vid_name']}")
+
     return range_requests_response(
         range_header=range, file_path=os.path.join(config.env.video_source, request.query_params['vid_name'])
     )
@@ -269,6 +268,7 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
 
 def start():
     # todo: Implement websockets to set a counter clock and logout automatically after a set timeout
+    startup_tasks()
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["default"]["fmt"] = "%(levelprefix)s [%(module)s:%(lineno)d] - %(message)s"
     # reload flag is set to false,
