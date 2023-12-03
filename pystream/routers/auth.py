@@ -1,8 +1,7 @@
 import os
 import pathlib
 
-from fastapi import APIRouter
-from fastapi import Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
@@ -31,7 +30,7 @@ async def login(request: Request,
     await authenticator.verify(credentials)
     squire.log_connection(request)
     return templates.TemplateResponse(
-        name=config.fileio.list_files, context={"request": request, "files": list(squire.get_stream_files())}
+        name=config.fileio.list_files, context={"request": request, "files": list(set(squire.get_stream_content()))}
     )
 
 

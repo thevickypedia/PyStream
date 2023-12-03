@@ -1,8 +1,9 @@
 import os
+import pathlib
 import urllib.parse
 from typing import Optional, Union
 
-from fastapi import Depends, Header, HTTPException, Request, status, APIRouter
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, StreamingResponse
 from fastapi.security import HTTPBasicCredentials
 
@@ -31,6 +32,15 @@ async def stream_video(request: Request,
     await authenticator.verify(credentials)
     squire.log_connection(request)
     video_file = config.env.video_source / video_path
+    if video_file.is_dir():
+        return auth.templates.TemplateResponse(
+            name=config.fileio.list_files,
+            context={
+                "request": request,
+                "files": [os.path.join(pathlib.Path(video_path).parts[-1], file)  # Use only the final dir in a path
+                          for file in os.listdir(video_file) if file.endswith(".mp4")]
+            }
+        )
     if video_file.exists():
         return auth.templates.TemplateResponse(
             name=config.fileio.index, headers=None,

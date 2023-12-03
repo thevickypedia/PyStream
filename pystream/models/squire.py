@@ -20,11 +20,11 @@ def log_connection(request: Request):
         logger.info(f"User agent: {request.headers.get('user-agent')}")
 
 
-def get_stream_files() -> Generator[os.PathLike]:
-    """Get files to be streamed.
+def get_stream_content() -> Generator[str]:
+    """Get video files or folders that contain video files to be streamed.
 
     Yields:
-        Path for video files.
+        Path for video files or folders that contain the video files.
     """
     for __path, __directory, __file in os.walk(config.env.video_source):
         if __path.endswith('__'):
@@ -33,11 +33,7 @@ def get_stream_files() -> Generator[os.PathLike]:
             if file_.startswith('__'):
                 continue
             if file_.endswith('.mp4'):
-                path = __path.replace(str(config.env.video_source), "")
-                if not path:
-                    value = os.path.join(config.static.VAULT, file_)
-                elif path.startswith("/"):
-                    value = config.static.VAULT + path + os.path.sep + file_
+                if path := __path.replace(str(config.env.video_source), ""):
+                    yield os.path.join(config.static.VAULT, path.lstrip(os.path.sep))
                 else:
-                    value = config.static.VAULT + os.path.sep + path + os.path.sep + file_
-                yield value
+                    yield os.path.join(config.static.VAULT, file_)
