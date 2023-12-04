@@ -29,8 +29,10 @@ async def login(request: Request,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
+    content = squire.get_stream_content()
     return templates.TemplateResponse(
-        name=config.fileio.list_files, context={"request": request, "files": list(set(squire.get_stream_content()))}
+        name=config.fileio.list_files,
+        context={"request": request, "files": content['files'], "directories": content['directories']}
     )
 
 
