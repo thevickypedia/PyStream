@@ -28,8 +28,8 @@ def send_bytes_range_requests(file_obj: BinaryIO,
             yield streamer.read(read_size)
 
 
-def _get_range_header(range_header: str,
-                      file_size: int) -> Tuple[int, int]:
+def get_range_header(range_header: str,
+                     file_size: int) -> Tuple[int, int]:
     """Proces range header.
 
     Args:
@@ -82,7 +82,7 @@ def range_requests_response(range_header: str, file_path: str) -> StreamingRespo
     status_code = status.HTTP_200_OK
 
     if range_header:
-        start_range, end_range = _get_range_header(range_header=range_header, file_size=file_size)
+        start_range, end_range = get_range_header(range_header=range_header, file_size=file_size)
         size = end_range - start_range + 1
         headers["content-length"] = str(size)
         headers["content-range"] = f"bytes {start_range}-{end_range}/{file_size}"

@@ -1,6 +1,6 @@
 import os
 import pathlib
-from typing import Dict
+from typing import Dict, List
 
 from fastapi import Request
 
@@ -8,7 +8,7 @@ from pystream.logger import logger
 from pystream.models import config
 
 
-def log_connection(request: Request):
+def log_connection(request: Request) -> None:
     """Logs the connection information.
 
     See Also:
@@ -21,15 +21,16 @@ def log_connection(request: Request):
         logger.info(f"User agent: {request.headers.get('user-agent')}")
 
 
-def get_dir_content(parent: pathlib.PosixPath, subdir: str):
+def get_dir_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
     """Get the video files inside a particular directory.
 
     Args:
         parent: Parent directory as displayed in the login page.
         subdir: Subdirectory within which video files exist.
 
-    Yields:
-        A dictionary of filename and the filepath as key-value pairs.
+    Returns:
+        List[Dict[str, str]]:
+        A list of dictionaries with filename and the filepath as key-value pairs.
     """
     files = []
     sort_by = "len"
@@ -43,11 +44,12 @@ def get_dir_content(parent: pathlib.PosixPath, subdir: str):
     return sorted(files, key=lambda x: x['name'])
 
 
-def get_stream_content() -> Dict[str, list[str]]:
+def get_stream_content() -> Dict[str, List[Dict[str, str]]]:
     """Get video files or folders that contain video files to be streamed.
 
-    Yields:
-        Path for video files or folders that contain the video files.
+    Returns:
+        Dict[str, List[str]]:
+        Dictionary of files and directories with name and path as key-value pairs on each section.
     """
     structure = {'files': [], 'directories': []}
     file_sort_by = "len"

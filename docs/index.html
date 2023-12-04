@@ -403,7 +403,7 @@ name is specified, allow every event.</p>
 <span id="squire"></span><h1>Squire<a class="headerlink" href="#module-pystream.models.squire" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="pystream.models.squire.log_connection">
-<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">log_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.squire.log_connection" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">log_connection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Request</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pystream.models.squire.log_connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Logs the connection information.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -416,7 +416,7 @@ name is specified, allow every event.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pystream.models.squire.get_dir_content">
-<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">get_dir_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PosixPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.squire.get_dir_content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">get_dir_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PosixPath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pystream.models.squire.get_dir_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the video files inside a particular directory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -425,19 +425,25 @@ name is specified, allow every event.</p>
 <li><p><strong>subdir</strong> – Subdirectory within which video files exist.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Yields<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary of filename and the filepath as key-value pairs.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A list of dictionaries with filename and the filepath as key-value pairs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Dict[str, str]]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pystream.models.squire.get_stream_content">
-<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">get_stream_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pystream.models.squire.get_stream_content" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pystream.models.squire.</span></span><span class="sig-name descname"><span class="pre">get_stream_content</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pystream.models.squire.get_stream_content" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get video files or folders that contain video files to be streamed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Yields<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Path for video files or folders that contain the video files.</p>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dictionary of files and directories with name and path as key-value pairs on each section.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, List[str]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -464,8 +470,8 @@ name is specified, allow every event.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pystream.models.stream._get_range_header">
-<span class="sig-prename descclassname"><span class="pre">pystream.models.stream.</span></span><span class="sig-name descname"><span class="pre">_get_range_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pystream.models.stream._get_range_header" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pystream.models.stream.get_range_header">
+<span class="sig-prename descclassname"><span class="pre">pystream.models.stream.</span></span><span class="sig-name descname"><span class="pre">get_range_header</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">range_header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pystream.models.stream.get_range_header" title="Permalink to this definition">¶</a></dt>
 <dd><p>Proces range header.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
