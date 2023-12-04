@@ -61,9 +61,9 @@ def start(**kwargs) -> None:
     if config.env.ngrok_token:
         try:
             import pyngrok  # noqa: F401
-        except ImportError:
+        except ImportError as error:
             raise ImportError(
-                "\n\tPlease install 'stream-localhost[ngrok]'"
+                f"\n\n{error.name}\n\tpip install 'stream-localhost[ngrok]'"
             )
-        Process(target=ngrok.run_tunnel, args=(logger,)).start()
+        Process(target=ngrok.run_tunnel, args=(logger,), kwargs=kwargs).start()
     uvicorn.run(**argument_dict)

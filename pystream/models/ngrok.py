@@ -31,12 +31,13 @@ def get_tunnel(logger: Logger) -> Union[HttpUrl, NoReturn]:
         logger.error(error)
 
 
-def run_tunnel(logger: Logger) -> None:
+def run_tunnel(logger: Logger, **kwargs) -> None:
     """Runs reverse proxy on video port to expose it using a public URL.
 
     Args:
         logger: Takes uvicorn custom logger as an argument.
     """
+    config.env = config.EnvConfig(**kwargs)
     if public_url := get_tunnel(logger=logger):
         logger.info(f"Already hosting {config.env.video_port} on {public_url}")
         return
@@ -56,7 +57,6 @@ def run_tunnel(logger: Logger) -> None:
     sock.listen(1)
     connection = None
 
-    print(public_url)
     logger.info(f'Tunneling http://{config.env.video_host}:{config.env.video_port} through public URL: {public_url}')
     try:
         connection, client_address = sock.accept()
