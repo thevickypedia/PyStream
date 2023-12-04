@@ -14,7 +14,7 @@ security = HTTPBasic(realm="simple")
 templates = Jinja2Templates(directory=os.path.join(pathlib.Path(__file__).parent.parent, "templates"))
 
 
-@router.get("/login", response_model=None)
+@router.get("%s" % config.static.login_endpoint, response_model=None)
 async def login(request: Request,
                 credentials: HTTPBasicCredentials = Depends(security)) -> templates.TemplateResponse:
     """Login request handler.
@@ -27,17 +27,19 @@ async def login(request: Request,
         templates.TemplateResponse:
         Template response for listing page.
     """
+    # fixme: this is just an index landing page, so throw it out or throw it under root endpoint and kill all redirects
     await authenticator.verify(credentials)
     squire.log_connection(request)
-    content = squire.get_stream_content()
+    content = squire.get_all_stream_content()
     return templates.TemplateResponse(
         name=config.fileio.list_files,
-        context={"request": request, "files": content['files'], "directories": content['directories']}
+        context={"request": request, "files": content['files'],
+                 "directories": content['directories'], "logout": config.static.logout_endpoint}
     )
 
 
-@router.get("/logout")
-async def logout(request: Request):
+@router.get("%s" % config.static.logout_endpoint, response_model=None)
+async def logout(request: Request) -> RedirectResponse:
     """Raises a 401 with no headers to log out the user.
 
     Raises:
@@ -49,7 +51,7 @@ async def logout(request: Request):
         if config.session.info.get(request.client.host):
             del config.session.info[request.client.host]
         else:
-            logger.warning(f"Session information for {request.client.host} was never stored.")
+            logger.warning("Session information for %s was never stored.", request.client.host)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Logged out successfully. Refresh the page to navigate to login.",
@@ -57,4 +59,4 @@ async def logout(request: Request):
         )
     else:
         logger.info("Redirecting connection from %s to login page", request.client.host)
-        return RedirectResponse(url="/login", headers=None)
+        return RedirectResponse(url=config.static.login_endpoint, headers=None)

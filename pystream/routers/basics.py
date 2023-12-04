@@ -3,6 +3,8 @@ import os
 from fastapi import APIRouter
 from fastapi.responses import FileResponse, RedirectResponse
 
+from pystream.models import config
+
 router = APIRouter()
 
 
@@ -26,4 +28,4 @@ async def root() -> RedirectResponse:
         RedirectResponse:
         Redirects to login page.
     """
-    return RedirectResponse(url="/login", headers=None)
+    return RedirectResponse(url=config.static.login_endpoint, headers=None)

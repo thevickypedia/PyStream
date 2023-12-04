@@ -17,11 +17,11 @@ def log_connection(request: Request) -> None:
     """
     if request.client.host not in config.session.info:
         config.session.info[request.client.host] = None
-        logger.info(f"Connection received from {request.client.host} via {request.headers.get('host')}")
-        logger.info(f"User agent: {request.headers.get('user-agent')}")
+        logger.info("Connection received from %s via %s", request.client.host, request.headers.get('host'))
+        logger.info("User agent: %s", request.headers.get('user-agent'))
 
 
-def get_dir_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
+def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
     """Get the video files inside a particular directory.
 
     Args:
@@ -44,13 +44,14 @@ def get_dir_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, st
     return sorted(files, key=lambda x: x['name'])
 
 
-def get_stream_content() -> Dict[str, List[Dict[str, str]]]:
+def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
     """Get video files or folders that contain video files to be streamed.
 
     Returns:
         Dict[str, List[str]]:
         Dictionary of files and directories with name and path as key-value pairs on each section.
     """
+    # todo: Cache this with a background task updating the cache periodically
     structure = {'files': [], 'directories': []}
     file_sort_by = "len"
     dir_sort_by = "len"
@@ -64,14 +65,14 @@ def get_stream_content() -> Dict[str, List[Dict[str, str]]]:
                 if path := __path.replace(str(config.env.video_source), "").lstrip(os.path.sep):
                     if path[0].isdigit():
                         dir_sort_by = "index"
-                    entry = {"name": path, "path": os.path.join(config.static.VAULT, path)}
+                    entry = {"name": path, "path": os.path.join(config.static.vault, path)}
                     if entry in structure['directories']:
                         continue
                     structure['directories'].append(entry)
                 else:
                     if file_[0].isdigit():
                         file_sort_by = "index"
-                    structure['files'].append({"name": file_, "path": os.path.join(config.static.VAULT, file_)})
+                    structure['files'].append({"name": file_, "path": os.path.join(config.static.vault, file_)})
     if file_sort_by == "len":
         structure['files'] = sorted(structure['files'], key=lambda x: len(x['name']))
     else:

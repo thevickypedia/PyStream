@@ -24,7 +24,7 @@ def send_bytes_range_requests(file_obj: BinaryIO,
     with file_obj as streamer:
         streamer.seek(start_range)
         while (pos := streamer.tell()) <= end_range:
-            read_size = min(config.static.CHUNK_SIZE, end_range + 1 - pos)
+            read_size = min(config.static.chunk_size, end_range + 1 - pos)
             yield streamer.read(read_size)
 
 

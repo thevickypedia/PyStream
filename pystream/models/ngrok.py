@@ -39,7 +39,7 @@ def run_tunnel(logger: Logger, **kwargs) -> None:
     """
     config.env = config.EnvConfig(**kwargs)
     if public_url := get_tunnel(logger=logger):
-        logger.info(f"Already hosting {config.env.video_port} on {public_url}")
+        logger.info("Already hosting %d on %s", config.env.video_port, public_url)
         return
 
     from pyngrok import ngrok
@@ -57,7 +57,8 @@ def run_tunnel(logger: Logger, **kwargs) -> None:
     sock.listen(1)
     connection = None
 
-    logger.info(f'Tunneling http://{config.env.video_host}:{config.env.video_port} through public URL: {public_url}')
+    logger.info('Tunneling http://%s:%s through public URL: %s',
+                config.env.video_host, config.env.video_port, public_url)
     try:
         connection, client_address = sock.accept()
     except KeyboardInterrupt:
