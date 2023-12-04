@@ -31,21 +31,22 @@ async def stream_video(request: Request,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
-    video_file = config.env.video_source / video_path
-    if video_file.is_dir():
+    pure_path = config.env.video_source / video_path
+    if pure_path.is_dir():
+        child_dir = pathlib.Path(video_path).parts[-1]  # Use only the final dir in a path
         return auth.templates.TemplateResponse(
             name=config.fileio.list_files,
             context={
                 "request": request,
-                "files": [os.path.join(pathlib.Path(video_path).parts[-1], file)  # Use only the final dir in a path
-                          for file in os.listdir(video_file) if file.endswith(".mp4")]
+                "files": list(squire.get_dir_content(pure_path, child_dir)),
+                "dir_name": child_dir,
             }
         )
-    if video_file.exists():
+    if pure_path.exists():
         return auth.templates.TemplateResponse(
             name=config.fileio.index, headers=None,
             context={"request": request, "title": video_path,
-                     "path": f"video?vid_name={urllib.parse.quote(str(video_file))}"}
+                     "path": f"video?vid_name={urllib.parse.quote(str(pure_path))}"}
         )
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")

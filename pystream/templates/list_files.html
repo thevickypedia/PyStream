@@ -93,17 +93,21 @@
 <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
 <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
-<h3>Files</h3>
+{% if dir_name %}
+    <h3>{{dir_name}}</h3>
+{% else %}
+    <h3>Files</h3>
+{% endif %}
 <ol>
     {% for file in files %}
-    <li><a href="{{file}}">{{file}}</a></li>
+    <li><a href="{{file.path}}">{{file.name}}</a></li>
     {% endfor %}
 </ol>
 {% if directories %}
-<h3>Folders</h3>
+<h3>Directories</h3>
 <ol>
     {% for directory in directories %}
-    <li><a href="{{directory}}">{{directory}}</a></li>
+    <li><a href="{{directory.path}}">{{directory.name}}</a></li>
     {% endfor %}
 </ol>
 {% endif %}
