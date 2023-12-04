@@ -1,4 +1,3 @@
-import os
 from multiprocessing import Process
 
 import uvicorn
@@ -17,8 +16,6 @@ app.include_router(video.router)
 
 def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
-    if not os.listdir(config.env.video_source):
-        raise FileNotFoundError(f"no files found in {config.env.video_source!r}")
     config.env.video_host = str(config.env.video_host)
     logger.info('Setting CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
@@ -62,5 +59,11 @@ def start(**kwargs) -> None:
         "workers": config.env.workers
     }
     if config.env.ngrok_token:
+        try:
+            import pyngrok  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "\n\tPlease install 'stream-localhost[ngrok]'"
+            )
         Process(target=ngrok.run_tunnel, args=(logger,)).start()
     uvicorn.run(**argument_dict)

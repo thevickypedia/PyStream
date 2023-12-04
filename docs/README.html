@@ -74,23 +74,15 @@
 <ul class="simple">
 <li><p><strong>USERNAME</strong>: Any username of choice.</p></li>
 <li><p><strong>PASSWORD</strong>: Any password of choice.</p></li>
-<li><p><strong>VIDEO_SOURCE</strong>: Source path for videos.</p></li>
+<li><p><strong>VIDEO_SOURCE</strong>: Source path for <code class="docutils literal notranslate"><span class="pre">.mp4</span></code> files.</p></li>
 </ul>
 <p><strong>Optional</strong></p>
 <ul class="simple">
-<li><p><strong>IP_HOSTED</strong>: Boolean flag to specify if the API is hosted via public IP</p></li>
 <li><p><strong>VIDEO_HOST</strong>: IP address to host the video. Defaults to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code></p></li>
 <li><p><strong>VIDEO_PORT</strong>: Port number to host the application. Defaults to <code class="docutils literal notranslate"><span class="pre">8000</span></code></p></li>
 <li><p><strong>WEBSITE</strong>: Website to add to CORS configuration.</p></li>
 <li><p><strong>WORKERS</strong>: Number of workers to spin up the <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> server. Defaults to 1.</p></li>
 </ul>
-<blockquote>
-<div><ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">IP_HOSTED</span></code> is typically set to <code class="docutils literal notranslate"><span class="pre">True</span></code> if port forwarding is used to expose the API</p></li>
-<li><p>This will allow the application to host the API on local IP instead of <code class="docutils literal notranslate"><span class="pre">localhost</span></code> (if <code class="docutils literal notranslate"><span class="pre">VIDEO_HOST</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-<li><p>This can also be done by specifying the local IP for the env var <code class="docutils literal notranslate"><span class="pre">VIDEO_HOST</span></code> manually</p></li>
-</ul>
-</div></blockquote>
 </section>
 </section>
 <section id="coding-standards">

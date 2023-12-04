@@ -4,8 +4,6 @@ from typing import NoReturn, Union
 
 import requests
 from pydantic import HttpUrl
-from pyngrok import ngrok
-from pyngrok.exception import PyngrokError
 
 from pystream.models import config
 
@@ -43,6 +41,8 @@ def run_tunnel(logger: Logger) -> None:
         logger.info(f"Already hosting {config.env.video_port} on {public_url}")
         return
 
+    from pyngrok import ngrok
+    from pyngrok.exception import PyngrokError
     ngrok.set_auth_token(token=config.env.ngrok_token)
     try:
         endpoint = ngrok.connect(config.env.video_port, "http",
