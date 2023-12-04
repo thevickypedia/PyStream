@@ -81,6 +81,79 @@
 </dd></dl>
 
 </section>
+<section id="module-pystream.logger">
+<span id="logger"></span><h1>Logger<a class="headerlink" href="#module-pystream.logger" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pystream.logger.RootFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.logger.</span></span><span class="sig-name descname"><span class="pre">RootFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.logger.RootFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to initiate <code class="docutils literal notranslate"><span class="pre">/</span></code> filter in logs while preserving other access logs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootFilter</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p>Filters <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/login</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">200</span> <span class="pre">OK</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">307</span> <span class="pre">Temporary</span> <span class="pre">Redirect</span></code>, <code class="docutils literal notranslate"><span class="pre">/video?vid_name=...</span></code></p></li>
+<li><p>Includes redundant logging for each iterable passed in <code class="docutils literal notranslate"><span class="pre">StreamingResponse</span></code></p></li>
+<li><p>Overrides logging by implementing a subclass of <code class="docutils literal notranslate"><span class="pre">logging.Filter</span></code></p></li>
+<li><p>The method <code class="docutils literal notranslate"><span class="pre">filter(record)</span></code>, that examines the log record and returns True to log it or False to discard it.</p></li>
+</ul>
+</div>
+<p>Initialize a filter.</p>
+<p>Initialize with the name of the logger which, together with its
+children, will have its events allowed through the filter. If no
+name is specified, allow every event.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pystream.logger.RootFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pystream.logger.RootFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter out logging at <code class="docutils literal notranslate"><span class="pre">/</span></code> from log streams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>record</strong> – <code class="docutils literal notranslate"><span class="pre">LogRecord</span></code> represents an event which is created every time something is logged.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False flag for the endpoint that needs to be filtered.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pystream.utils">
+<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-pystream.utils" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pystream.utils.get_local_ip">
+<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_local_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_local_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses simple check on network id to retrieve the local IP address.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Private IP address of host machine.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>IPv4Address</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pystream.utils.get_public_ip">
+<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_public_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_public_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract public IP address of the connection by making a request to external source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Public IP address of host machine’s connection.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>IPv4Address</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="models">
 <h1>Models<a class="headerlink" href="#models" title="Permalink to this heading">¶</a></h1>
 </section>
@@ -108,7 +181,7 @@
 <span id="config"></span><h1>Config<a class="headerlink" href="#module-pystream.models.config" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="pystream.models.config.EnvConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.models.config.</span></span><span class="sig-name descname"><span class="pre">EnvConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_case_sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DotenvType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('.')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_file_encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_nested_delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_secrets_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">website</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Url</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngrok_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IPv4Address</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.config.EnvConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.models.config.</span></span><span class="sig-name descname"><span class="pre">EnvConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_case_sensitive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DotenvType</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('.')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_file_encoding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_env_nested_delimiter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_secrets_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">SecretStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_source</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_port</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">website</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Url</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ngrok_token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_host</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IPv4Address</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'127.0.0.1'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.config.EnvConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Configure all env vars and validate using <code class="docutils literal notranslate"><span class="pre">pydantic</span></code> to share across modules.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EnvConfig</span>
 </pre></div>
@@ -125,7 +198,7 @@ allow <cite>self</cite> as a field name.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pystream.models.config.EnvConfig.password">
-<span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#pystream.models.config.EnvConfig.password" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">password</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">SecretStr</span></em><a class="headerlink" href="#pystream.models.config.EnvConfig.password" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -175,6 +248,11 @@ allow <cite>self</cite> as a field name.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pystream.models.config.EnvConfig.Config.extra">
 <span class="sig-name descname"><span class="pre">extra</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ignore'</span></em><a class="headerlink" href="#pystream.models.config.EnvConfig.Config.extra" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pystream.models.config.EnvConfig.Config.hide_input_in_errors">
+<span class="sig-name descname"><span class="pre">hide_input_in_errors</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#pystream.models.config.EnvConfig.Config.hide_input_in_errors" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -252,83 +330,6 @@ allow <cite>self</cite> as a field name.</p>
 <dt class="sig sig-object py" id="pystream.models.config.env">
 <span class="sig-prename descclassname"><span class="pre">pystream.models.config.</span></span><span class="sig-name descname"><span class="pre">env</span></span><a class="headerlink" href="#pystream.models.config.env" title="Permalink to this definition">¶</a></dt>
 <dd><p>alias of <a class="reference internal" href="#pystream.models.config.EnvConfig" title="pystream.models.config.EnvConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvConfig</span></code></a></p>
-</dd></dl>
-
-</section>
-<section id="module-pystream.models.filters">
-<span id="filters"></span><h1>Filters<a class="headerlink" href="#module-pystream.models.filters" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pystream.models.filters.VideoFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.models.filters.</span></span><span class="sig-name descname"><span class="pre">VideoFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.filters.VideoFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class to initiate <code class="docutils literal notranslate"><span class="pre">/video</span></code> filter in logs while preserving other access logs.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">VideoFilter</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p>Overrides logging by implementing a subclass of <code class="docutils literal notranslate"><span class="pre">logging.Filter</span></code></p></li>
-<li><p>The method <code class="docutils literal notranslate"><span class="pre">filter(record)</span></code>, that examines the log record and returns True to log it or False to discard it.</p></li>
-</ul>
-</div>
-<p>Initialize a filter.</p>
-<p>Initialize with the name of the logger which, together with its
-children, will have its events allowed through the filter. If no
-name is specified, allow every event.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pystream.models.filters.VideoFilter.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pystream.models.filters.VideoFilter.filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter out logging at <code class="docutils literal notranslate"><span class="pre">/video</span></code> from log streams.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>record</strong> – <code class="docutils literal notranslate"><span class="pre">LogRecord</span></code> represents an event which is created every time something is logged.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>False flag for the endpoint that needs to be filtered.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pystream.models.filters.RootFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.models.filters.</span></span><span class="sig-name descname"><span class="pre">RootFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.models.filters.RootFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class to initiate <code class="docutils literal notranslate"><span class="pre">/</span></code> filter in logs while preserving other access logs.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootFilter</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p>Overrides logging by implementing a subclass of <code class="docutils literal notranslate"><span class="pre">logging.Filter</span></code></p></li>
-<li><p>The method <code class="docutils literal notranslate"><span class="pre">filter(record)</span></code>, that examines the log record and returns True to log it or False to discard it.</p></li>
-</ul>
-</div>
-<p>Initialize a filter.</p>
-<p>Initialize with the name of the logger which, together with its
-children, will have its events allowed through the filter. If no
-name is specified, allow every event.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pystream.models.filters.RootFilter.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pystream.models.filters.RootFilter.filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter out logging at <code class="docutils literal notranslate"><span class="pre">/</span></code> from log streams.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>record</strong> – <code class="docutils literal notranslate"><span class="pre">LogRecord</span></code> represents an event which is created every time something is logged.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>False flag for the endpoint that needs to be filtered.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -608,10 +609,11 @@ name is specified, allow every event.</p>
     <ul>
 <li><a class="reference internal" href="#">Stream-Localhost - A secured interface to stream videos</a></li>
 <li><a class="reference internal" href="#module-pystream.main">Main Module</a></li>
+<li><a class="reference internal" href="#module-pystream.logger">Logger</a></li>
+<li><a class="reference internal" href="#module-pystream.utils">Utils</a></li>
 <li><a class="reference internal" href="#models">Models</a></li>
 <li><a class="reference internal" href="#module-pystream.models.authenticator">Authenticator</a></li>
 <li><a class="reference internal" href="#module-pystream.models.config">Config</a></li>
-<li><a class="reference internal" href="#module-pystream.models.filters">Filters</a></li>
 <li><a class="reference internal" href="#module-pystream.models.ngrok">Ngrok</a></li>
 <li><a class="reference internal" href="#module-pystream.models.squire">Squire</a></li>
 <li><a class="reference internal" href="#module-pystream.models.stream">Stream</a></li>

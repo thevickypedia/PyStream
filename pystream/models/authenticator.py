@@ -26,7 +26,7 @@ async def verify(credentials: HTTPBasicCredentials) -> JSONResponse:
         )
 
     username_validation = secrets.compare_digest(credentials.username, config.env.username)
-    password_validation = secrets.compare_digest(credentials.password, config.env.password)
+    password_validation = secrets.compare_digest(credentials.password, config.env.password.get_secret_value())
 
     if username_validation and password_validation:
         return JSONResponse(

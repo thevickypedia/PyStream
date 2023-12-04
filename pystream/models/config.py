@@ -3,7 +3,8 @@ import socket
 from ipaddress import IPv4Address
 from typing import Union
 
-from pydantic import BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt
+from pydantic import (BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt,
+                      SecretStr)
 from pydantic_settings import BaseSettings
 
 
@@ -15,7 +16,7 @@ class EnvConfig(BaseSettings):
     """
 
     username: str
-    password: str
+    password: SecretStr
     video_source: DirectoryPath
 
     video_port: PositiveInt = 8000
@@ -30,6 +31,7 @@ class EnvConfig(BaseSettings):
         env_prefix = ""
         env_file = os.environ.get("env_file") or os.environ.get("ENV_FILE") or ".env"
         extra = "ignore"
+        hide_input_in_errors = True
 
 
 class FileIO(BaseModel):

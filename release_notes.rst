@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+v0.0.1 (12/04/2023)
+-------------------
+- Let the streaming begin
+
 v0.0.1b (12/04/2023)
 --------------------
 - Install ``ngrok`` as an exteion package only if needed

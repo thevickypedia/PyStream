@@ -19,6 +19,20 @@ Main Module
    :members:
    :undoc-members:
 
+Logger
+======
+
+.. automodule:: pystream.logger
+   :members:
+   :undoc-members:
+
+Utils
+=====
+
+.. automodule:: pystream.utils
+   :members:
+   :undoc-members:
+
 Models
 ======
 Authenticator
@@ -34,13 +48,6 @@ Config
 .. automodule:: pystream.models.config
    :members:
    :exclude-members: _abc_impl, model_config, model_fields
-
-Filters
-=======
-
-.. automodule:: pystream.models.filters
-   :members:
-   :undoc-members:
 
 Ngrok
 =====
