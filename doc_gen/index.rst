@@ -19,20 +19,6 @@ Main Module
    :members:
    :undoc-members:
 
-Logger
-======
-
-.. automodule:: pystream.logger
-   :members:
-   :undoc-members:
-
-Utils
-=====
-
-.. automodule:: pystream.utils
-   :members:
-   :undoc-members:
-
 Models
 ======
 Authenticator
@@ -97,6 +83,22 @@ Video
 =====
 
 .. automodule:: pystream.routers.video
+   :members:
+   :undoc-members:
+
+Support Modules
+===============
+Logger
+======
+
+.. automodule:: pystream.logger
+   :members:
+   :undoc-members:
+
+Utils
+=====
+
+.. automodule:: pystream.utils
    :members:
    :undoc-members:
 

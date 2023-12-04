@@ -81,79 +81,6 @@
 </dd></dl>
 
 </section>
-<section id="module-pystream.logger">
-<span id="logger"></span><h1>Logger<a class="headerlink" href="#module-pystream.logger" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pystream.logger.RootFilter">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.logger.</span></span><span class="sig-name descname"><span class="pre">RootFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.logger.RootFilter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class to initiate <code class="docutils literal notranslate"><span class="pre">/</span></code> filter in logs while preserving other access logs.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootFilter</span>
-</pre></div>
-</div>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p>Filters <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/login</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">200</span> <span class="pre">OK</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">307</span> <span class="pre">Temporary</span> <span class="pre">Redirect</span></code>, <code class="docutils literal notranslate"><span class="pre">/video?vid_name=...</span></code></p></li>
-<li><p>Includes redundant logging for each iterable passed in <code class="docutils literal notranslate"><span class="pre">StreamingResponse</span></code></p></li>
-<li><p>Overrides logging by implementing a subclass of <code class="docutils literal notranslate"><span class="pre">logging.Filter</span></code></p></li>
-<li><p>The method <code class="docutils literal notranslate"><span class="pre">filter(record)</span></code>, that examines the log record and returns True to log it or False to discard it.</p></li>
-</ul>
-</div>
-<p>Initialize a filter.</p>
-<p>Initialize with the name of the logger which, together with its
-children, will have its events allowed through the filter. If no
-name is specified, allow every event.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pystream.logger.RootFilter.filter">
-<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pystream.logger.RootFilter.filter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Filter out logging at <code class="docutils literal notranslate"><span class="pre">/</span></code> from log streams.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>record</strong> – <code class="docutils literal notranslate"><span class="pre">LogRecord</span></code> represents an event which is created every time something is logged.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>False flag for the endpoint that needs to be filtered.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-pystream.utils">
-<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-pystream.utils" title="Permalink to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pystream.utils.get_local_ip">
-<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_local_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_local_ip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Uses simple check on network id to retrieve the local IP address.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Private IP address of host machine.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>IPv4Address</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pystream.utils.get_public_ip">
-<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_public_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_public_ip" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract public IP address of the connection by making a request to external source.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Public IP address of host machine’s connection.</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>IPv4Address</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
 <section id="models">
 <h1>Models<a class="headerlink" href="#models" title="Permalink to this heading">¶</a></h1>
 </section>
@@ -192,16 +119,15 @@ name is specified, allow every event.</p>
 </ul>
 </dd>
 </dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">lru_cache</span></code> takes all params of the function and creates a key</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lru_cache</span></code> takes all params of the function and creates a key.</p></li>
 <li><p>If even one key is changed, it will map to new entry thus refreshed.</p></li>
 <li><p>This is just a trick to force lrc_cache lib to provide TTL on top of max size.</p></li>
-<li><p>Uses <code class="docutils literal notranslate"><span class="pre">time.monotonic</span></code> since <code class="docutils literal notranslate"><span class="pre">time.time</span></code> relies on the system clock and may not be monotonic</p></li>
 <li><div class="line-block">
-<div class="line">It’s not guaranteed to always increase, it may in fact decrease if</div>
-<div class="line">the machine syncs its system clock over a network</div>
+<div class="line">Uses <code class="docutils literal notranslate"><span class="pre">time.monotonic</span></code> since <code class="docutils literal notranslate"><span class="pre">time.time</span></code> is not guaranteed to always increase, it may in fact decrease if</div>
+<div class="line">the machine syncs its system clock over a network.</div>
 </div>
 </li>
 </ul>
@@ -640,6 +566,82 @@ allow <cite>self</cite> as a field name.</p>
 </dd></dl>
 
 </section>
+<section id="support-modules">
+<h1>Support Modules<a class="headerlink" href="#support-modules" title="Permalink to this heading">¶</a></h1>
+</section>
+<section id="module-pystream.logger">
+<span id="logger"></span><h1>Logger<a class="headerlink" href="#module-pystream.logger" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pystream.logger.RootFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pystream.logger.</span></span><span class="sig-name descname"><span class="pre">RootFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pystream.logger.RootFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to initiate <code class="docutils literal notranslate"><span class="pre">/</span></code> filter in logs while preserving other access logs.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">RootFilter</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p>Filters <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/login</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">200</span> <span class="pre">OK</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;GET</span> <span class="pre">/</span> <span class="pre">HTTP/1.1&quot;</span> <span class="pre">307</span> <span class="pre">Temporary</span> <span class="pre">Redirect</span></code>, <code class="docutils literal notranslate"><span class="pre">/video?vid_name=...</span></code></p></li>
+<li><p>Includes redundant logging for each iterable passed in <code class="docutils literal notranslate"><span class="pre">StreamingResponse</span></code></p></li>
+<li><p>Overrides logging by implementing a subclass of <code class="docutils literal notranslate"><span class="pre">logging.Filter</span></code></p></li>
+<li><p>The method <code class="docutils literal notranslate"><span class="pre">filter(record)</span></code>, that examines the log record and returns True to log it or False to discard it.</p></li>
+</ul>
+</div>
+<p>Initialize a filter.</p>
+<p>Initialize with the name of the logger which, together with its
+children, will have its events allowed through the filter. If no
+name is specified, allow every event.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pystream.logger.RootFilter.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LogRecord</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pystream.logger.RootFilter.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter out logging at <code class="docutils literal notranslate"><span class="pre">/</span></code> from log streams.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>record</strong> – <code class="docutils literal notranslate"><span class="pre">LogRecord</span></code> represents an event which is created every time something is logged.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>False flag for the endpoint that needs to be filtered.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-pystream.utils">
+<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-pystream.utils" title="Permalink to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pystream.utils.get_local_ip">
+<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_local_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_local_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses simple check on network id to retrieve the local IP address.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Private IP address of host machine.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>IPv4Address</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pystream.utils.get_public_ip">
+<span class="sig-prename descclassname"><span class="pre">pystream.utils.</span></span><span class="sig-name descname"><span class="pre">get_public_ip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">IPv4Address</span></span></span><a class="headerlink" href="#pystream.utils.get_public_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract public IP address of the connection by making a request to external source.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Public IP address of host machine’s connection.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>IPv4Address</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 <section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
 <ul class="simple">
@@ -661,8 +663,6 @@ allow <cite>self</cite> as a field name.</p>
     <ul>
 <li><a class="reference internal" href="#">Stream-Localhost - A secured interface to stream videos</a></li>
 <li><a class="reference internal" href="#module-pystream.main">Main Module</a></li>
-<li><a class="reference internal" href="#module-pystream.logger">Logger</a></li>
-<li><a class="reference internal" href="#module-pystream.utils">Utils</a></li>
 <li><a class="reference internal" href="#models">Models</a></li>
 <li><a class="reference internal" href="#module-pystream.models.authenticator">Authenticator</a></li>
 <li><a class="reference internal" href="#module-pystream.models.cache">Cache</a></li>
@@ -674,6 +674,9 @@ allow <cite>self</cite> as a field name.</p>
 <li><a class="reference internal" href="#module-pystream.routers.auth">Authentication</a></li>
 <li><a class="reference internal" href="#module-pystream.routers.basics">Basics</a></li>
 <li><a class="reference internal" href="#module-pystream.routers.video">Video</a></li>
+<li><a class="reference internal" href="#support-modules">Support Modules</a></li>
+<li><a class="reference internal" href="#module-pystream.logger">Logger</a></li>
+<li><a class="reference internal" href="#module-pystream.utils">Utils</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 

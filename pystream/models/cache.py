@@ -11,13 +11,12 @@ def timed_cache(max_age: int, maxsize: int = 128, typed: bool = False):
         maxsize: Maximum cache size (see `functools.lru_cache`).
         typed: Cache on distinct input types (see `functools.lru_cache`).
 
-    See Also:
-        - ``lru_cache`` takes all params of the function and creates a key
+    Warnings:
+        - ``lru_cache`` takes all params of the function and creates a key.
         - If even one key is changed, it will map to new entry thus refreshed.
         - This is just a trick to force lrc_cache lib to provide TTL on top of max size.
-        - Uses ``time.monotonic`` since ``time.time`` relies on the system clock and may not be monotonic
-        - | It's not guaranteed to always increase, it may in fact decrease if
-          | the machine syncs its system clock over a network
+        - | Uses ``time.monotonic`` since ``time.time`` is not guaranteed to always increase, it may in fact decrease if
+          | the machine syncs its system clock over a network.
     """
 
     def _decorator(fn: Callable):
