@@ -10,7 +10,22 @@
 # Video Streaming
 Video streaming using FastAPI
 
+## Install
+```shell
+python -m pip install stream-localhost
+```
+
+## Usage
+```python
+import pystream
+
+if __name__ == '__main__':
+    pystream.start()
+```
+
 ### Env Variables
+> Environment variables can be loaded from any file. Defaults to `.env` (_set the env var `env_file` to the filename_)
+
 **Mandatory**
 - **USERNAME**: Any username of choice.
 - **PASSWORD**: Any password of choice.

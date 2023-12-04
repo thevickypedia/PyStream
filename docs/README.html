@@ -42,11 +42,34 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="video-streaming">
+  <p><strong>Deployments</strong></p>
+<p><a class="reference external" href="https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment"><img alt="pages" src="https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg" /></a>
+<a class="reference external" href="https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml"><img alt="pypi" src="https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml/badge.svg" /></a></p>
+<p><a class="reference external" href="https://pypi.org/project/stream-localhost"><img alt="PyPI version shields.io" src="https://img.shields.io/pypi/v/stream-localhost" /></a>
+<a class="reference external" href="https://pypi.org/project/stream-localhost/#files"><img alt="Pypi-format" src="https://img.shields.io/pypi/format/stream-localhost" /></a>
+<a class="reference external" href="https://pypi.org/project/stream-localhost"><img alt="Pypi-status" src="https://img.shields.io/pypi/status/stream-localhost" /></a></p>
+<section id="video-streaming">
 <h1>Video Streaming<a class="headerlink" href="#video-streaming" title="Permalink to this heading">¶</a></h1>
 <p>Video streaming using FastAPI</p>
+<section id="install">
+<h2>Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>stream-localhost
+</pre></div>
+</div>
+</section>
+<section id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pystream</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">pystream</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
 <section id="env-variables">
-<h2>Env Variables<a class="headerlink" href="#env-variables" title="Permalink to this heading">¶</a></h2>
+<h3>Env Variables<a class="headerlink" href="#env-variables" title="Permalink to this heading">¶</a></h3>
+<blockquote>
+<div><p>Environment variables can be loaded from any file. Defaults to <code class="docutils literal notranslate"><span class="pre">.env</span></code> (<em>set the env var <code class="docutils literal notranslate"><span class="pre">env_file</span></code> to the filename</em>)</p>
+</div></blockquote>
 <p><strong>Mandatory</strong></p>
 <ul class="simple">
 <li><p><strong>USERNAME</strong>: Any username of choice.</p></li>
@@ -70,6 +93,51 @@
 </div></blockquote>
 </section>
 </section>
+<section id="coding-standards">
+<h2>Coding Standards<a class="headerlink" href="#coding-standards" title="Permalink to this heading">¶</a></h2>
+<p>Docstring format: <a class="reference external" href="https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings"><code class="docutils literal notranslate"><span class="pre">Google</span></code></a> <br>
+Styling conventions: <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/"><code class="docutils literal notranslate"><span class="pre">PEP</span> <span class="pre">8</span></code></a> and <a class="reference external" href="https://pycqa.github.io/isort/"><code class="docutils literal notranslate"><span class="pre">isort</span></code></a></p>
+</section>
+<section id="release-notes">
+<h2><a class="reference external" href="https://github.com/thevickypedia/pystream/blob/master/release_notes.rst">Release Notes</a><a class="headerlink" href="#release-notes" title="Permalink to this heading">¶</a></h2>
+<p><strong>Requirement</strong></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>gitverse
+</pre></div>
+</div>
+<p><strong>Usage</strong></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>gitverse-release<span class="w"> </span>reverse<span class="w"> </span>-f<span class="w"> </span>release_notes.rst<span class="w"> </span>-t<span class="w"> </span><span class="s1">&#39;Release Notes&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="linting">
+<h2>Linting<a class="headerlink" href="#linting" title="Permalink to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> will ensure linting, run pytest, generate runbook &amp; release notes, and validate hyperlinks in ALL
+markdown files (including Wiki pages)</p>
+<p><strong>Requirement</strong></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span><span class="nv">sphinx</span><span class="o">==</span><span class="m">5</span>.1.1<span class="w"> </span>pre-commit<span class="w"> </span>recommonmark
+</pre></div>
+</div>
+<p><strong>Usage</strong></p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+</section>
+<section id="pypi-package">
+<h2>Pypi Package<a class="headerlink" href="#pypi-package" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://packaging.python.org/tutorials/packaging-projects/"><img alt="pypi-module" src="https://img.shields.io/badge/Software%20Repository-pypi-1f425f.svg" /></a></p>
+<p><a class="reference external" href="https://pypi.org/project/stream-localhost">https://pypi.org/project/stream-localhost/</a></p>
+</section>
+<section id="runbook">
+<h2>Runbook<a class="headerlink" href="#runbook" title="Permalink to this heading">¶</a></h2>
+<p><a class="reference external" href="https://www.sphinx-doc.org/en/master/man/sphinx-autogen.html"><img alt="made-with-sphinx-doc" src="https://img.shields.io/badge/Code%20Docs-Sphinx-1f425f.svg" /></a></p>
+<p><a class="reference external" href="https://thevickypedia.github.io/pystream/">https://thevickypedia.github.io/pystream/</a></p>
+</section>
+<section id="license-copyright">
+<h2>License &amp; copyright<a class="headerlink" href="#license-copyright" title="Permalink to this heading">¶</a></h2>
+<p>© Vignesh Rao</p>
+<p>Licensed under the <a class="reference external" href="https://github.com/thevickypedia/pystream/blob/master/LICENSE">MIT License</a></p>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -82,7 +150,17 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">Video Streaming</a><ul>
+<li><a class="reference internal" href="#install">Install</a></li>
+<li><a class="reference internal" href="#usage">Usage</a><ul>
 <li><a class="reference internal" href="#env-variables">Env Variables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#coding-standards">Coding Standards</a></li>
+<li><a class="reference internal" href="#release-notes">Release Notes</a></li>
+<li><a class="reference internal" href="#linting">Linting</a></li>
+<li><a class="reference internal" href="#pypi-package">Pypi Package</a></li>
+<li><a class="reference internal" href="#runbook">Runbook</a></li>
+<li><a class="reference internal" href="#license-copyright">License &amp; copyright</a></li>
 </ul>
 </li>
 </ul>
