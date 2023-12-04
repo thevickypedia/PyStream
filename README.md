@@ -64,7 +64,7 @@ pre-commit run --all-files
 ## Runbook
 [![made-with-sphinx-doc](https://img.shields.io/badge/Code%20Docs-Sphinx-1f425f.svg)][sphinx]
 
-[https://jarvis-docs.vigneshrao.com/][runbook]
+[https://thevickypedia.github.io/pystream/][runbook]
 
 ## License & copyright
 
@@ -82,4 +82,4 @@ Licensed under the [MIT License][license]
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 [isort]: https://pycqa.github.io/isort/
 [sphinx]: https://www.sphinx-doc.org/en/master/man/sphinx-autogen.html
-[runbook]: https://jarvis-docs.vigneshrao.com/
+[runbook]: https://thevickypedia.github.io/pystream/
