@@ -38,8 +38,8 @@ class EnvConfig(BaseSettings):
 
     ip_hosted: bool = False
     video_port: PositiveInt = 8000
-    website: HttpUrl | None = None
-    ngrok_token: str | None = None
+    website: Union[HttpUrl, None] = None
+    ngrok_token: Union[str, None] = None
     video_host: IPv4Address = socket.gethostbyname("localhost")
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
 

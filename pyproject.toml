@@ -1,0 +1,43 @@
+[project]
+name = "stream-localhost"
+dynamic = ["version", "dependencies"]
+description = "Python module to, stream videos via authenticated sessions using FastAPI"
+readme = "README.md"
+authors = [{ name = "Vignesh Rao", email = "svignesh1793@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Multimedia :: Video"
+]
+keywords = ["video-streaming", "localhost"]
+requires-python = ">=3.8"
+
+[tool.setuptools]
+packages = ["pystream", "pystream.models", "pystream.routers", "pystream.templates"]
+[tool.setuptools.package-data]
+"pystream.templates" = ["*.html"]
+
+[tool.setuptools.dynamic]
+version = {attr = "pystream.version"}
+dependencies = {file = ["pystream/requirements.txt"]}
+
+[build-system]
+requires      = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = ["pre-commit"]
+
+[project.urls]
+Homepage = "https://github.com/thevickypedia/pystream"
+Docs = "https://thevickypedia.github.io/pystream/"
+Source = "https://github.com/thevickypedia/pystream"
+"Bug Tracker" = "https://github.com/thevickypedia/pystream/issues"
+"Release Notes" = "https://github.com/thevickypedia/pystream/blob/main/release_notes.rst"
