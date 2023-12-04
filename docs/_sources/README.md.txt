@@ -8,7 +8,7 @@
 [![Pypi-status](https://img.shields.io/pypi/status/stream-localhost)][pypi]
 
 # Video Streaming
-Video streaming using FastAPI
+Python module to, stream videos via authenticated sessions using FastAPI
 
 ## Install
 ```shell
