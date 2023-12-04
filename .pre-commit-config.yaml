@@ -31,23 +31,13 @@ repos:
     hooks:
       - id: isort
 
-#  - repo: local
-#    hooks:
-#      -
-#        id: pytest
-#        name: pytest
-#        entry: cd tests pytest
-#        language: system
-#        pass_filenames: false
-#        always_run: true
-#
-#  -
-#    repo: local
-#    hooks:
-#      -
-#        id: docs
-#        name: docs
-#        entry: /bin/bash gen_docs.sh
-#        language: system
-#        pass_filenames: false
-#        always_run: true
+  -
+    repo: local
+    hooks:
+      -
+        id: docs
+        name: docs
+        entry: /bin/bash pre_commit.sh
+        language: system
+        pass_filenames: false
+        always_run: true

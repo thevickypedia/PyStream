@@ -4,3 +4,5 @@ venv
 temp.py
 test.py
 source
+doc_gen/_build
+doc_gen/_static
