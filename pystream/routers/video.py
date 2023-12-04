@@ -33,12 +33,13 @@ async def stream_video(request: Request,
     squire.log_connection(request)
     pure_path = config.env.video_source / video_path
     if pure_path.is_dir():
-        child_dir = pathlib.Path(video_path).parts[-1]  # Use only the final dir in a path
+        # Use only the final dir in a path, since rest of it will be loaded in the login page itself
+        child_dir = pathlib.Path(video_path).parts[-1]
         return auth.templates.TemplateResponse(
             name=config.fileio.list_files,
             context={
                 "request": request,
-                "files": list(squire.get_dir_content(pure_path, child_dir)),
+                "files": squire.get_dir_content(pure_path, child_dir),
                 "dir_name": child_dir,
             }
         )
