@@ -75,7 +75,7 @@ async def video_endpoint(request: Request, range: Optional[str] = Header(None),
     squire.log_connection(request)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")
-        return RedirectResponse(url=config.static.login_endpoint, headers=None)
+        return RedirectResponse(url=config.static.index_endpoint, headers=None)
     if not request.query_params.get(config.static.query_param):
         raise HTTPException(status_code=status.HTTP_421_MISDIRECTED_REQUEST,
                             detail="Misdirected request, please route through the login page.")

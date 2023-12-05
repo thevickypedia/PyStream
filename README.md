@@ -17,10 +17,18 @@ python -m pip install stream-localhost
 
 ## Usage
 ```python
+import os
 import pystream
 
 if __name__ == '__main__':
-    pystream.start()
+    kwargs = dict(
+        username="foo",
+        password="bar",
+        video_source=os.path.join(os.path.expanduser('~'), 'Downloads'),
+    )
+    # Add the following to host on local IP address, skip for localhost (127.0.0.1)
+    kwargs["video_host"] = pystream.utils.get_local_ip()
+    pystream.start(**kwargs)
 ```
 
 ### Env Variables

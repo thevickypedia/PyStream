@@ -54,7 +54,7 @@ class Static(BaseModel):
 
     vault: str = "stream"  # Use a masked location to hide real path in the URL (will still be visible in html though)
     query_param: str = "file"
-    login_endpoint: str = "/login"
+    index_endpoint: str = "/index"
     logout_endpoint: str = "/logout"
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024

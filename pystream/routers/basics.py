@@ -28,4 +28,4 @@ async def root() -> RedirectResponse:
         RedirectResponse:
         Redirects to login page.
     """
-    return RedirectResponse(url=config.static.login_endpoint, headers=None)
+    return RedirectResponse(url=config.static.index_endpoint, headers=None)
