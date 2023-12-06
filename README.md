@@ -40,11 +40,12 @@ if __name__ == '__main__':
 - **VIDEO_SOURCE**: Source path for `.mp4` files.
 
 **Optional**
-- **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
 - **VIDEO_HOST**: IP address to host the video. Defaults to `127.0.0.1`
 - **VIDEO_PORT**: Port number to host the application. Defaults to `8000`
-- **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
+- **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
+- **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
+- **SCAN_INTERVAL**: Interval in seconds to deep scan `VIDEO_SOURCE` for `.mp4` files. Defaults to `30s`, set to `0` to skip
 
 ## Coding Standards
 Docstring format: [`Google`][google-docs] <br>

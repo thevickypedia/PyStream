@@ -28,13 +28,6 @@ Authenticator
    :members:
    :undoc-members:
 
-Cache
-=====
-
-.. automodule:: pystream.models.cache
-   :members:
-   :undoc-members:
-
 Config
 ======
 
@@ -53,6 +46,13 @@ Ngrok
 =====
 
 .. automodule:: pystream.models.ngrok
+   :members:
+   :undoc-members:
+
+Scheduler
+=========
+
+.. automodule:: pystream.models.scheduler
    :members:
    :undoc-members:
 

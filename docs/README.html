@@ -86,11 +86,12 @@
 </ul>
 <p><strong>Optional</strong></p>
 <ul class="simple">
-<li><p><strong>AUTO_THUMBNAIL</strong>: Boolean flag to auto generate thumbnail images for preview. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 <li><p><strong>VIDEO_HOST</strong>: IP address to host the video. Defaults to <code class="docutils literal notranslate"><span class="pre">127.0.0.1</span></code></p></li>
 <li><p><strong>VIDEO_PORT</strong>: Port number to host the application. Defaults to <code class="docutils literal notranslate"><span class="pre">8000</span></code></p></li>
-<li><p><strong>WEBSITE</strong>: Website to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
 <li><p><strong>WORKERS</strong>: Number of workers to spin up the <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> server. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
+<li><p><strong>WEBSITE</strong>: Website to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
+<li><p><strong>AUTO_THUMBNAIL</strong>: Boolean flag to auto generate thumbnail images for preview. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>SCAN_INTERVAL</strong>: Interval in seconds to deep scan <code class="docutils literal notranslate"><span class="pre">VIDEO_SOURCE</span></code> for <code class="docutils literal notranslate"><span class="pre">.mp4</span></code> files. Defaults to <code class="docutils literal notranslate"><span class="pre">30s</span></code>, set to <code class="docutils literal notranslate"><span class="pre">0</span></code> to skip</p></li>
 </ul>
 </section>
 </section>

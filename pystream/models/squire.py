@@ -5,7 +5,7 @@ from typing import Dict, List
 from fastapi import Request
 
 from pystream.logger import logger
-from pystream.models import cache, config
+from pystream.models import config
 
 
 def log_connection(request: Request) -> None:
@@ -44,7 +44,6 @@ def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[
     return sorted(files, key=lambda x: x['name'])
 
 
-@cache.timed_cache(max_age=600)  # Cache it for 10 minutes
 def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
     """Get video files or folders that contain video files to be streamed.
 
