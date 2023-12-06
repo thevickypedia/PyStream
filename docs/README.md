@@ -1,6 +1,6 @@
 **Deployments**
 
-[![pages](https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg)][gha_pages]
+[![book](https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg)][gha_pages]
 [![pypi](https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml/badge.svg)][gha_pypi]
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/stream-localhost)][pypi]
@@ -17,6 +17,7 @@ python -m pip install stream-localhost
 
 ## Usage
 ```python
+import asyncio
 import os
 import pystream
 
@@ -27,12 +28,13 @@ if __name__ == '__main__':
         video_source=os.path.join(os.path.expanduser('~'), 'Downloads'),
     )
     # Add the following to host on local IP address, skip for localhost (127.0.0.1)
-    kwargs["video_host"] = pystream.utils.get_local_ip()
-    pystream.start(**kwargs)
+    # kwargs["video_host"] = pystream.utils.get_local_ip()
+    asyncio.run(pystream.start(**kwargs))
 ```
 
 ### Env Variables
-> Environment variables can be loaded from any file. Defaults to `.env` (_set the env var `env_file` to the filename_)
+> :bulb: &nbsp; Environment variables can be loaded from any file.
+> Defaults to `.env` (_set the env var `env_file` to the filename_)
 
 **Mandatory**
 - **USERNAME**: Any username of choice.
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
 - **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
-- **SCAN_INTERVAL**: Interval in seconds to deep scan `VIDEO_SOURCE` for `.mp4` files. Defaults to `30s`, set to `0` to skip
+- **SCAN_INTERVAL**: Interval in seconds to scan `VIDEO_SOURCE` for `.mp4` files. Defaults to `30s`, set to `0` to skip
 
 ## Coding Standards
 Docstring format: [`Google`][google-docs] <br>
