@@ -19,6 +19,7 @@ class EnvConfig(BaseSettings):
     password: SecretStr
     video_source: DirectoryPath
 
+    auto_thumbnail: bool = True
     video_port: PositiveInt = 8000
     website: Union[HttpUrl, None] = None
     ngrok_token: Union[str, None] = None

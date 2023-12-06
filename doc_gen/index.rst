@@ -42,6 +42,13 @@ Config
    :members:
    :exclude-members: _abc_impl, model_config, model_fields
 
+Images
+======
+
+.. automodule:: pystream.models.images
+   :members:
+   :undoc-members:
+
 Ngrok
 =====
 

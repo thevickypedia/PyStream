@@ -23,6 +23,7 @@ requires-python = ">=3.8"
 packages = ["pystream", "pystream.models", "pystream.routers", "pystream.templates"]
 [tool.setuptools.package-data]
 "pystream.templates" = ["*.html"]
+"pystream.routers" = ["blank.jpg"]
 
 [tool.setuptools.dynamic]
 version = {attr = "pystream.version"}

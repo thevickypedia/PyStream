@@ -4,7 +4,7 @@ from typing import Optional, Union
 from urllib import parse as urlparse
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
-from fastapi.responses import RedirectResponse, StreamingResponse, FileResponse
+from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.security import HTTPBasicCredentials
 
 from pystream.logger import logger
@@ -33,9 +33,6 @@ async def preview_loader(request: Request, img_path: str,
     squire.log_connection(request)
     if pathlib.PosixPath(img_path).exists():
         return FileResponse(img_path)
-    img_src = os.path.join(os.getcwd(), img_path)
-    if os.path.isfile(img_src):
-        return FileResponse(img_src)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
 
 
@@ -73,14 +70,16 @@ async def stream_video(request: Request,
     if pure_path.exists():
         attrs = {
             "request": request, "title": video_path,
-            "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}"
+            "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
         }
-        # If preview file exists at source, uses it, else tries to create one at video_source (reuses when refreshed)
-        preview_src = os.path.join(pure_path.parent, pure_path.name.replace('.mp4', '.jpg'))  # .mp4 has been hard coded
-        if os.path.isfile(preview_src):
-            attrs['preview'] = f"/{config.static.preview}/{preview_src}"
-        elif Images(filepath=pure_path).generate_preview(preview_src):  # preview file has been created at video source
-            attrs['preview'] = f"/{config.static.preview}/{preview_src}"
+        # set default to avoid broken image sign in thumbnail
+        preview_src = os.path.join(pathlib.PurePath(__file__).parent, "blank.jpg")
+        if config.env.auto_thumbnail:
+            # Uses preview file if exists at source, else tries to create one at video_source (reuses when refreshed)
+            __preview_src = os.path.join(pure_path.parent, f"_{pure_path.name.replace('.mp4', 'pys_preview.jpg')}")
+            if os.path.isfile(preview_src) or Images(filepath=pure_path).generate_preview(preview_src):
+                preview_src = __preview_src
+        attrs['preview'] = f"/{config.static.preview}/{preview_src}"
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
