@@ -63,13 +63,7 @@
         }
     </style>
     <!-- Video, title and body CSS -->
-    <!-- fixme: video is not centered despite setting as !important -->
     <style>
-        video {
-            margin-left: auto;
-            margin-right: auto;
-            display: block
-        }
         body {
             font-family: 'PT Serif', serif;
         }
@@ -85,12 +79,13 @@
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
 <br><br>
 <h1>{{title}}</h1>
+<!-- todo: check if video dimensions will match for vertically long videos -->
 <video id="video-player"
-       width="640" height="264"
+       width="960" height="480"
        class="video-js"
        preload="auto"
        controls muted="muted"
-       style="position: relative"
+       style="position: relative; margin-left: auto; margin-right: auto; display: block"
        poster=""
        data-setup="{}">
     <source id="video-source" type="video/mp4" src=""/>
