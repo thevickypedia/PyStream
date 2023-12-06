@@ -37,8 +37,8 @@ class EnvConfig(BaseSettings):
 
     # noinspection PyMethodParameters
     @field_validator("video_host", mode='after', check_fields=True)
-    def parse_video_host(cls, value: str) -> str:
-        """Validates date value to be in DD-MM format."""
+    def parse_video_host(cls, value: IPv4Address) -> str:
+        """Returns the string notion of IPv4Address object."""
         return str(value)
 
 
