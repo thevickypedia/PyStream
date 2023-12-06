@@ -1,17 +1,42 @@
 import os
 import pathlib
-import urllib.parse
 from typing import Optional, Union
+from urllib import parse as urlparse
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse, FileResponse
 from fastapi.security import HTTPBasicCredentials
 
 from pystream.logger import logger
 from pystream.models import authenticator, config, squire, stream
+from pystream.models.images import Images
 from pystream.routers import auth
 
 router = APIRouter()
+
+
+@router.get("/%s/{img_path:path}" % config.static.preview, response_model=None)
+async def preview_loader(request: Request, img_path: str,
+                         credentials: HTTPBasicCredentials = Depends(auth.security)) -> FileResponse:
+    """Returns the file for preview image.
+
+    Args:
+        request: Takes the ``Request`` class as an argument.
+        img_path: Path of the image file that has to be rendered.
+        credentials: HTTPBasicCredentials for authentication.
+
+    Returns:
+        FileResponse:
+        FileResponse for preview image.
+    """
+    await authenticator.verify(credentials)
+    squire.log_connection(request)
+    if pathlib.PosixPath(img_path).exists():
+        return FileResponse(img_path)
+    img_src = os.path.join(os.getcwd(), img_path)
+    if os.path.isfile(img_src):
+        return FileResponse(img_src)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
 
 
 @router.get("/%s/{video_path:path}" % config.static.vault, response_model=None)
@@ -46,11 +71,17 @@ async def stream_video(request: Request,
             }
         )
     if pure_path.exists():
-        src = f"{config.static.streaming_endpoint}?{config.static.query_param}={urllib.parse.quote(str(pure_path))}"
-        return auth.templates.TemplateResponse(
-            name=config.fileio.index, headers=None,
-            context={"request": request, "title": video_path, "path": src}
-        )
+        attrs = {
+            "request": request, "title": video_path,
+            "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}"
+        }
+        # If preview file exists at source, uses it, else tries to create one at video_source (reuses when refreshed)
+        preview_src = os.path.join(pure_path.parent, pure_path.name.replace('.mp4', '.jpg'))  # .mp4 has been hard coded
+        if os.path.isfile(preview_src):
+            attrs['preview'] = f"/{config.static.preview}/{preview_src}"
+        elif Images(filepath=pure_path).generate_preview(preview_src):  # preview file has been created at video source
+            attrs['preview'] = f"/{config.static.preview}/{preview_src}"
+        return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 

@@ -53,6 +53,7 @@ class Static(BaseModel):
     """
 
     vault: str = "stream"  # Use a masked location to hide real path in the URL (will still be visible in html though)
+    preview: str = "preview"
     query_param: str = "file"
     index_endpoint: str = "/index"
     logout_endpoint: str = "/logout"
