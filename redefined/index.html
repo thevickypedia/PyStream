@@ -1,113 +1,19 @@
-<!DOCTYPE html>
-<!--suppress JSUnresolvedLibraryURL -->
-<html lang="en">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>FastAPI video streaming</title>
-    <meta content="no-cache, no-store, must-revalidate" http-equiv="content-type"/>
-    <meta content="no-cache" http-equiv="refresh"/>
-    <meta property="og:type" content="VideoStreaming">
-    <meta name="keywords" content="Python, streaming, fastapi, JavaScript, HTML, CSS">
-    <meta name="author" content="Vignesh Rao">
-    <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
-    <meta content="width=device-width, initial-scale=1" name="viewport">
-    <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
-    <link rel="shortcut icon" href="#">
-    <!-- Font Awesome icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- CSS and JS for night mode -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <!-- Use defer to download in parallel to parsing the page, and execute after the page has finished parsing -->
-    <script type="text/javascript" src="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.js" defer></script>
-    <link rel="stylesheet" href="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.css">
-    <!-- Button CSS -->
-    <style>
-        .home {
-            position: absolute; /* relative or fixed or absolute; */
-            top: 3.8%;
-            right: 218px;
-            background-color: #4169E1;
-            border: none;
-            color: black;
-            padding: 10px 14px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .back {
-            position: absolute; /* relative or fixed or absolute; */
-            top: 3.8%;
-            right: 130px;
-            background-color: #4169E1;
-            border: none;
-            color: black;
-            padding: 10px 14px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .logout {
-            position: absolute; /* relative or fixed or absolute; */
-            top: 3.8%;
-            right: 30px;
-            background-color: #4169E1;
-            border: none;
-            color: black;
-            padding: 10px 14px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
-    <!-- Video, title and body CSS -->
-    <style>
-        video {
-            margin-left: auto;
-            margin-right: auto;
-            display: block
-        }
-        body {
-            font-family: 'PT Serif', serif;
-        }
-        h1 {
-            text-align: center;
-        }
-    </style>
+  <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet" />
+  <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+  <!-- <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script> -->
 </head>
-<body translate="no">
-<div class="toggler fa fa-moon-o"></div>
-<button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
-<button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
-<button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
-<br><br>
-<h1>{{title}}</h1>
-<video id="video-player" width="1000" controls muted="muted" style="position: relative">
-    <source id="video-source" type="video/mp4"  src=""/>
-</video>
-<script>
-    let path = "/video.mp4"; // Get the path variable from Jinja template
-    let origin = window.location.origin; // Get the current origin using JavaScript
 
-    // Construct the video source URL by combining origin and path
-    let videoSource = origin + path;
-
-    // Set the source URL for the video element
-    let videoElement = document.getElementById("video-source");
-    videoElement.setAttribute("src", videoSource);
-
-    // Load and play the video
-    let videoPlayer = document.getElementById("video-player");
-    videoPlayer.load(); // Load the video
-    // videoPlayer.play(); // Play the video
-</script>
-<script>
-    function logOut() {
-        window.location.href = window.location.origin + '/logout';
-    }
-    function goHome() {
-        window.location.href = window.location.origin;
-    }
-    function goBack() {
-        window.history.back();
-    }
-
-</script>
+<body>
+  <video id="my-video" class="video-js" controls preload="auto" width="640" height="264" poster="video.mp4_preview.jpg" data-setup="{}">
+    <source src="video.mp4" type="video/mp4" />
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a
+      web browser that
+      <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a
+      >
+    </p>
+  </video>
+  <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
 </body>
-</html>
