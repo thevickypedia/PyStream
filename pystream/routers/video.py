@@ -82,7 +82,7 @@ async def stream_video(request: Request,
             pys_preview = os.path.join(pure_path.parent, f"_{pure_path.name.replace('.mp4', '_pys_preview.jpg')}")
             if os.path.isfile(pys_preview) or Images(filepath=pure_path).generate_preview(pys_preview):
                 preview_src = pys_preview
-        attrs['preview'] = f"/{config.static.preview}/{preview_src}"
+        attrs['preview'] = urlparse.quote(f"/{config.static.preview}/{preview_src}")
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
