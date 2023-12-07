@@ -1,3 +1,4 @@
+import html
 import os
 import pathlib
 from typing import Optional, Union
@@ -31,8 +32,10 @@ async def preview_loader(request: Request, img_path: str,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
+    img_path = html.unescape(img_path)
     if pathlib.PosixPath(img_path).exists():
         return FileResponse(img_path)
+    logger.critical("'%s' not found", img_path)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
 
 
@@ -76,9 +79,9 @@ async def stream_video(request: Request,
         preview_src = os.path.join(pathlib.PurePath(__file__).parent, "blank.jpg")
         if config.env.auto_thumbnail:
             # Uses preview file if exists at source, else tries to create one at video_source (reuses when refreshed)
-            __preview_src = os.path.join(pure_path.parent, f"_{pure_path.name.replace('.mp4', 'pys_preview.jpg')}")
-            if os.path.isfile(preview_src) or Images(filepath=pure_path).generate_preview(preview_src):
-                preview_src = __preview_src
+            pys_preview = os.path.join(pure_path.parent, f"_{pure_path.name.replace('.mp4', '_pys_preview.jpg')}")
+            if os.path.isfile(pys_preview) or Images(filepath=pure_path).generate_preview(pys_preview):
+                preview_src = pys_preview
         attrs['preview'] = f"/{config.static.preview}/{preview_src}"
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     else:
