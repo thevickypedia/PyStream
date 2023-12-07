@@ -21,23 +21,19 @@ def task() -> None:
 
 def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
-    logger.info('Setting CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
     if config.env.website:
+        logger.info('Setting CORS policy.')
         origins.extend([
             f"http://{config.env.website.host}",
             f"https://{config.env.website.host}",
             f"http://{config.env.website.host}/*",
             f"https://{config.env.website.host}/*"
         ])
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_origin_regex='https://.*\.ngrok\.io/*',  # noqa: W605
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    kwargs = dict(allow_origins=origins)
+    if config.env.ngrok_token:
+        kwargs['allow_origin_regex'] = 'https://.*\.ngrok\.io/*'  # noqa: W605
+    app.add_middleware(CORSMiddleware, **kwargs)
     task()
 
 
