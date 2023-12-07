@@ -20,21 +20,13 @@
     <link rel="shortcut icon" href="#">
     <!-- Font Awesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- CSS and JS for night mode -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <!-- Use defer to download in parallel to parsing the page, and execute after the page has finished parsing -->
-    <script type="text/javascript" src="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.js"
-            defer></script>
-    <link rel="stylesheet" href="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.css">
     <!-- Button CSS -->
     <style>
         .home {
             position: absolute; /* relative or fixed or absolute; */
             top: 3.8%;
             right: 218px;
-            background-color: #4169E1;
             border: none;
-            color: black;
             padding: 10px 14px;
             font-size: 16px;
             cursor: pointer;
@@ -43,9 +35,7 @@
             position: absolute; /* relative or fixed or absolute; */
             top: 3.8%;
             right: 130px;
-            background-color: #4169E1;
             border: none;
-            color: black;
             padding: 10px 14px;
             font-size: 16px;
             cursor: pointer;
@@ -54,12 +44,25 @@
             position: absolute; /* relative or fixed or absolute; */
             top: 3.8%;
             right: 30px;
-            background-color: #4169E1;
             border: none;
-            color: black;
             padding: 10px 14px;
             font-size: 16px;
             cursor: pointer;
+        }
+        body {
+            background-color: #151515;
+        }
+        title, h1, h2, h3, h4, h5, h6, p {
+            color: #f0f0f0;
+        }
+        button {
+            background: transparent !important;
+            color: #f0f0f0;
+        }
+        button:hover {
+            background: transparent !important;
+            opacity: 0.6;
+            transition: 0.5s;
         }
     </style>
     <!-- Video, title and body CSS -->
@@ -72,8 +75,7 @@
         }
     </style>
 </head>
-<body translate="no">
-<div class="toggler fa fa-moon-o"></div>
+<body>
 <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
 <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
