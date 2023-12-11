@@ -107,7 +107,15 @@
        controls muted="muted"
        style="position: relative; margin-left: auto; margin-right: auto; display: block"
        poster=""
-       data-setup='{"playbackRates": [1, 1.5, 2] }'>
+       data-setup='{
+         "playbackRates": [1, 1.5, 2, 5],
+         "controlBar": {
+           "skipButtons": {
+             "backward": 10,
+             "forward": 10
+           }
+         }
+       }'>
     <source id="video-source" type="video/mp4" src=""/>
     <p class="vjs-no-js">
         To view this video please enable JavaScript, and consider upgrading to a
@@ -115,8 +123,7 @@
         <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
     </p>
 </video>
-<button data-skip="-15" class="player__button">« 15s</button>
-<button data-skip="15" class="player__button">15s »</button>
+<br><br>
 </div>
 <script>
     let origin = window.location.origin; // Get the current origin using JavaScript
@@ -134,12 +141,6 @@
     let videoPlayer = document.getElementById("video-player");
     // Set the preview source URL for the video-player element
     videoPlayer.setAttribute("poster", previewSource);
-    let skipButtons = document.querySelectorAll("[data-skip]");
-    skipButtons.forEach((button) => button.addEventListener("click", skip));
-    function skip() {
-      // used parseFloat to convert string to number
-      videoPlayer.currentTime += parseFloat(this.dataset.skip);
-    }
     videoPlayer.load(); // Load the video
     // videoPlayer.play(); // Play the video
 </script>
