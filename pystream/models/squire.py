@@ -35,7 +35,7 @@ def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[
     files = []
     sort_by = "len"
     for file in os.listdir(parent):
-        if file.endswith(".mp4"):
+        if any(file.endswith(format_) for format_ in config.env.file_formats):
             if file[0].isdigit():
                 sort_by = "index"
             files.append({"name": file, "path": os.path.join(subdir, file)})
@@ -51,7 +51,6 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
         Dict[str, List[str]]:
         Dictionary of files and directories with name and path as key-value pairs on each section.
     """
-    # fixme: Cache this with a background task if the timed cache doesn't seem to be viable with too many sub dirs
     structure = {'files': [], 'directories': []}
     file_sort_by = "len"
     dir_sort_by = "len"
@@ -61,7 +60,7 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
         for file_ in __file:
             if file_.startswith('__'):
                 continue
-            if file_.endswith('.mp4'):
+            if any(file_.endswith(format_) for format_ in config.env.file_formats):
                 if path := __path.replace(str(config.env.video_source), "").lstrip(os.path.sep):
                     if path[0].isdigit():
                         dir_sort_by = "index"

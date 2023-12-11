@@ -79,7 +79,8 @@ async def stream_video(request: Request,
         preview_src = os.path.join(pathlib.PurePath(__file__).parent, "blank.jpg")
         if config.env.auto_thumbnail:
             # Uses preview file if exists at source, else tries to create one at video_source (reuses when refreshed)
-            pys_preview = os.path.join(pure_path.parent, f"_{pure_path.name.replace('.mp4', '_pys_preview.jpg')}")
+            pys_preview = os.path.join(pure_path.parent,
+                                       f"_{pure_path.name.replace(pure_path.suffix, '_pys_preview.jpg')}")
             if os.path.isfile(pys_preview) or Images(filepath=pure_path).generate_preview(pys_preview):
                 preview_src = pys_preview
         attrs['preview'] = urlparse.quote(f"/{config.static.preview}/{preview_src}")

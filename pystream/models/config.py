@@ -1,7 +1,7 @@
 import os
 import socket
 from ipaddress import IPv4Address
-from typing import Dict, List, Union
+from typing import Dict, List, Sequence, Union
 
 from pydantic import (BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt,
                       SecretStr, field_validator)
@@ -23,6 +23,7 @@ class EnvConfig(BaseSettings):
     video_port: PositiveInt = 8000
     website: Union[HttpUrl, None] = None
     ngrok_token: Union[str, None] = None
+    file_formats: Sequence[str] = (".mov", ".mp4")
     video_host: IPv4Address = socket.gethostbyname("localhost")
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
     scan_interval: Union[PositiveInt, None] = Field(30, ge=30, le=86_400)  # range: 30s to 24h

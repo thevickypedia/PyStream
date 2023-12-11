@@ -82,7 +82,7 @@ async def start(**kwargs) -> None:
         background_task = scheduler.RepeatedTimer(function=task, interval=config.env.scan_interval)
         background_task.start()  # Start background task
     else:
-        logger.warning("Without background scans, new .mp4 files at %s will not reflect in the UI",
+        logger.warning("Without background scans, new video files at %s will not reflect in the UI",
                        config.env.video_source)
         background_task = None
     await uvicorn_server.serve()  # Await uvicorn server
