@@ -40,6 +40,7 @@ if __name__ == '__main__':
 - **USERNAME**: Any username of choice.
 - **PASSWORD**: Any password of choice.
 - **VIDEO_SOURCE**: Source path for `.mp4` files.
+> :bulb: &nbsp; Files starting with `_` _(underscore)_ will be ignored
 
 **Optional**
 - **VIDEO_HOST**: IP address to host the video. Defaults to `127.0.0.1`
