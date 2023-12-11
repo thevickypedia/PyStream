@@ -81,3 +81,8 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
     structure['files'] = sorted(structure['files'], key=lambda x: extract_number(x['name']))
     structure['directories'] = sorted(structure['directories'], key=lambda x: extract_number(x['name']))
     return structure
+
+
+def scanner() -> None:
+    """Update the shared static object member to response from stream all content."""
+    config.static.landing_page = get_all_stream_content()

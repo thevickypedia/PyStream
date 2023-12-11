@@ -115,6 +115,8 @@
         <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
     </p>
 </video>
+<button data-skip="-15" class="player__button">« 15s</button>
+<button data-skip="15" class="player__button">15s »</button>
 </div>
 <script>
     let origin = window.location.origin; // Get the current origin using JavaScript
@@ -132,6 +134,12 @@
     let videoPlayer = document.getElementById("video-player");
     // Set the preview source URL for the video-player element
     videoPlayer.setAttribute("poster", previewSource);
+    let skipButtons = document.querySelectorAll("[data-skip]");
+    skipButtons.forEach((button) => button.addEventListener("click", skip));
+    function skip() {
+      // used parseFloat to convert string to number
+      videoPlayer.currentTime += parseFloat(this.dataset.skip);
+    }
     videoPlayer.load(); // Load the video
     // videoPlayer.play(); // Play the video
 </script>

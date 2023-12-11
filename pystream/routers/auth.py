@@ -29,6 +29,7 @@ async def index(request: Request,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
+    config.env.scan_interval or squire.scanner()
     return templates.TemplateResponse(
         name=config.fileio.list_files,
         context={"request": request, "logout": config.static.logout_endpoint,

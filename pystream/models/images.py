@@ -45,7 +45,7 @@ class Images:
         else:
             path = os.getcwd()
         success, image = self.video_capture.read()
-        logger.info("Generating thumbnail for %s", self.filepath)
+        logger.info("Generating thumbnail for '%s'", self.filepath.name)
         count = 0
         n = 0
         while success:
@@ -57,7 +57,7 @@ class Images:
         if n:
             logger.info("Generated %d thumbnails", n)
             return True
-        logger.error("Failed to generate thumbnails for %s", self.filepath)
+        logger.error("Failed to generate thumbnails for '%s'", self.filepath.name)
 
     def get_video_length(self) -> Tuple[int, datetime.timedelta]:
         """Get the number of frames to calculate length of the video.
@@ -84,7 +84,6 @@ class Images:
             Returns a boolean flag to indicate success/failure.
         """
         seconds, video_time = self.get_video_length()
-        logger.info("video duration: %s", video_time)
         if os.path.isdir(path):
             raise IsADirectoryError("Requires a filepath, received a directory path.")
         if os.path.isfile(path):
@@ -103,6 +102,7 @@ class Images:
         success, image = self.video_capture.read()
         if success:
             cv2.imwrite(path, image)  # save frame as JPEG file
-            logger.info("Generated preview image for %s at %d seconds", self.filepath, at_second)
+            logger.info("Generated preview image for '%s' [%s] at %d seconds",
+                        self.filepath.name, video_time, at_second)
             return True
-        logger.error("Failed to generate preview image for %s", self.filepath)
+        logger.error("Failed to generate preview image for '%s' [%s]", self.filepath.name, video_time)

@@ -14,11 +14,6 @@ app.include_router(basics.router)
 app.include_router(video.router)
 
 
-def task() -> None:
-    """Update the shared static object member to response from stream all content."""
-    config.static.landing_page = squire.get_all_stream_content()
-
-
 def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
     origins = ["http://localhost.com", "https://localhost.com"]
@@ -34,7 +29,7 @@ def startup_tasks() -> None:
     if config.env.ngrok_token:
         kwargs['allow_origin_regex'] = 'https://.*\.ngrok\.io/*'  # noqa: W605
     app.add_middleware(CORSMiddleware, **kwargs)
-    task()
+    squire.scanner()
 
 
 async def start(**kwargs) -> None:
@@ -79,11 +74,11 @@ async def start(**kwargs) -> None:
     startup_tasks()
     if config.env.scan_interval:
         # Initiate background task with repeated timer
-        background_task = scheduler.RepeatedTimer(function=task, interval=config.env.scan_interval)
+        logger.info("'%s' will be scanned every %s seconds", config.env.video_source, config.env.scan_interval)
+        background_task = scheduler.RepeatedTimer(function=squire.scanner, interval=config.env.scan_interval)
         background_task.start()  # Start background task
     else:
-        logger.warning("Without background scans, new video files at %s will not reflect in the UI",
-                       config.env.video_source)
+        logger.info("'%s' will be scanned in realtime", config.env.video_source)
         background_task = None
     await uvicorn_server.serve()  # Await uvicorn server
     if background_task:

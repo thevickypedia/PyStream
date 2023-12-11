@@ -48,7 +48,10 @@ if __name__ == '__main__':
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
 - **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
-- **SCAN_INTERVAL**: Interval in seconds to scan `VIDEO_SOURCE` for `.mp4` files. Defaults to `30s`, set to `0` to skip
+- **SCAN_INTERVAL**: Interval in seconds to scan `VIDEO_SOURCE` in the background. Defaults traditional scan at run time.
+> :bulb: &nbsp; When `SCAN_INTERVAL` is set to `None`, `VIDEO_SOURCE` will be scanned in real time whenever the user
+> loads the landing page. Setting a `SCAN_INTERVAL` will scan the `VIDEO_SOURCE` in background and reduce runtime
+> delays in case of complex directory structure.
 
 ## Coding Standards
 Docstring format: [`Google`][google-docs] <br>
