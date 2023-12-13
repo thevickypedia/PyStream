@@ -1,7 +1,7 @@
 import os
 import pathlib
 import re
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from fastapi import Request
 
@@ -22,18 +22,18 @@ def log_connection(request: Request) -> None:
         logger.info("User agent: %s", request.headers.get('user-agent'))
 
 
-def extract_number(filename: str) -> int:
-    """Use a regular expression to find the numeric part in the filename.
+def natural_sort_key(filename: str) -> List[Union[int, str]]:
+    """Key function for sorting filenames in a natural way.
 
     Args:
         filename: Takes the filename as an argument.
 
     Returns:
-        int:
-        Returns the index of the numeric part in the filename.
+        List[Union[int, str]]:
+        Returns a list of elements derived from splitting the filename into parts using a regular expression.
     """
-    match = re.search(r'\d+', filename)
-    return int(match.group()) if match else 0
+    parts = re.split(r'(\d+)', filename)
+    return [int(part) if part.isdigit() else part.lower() for part in parts]
 
 
 def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
@@ -53,7 +53,7 @@ def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[
             continue
         if pathlib.PurePath(file_).suffix in config.env.file_formats:
             files.append({"name": file_, "path": os.path.join(subdir, file_)})
-    return sorted(files, key=lambda x: extract_number(x['name']))
+    return sorted(files, key=lambda x: natural_sort_key(x['name']))
 
 
 def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
@@ -78,8 +78,8 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
                     structure['directories'].append(entry)
                 else:
                     structure['files'].append({"name": file_, "path": os.path.join(config.static.vault, file_)})
-    structure['files'] = sorted(structure['files'], key=lambda x: extract_number(x['name']))
-    structure['directories'] = sorted(structure['directories'], key=lambda x: extract_number(x['name']))
+    structure['files'] = sorted(structure['files'], key=lambda x: natural_sort_key(x['name']))
+    structure['directories'] = sorted(structure['directories'], key=lambda x: natural_sort_key(x['name']))
     return structure
 
 
