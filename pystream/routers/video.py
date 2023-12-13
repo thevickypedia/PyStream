@@ -1,6 +1,7 @@
 import html
 import os
 import pathlib
+import threading
 from typing import Optional, Union
 from urllib import parse as urlparse
 
@@ -34,6 +35,8 @@ async def preview_loader(request: Request, img_path: str,
     squire.log_connection(request)
     img_path = html.unescape(img_path)
     if pathlib.PosixPath(img_path).exists():
+        # Image is required only for caching in the browser, so it is not required after it has been rendered
+        threading.Timer(interval=5, function=os.remove, args=(img_path,)).start()
         return FileResponse(img_path)
     logger.critical("'%s' not found", img_path)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
@@ -85,8 +88,7 @@ async def stream_video(request: Request,
                 preview_src = pys_preview
         attrs['preview'] = urlparse.quote(f"/{config.static.preview}/{preview_src}")
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 
 
 # noinspection PyShadowingBuiltins
