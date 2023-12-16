@@ -22,6 +22,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Button CSS -->
     <style>
+        .iter {
+            border: none;
+            padding: 10px 14px;
+            font-size: 16px;
+            cursor: pointer;
+        }
         .home {
             position: absolute; /* relative or fixed or absolute; */
             top: 3.8%;
@@ -93,25 +99,6 @@
             display: block
         }
     </style>
-    <style>
-        a {
-          text-decoration: none;
-          display: inline-block;
-          padding: 8px 16px;
-        }
-        a:hover {
-          background-color: #ddd;
-          color: black;
-        }
-        .previous {
-          background-color: #f1f1f1;
-          color: black;
-        }
-        .next {
-          background-color: #f1f1f1;
-          color: black;
-        }
-        </style>
 </head>
 <body>
 <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
@@ -142,8 +129,12 @@
         <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
     </p>
 </video>
-<a style="float: left" href="{{ previous }}" title="{{ previous }}" class="previous">&laquo; Previous</a>
-<a style="float: right" href="{{ next }}" title="{{ next }}" class="next">Next &raquo;</a>
+<button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous }}">
+    <i class="fa fa-backward"></i> Previous
+</button>
+<button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next }}">
+    Next <i class="fa fa-forward"></i>
+</button>
 <br><br>
 </div>
 <script>
