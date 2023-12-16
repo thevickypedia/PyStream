@@ -1,7 +1,7 @@
 import os
 import pathlib
 import re
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Tuple
 
 from fastapi import Request
 
@@ -83,6 +83,47 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
     return structure
 
 
+def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, None]]:
+    """Sort video files at the currently served file's directory, and return the previous and next filenames.
+
+    Args:
+        filename: Path to the video file currently rendered.
+
+    Returns:
+        Tuple[str, str]:
+        Tuple of previous file and next file.
+    """
+    dir_content = sorted(os.listdir(filename.parent), key=lambda x: natural_sort_key(x))
+    for idx, file in enumerate(dir_content):
+        if file == filename.name:
+            try:
+                previous_ = dir_content[idx - 1]
+            except IndexError:
+                previous_ = None
+            try:
+                next_ = dir_content[idx + 1]
+            except IndexError:
+                next_ = None
+            if pathlib.PosixPath(previous_).suffix not in config.env.file_formats:
+                previous_ = None
+            if pathlib.PosixPath(next_).suffix not in config.env.file_formats:
+                next_ = None
+            return previous_, next_
+    return None, None
+
+
 def scanner() -> None:
     """Update the shared static object member to response from stream all content."""
     config.static.landing_page = get_all_stream_content()
+
+
+def remove_thumbnail(img_path: pathlib.PosixPath) -> None:
+    """Triggered by timer to remove the thumbnail file.
+
+    Args:
+        img_path: PosixPath to the thumbnail image.
+    """
+    if img_path.exists():
+        os.remove(img_path)
+    else:
+        logger.warning("%s was removed before hand." % img_path)

@@ -33,10 +33,10 @@ async def preview_loader(request: Request, img_path: str,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
-    img_path = html.unescape(img_path)
-    if pathlib.PosixPath(img_path).exists():
+    img_path = pathlib.PosixPath(html.unescape(img_path))
+    if img_path.exists():
         # Image is required only for caching in the browser, so it is not required after it has been rendered
-        threading.Timer(interval=5, function=os.remove, args=(img_path,)).start()
+        threading.Timer(interval=5, function=squire.remove_thumbnail, args=(img_path,)).start()
         return FileResponse(img_path)
     logger.critical("'%s' not found", img_path)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
@@ -74,9 +74,11 @@ async def stream_video(request: Request,
             }
         )
     if pure_path.exists():
+        prev_, next_ = squire.get_iter(pure_path)
         attrs = {
             "request": request, "title": video_path,
             "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
+            "previous": prev_ or "#", "next": next_ or "#"
         }
         # set default to avoid broken image sign in thumbnail
         preview_src = os.path.join(pathlib.PurePath(__file__).parent, "blank.jpg")
