@@ -19,14 +19,16 @@ class EnvConfig(BaseSettings):
     password: SecretStr
     video_source: DirectoryPath
 
-    auto_thumbnail: bool = True
-    video_port: PositiveInt = 8000
-    website: Union[HttpUrl, None] = None
-    ngrok_token: Union[str, None] = None
-    file_formats: Sequence[str] = (".mov", ".mp4")
     video_host: IPv4Address = socket.gethostbyname("localhost")
+    video_port: PositiveInt = 8000
+    file_formats: Sequence[str] = (".mov", ".mp4")
+
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
+    website: Union[HttpUrl, None] = None
+    auto_thumbnail: bool = True
     scan_interval: Union[PositiveInt, None] = Field(None, ge=30, le=86_400)  # range: 30s to 24h
+
+    ngrok_token: Union[str, None] = None
 
     class Config:
         """Environment variables configuration."""

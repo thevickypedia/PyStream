@@ -33,22 +33,24 @@ if __name__ == '__main__':
 ```
 
 ### Env Variables
-> :bulb: &nbsp; Environment variables can be loaded from any file.
-> Defaults to `.env` (_set the env var `env_file` to the filename_)
+> :bulb: &nbsp; Environment variables can be loaded from any file. _Defaults to `.env`_<br>
+> Set the env var `env_file` to the filename to use custom `.env` files
 
 **Mandatory**
 - **USERNAME**: Any username of choice.
 - **PASSWORD**: Any password of choice.
-- **VIDEO_SOURCE**: Source path for `.mp4` files.
+- **VIDEO_SOURCE**: Source path for video files.
 > :bulb: &nbsp; Files starting with `_` _(underscore)_ will be ignored
 
 **Optional**
 - **VIDEO_HOST**: IP address to host the video. Defaults to `127.0.0.1`
 - **VIDEO_PORT**: Port number to host the application. Defaults to `8000`
+- **FILE_FORMATS**: Sequence of supported video file formats. Defaults to `(.mp4, .mov)`
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
 - **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
 - **SCAN_INTERVAL**: Interval in seconds to scan `VIDEO_SOURCE` in the background. Defaults traditional scan at run time.
+- **NGROK_TOKEN**: Ngrok token to initiate tunneling via public endpoint.
 > :bulb: &nbsp; When `SCAN_INTERVAL` is set to `None`, `VIDEO_SOURCE` will be scanned in real time whenever the user
 > loads the landing page. Setting a `SCAN_INTERVAL` will scan the `VIDEO_SOURCE` in background and reduce runtime
 > delays in case of complex directory structure.
