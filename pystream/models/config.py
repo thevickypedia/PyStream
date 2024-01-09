@@ -28,15 +28,13 @@ class EnvConfig(BaseSettings):
     auto_thumbnail: bool = True
     scan_interval: Union[PositiveInt, None] = Field(None, ge=30, le=86_400)  # range: 30s to 24h
 
-    ngrok_token: Union[str, None] = None
-
     class Config:
         """Environment variables configuration."""
 
         env_prefix = ""
         env_file = os.environ.get("env_file") or os.environ.get("ENV_FILE") or ".env"
-        extra = "ignore"
-        hide_input_in_errors = True
+        extra = "ignore"  # Ignores additional environment variables present in env files
+        hide_input_in_errors = True  # Avoids revealing sensitive information in validation error messages
 
     # noinspection PyMethodParameters
     @field_validator("video_host", mode='after', check_fields=True)

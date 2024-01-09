@@ -50,7 +50,6 @@ if __name__ == '__main__':
 - **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
 - **SCAN_INTERVAL**: Interval in seconds to scan `VIDEO_SOURCE` in the background. Defaults traditional scan at run time.
-- **NGROK_TOKEN**: Ngrok token to initiate tunneling via public endpoint.
 > :bulb: &nbsp; When `SCAN_INTERVAL` is set to `None`, `VIDEO_SOURCE` will be scanned in real time whenever the user
 > loads the landing page. Setting a `SCAN_INTERVAL` will scan the `VIDEO_SOURCE` in background and reduce runtime
 > delays in case of complex directory structure.

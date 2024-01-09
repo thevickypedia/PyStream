@@ -35,7 +35,6 @@ build-backend = "setuptools.build_meta"
 
 [project.optional-dependencies]
 dev = ["sphinx==5.1.1", "pre-commit", "recommonmark", "gitverse"]
-ngrok = ["pyngrok==7.0.2"]
 
 [project.urls]
 Homepage = "https://github.com/thevickypedia/pystream"

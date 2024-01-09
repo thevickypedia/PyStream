@@ -1,11 +1,9 @@
-from multiprocessing import Process
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from pystream.logger import logger
-from pystream.models import config, ngrok, scheduler, squire
+from pystream.models import config, scheduler, squire
 from pystream.routers import auth, basics, video
 
 app = FastAPI()
@@ -14,6 +12,7 @@ app.include_router(basics.router)
 app.include_router(video.router)
 
 
+# noinspection HttpUrlsUsage
 def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
     origins = ["http://localhost.com", "https://localhost.com"]
@@ -26,8 +25,6 @@ def startup_tasks() -> None:
             f"https://{config.env.website.host}/*"
         ])
     kwargs = dict(allow_origins=origins)
-    if config.env.ngrok_token:
-        kwargs['allow_origin_regex'] = 'https://.*\.ngrok\.io/*'  # noqa: W605
     app.add_middleware(CORSMiddleware, **kwargs)
     squire.scanner()
 
@@ -59,16 +56,6 @@ async def start(**kwargs) -> None:
     }
     uvicorn_config = uvicorn.Config(**argument_dict)
     uvicorn_server = uvicorn.Server(config=uvicorn_config)
-
-    # Validate and initiate tunneling via ngrok (if chosen)
-    if config.env.ngrok_token:
-        try:
-            import pyngrok  # noqa: F401
-        except ImportError as error:
-            raise ImportError(
-                f"\n\n{error.name}\n\tpip install 'stream-localhost[ngrok]'"
-            )
-        Process(target=ngrok.run_tunnel, args=(logger,), kwargs=kwargs).start()
 
     # Run startup tasks
     startup_tasks()

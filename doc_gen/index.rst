@@ -42,13 +42,6 @@ Images
    :members:
    :undoc-members:
 
-Ngrok
-=====
-
-.. automodule:: pystream.models.ngrok
-   :members:
-   :undoc-members:
-
 Scheduler
 =========
 
