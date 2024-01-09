@@ -1,7 +1,7 @@
 import os
 import socket
 from ipaddress import IPv4Address
-from typing import Dict, List, Sequence, Union
+from typing import Sequence, Union
 
 from pydantic import (BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt,
                       SecretStr, field_validator)
@@ -26,7 +26,6 @@ class EnvConfig(BaseSettings):
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
     website: Union[HttpUrl, None] = None
     auto_thumbnail: bool = True
-    scan_interval: Union[PositiveInt, None] = Field(None, ge=30, le=86_400)  # range: 30s to 24h
 
     class Config:
         """Environment variables configuration."""
@@ -68,7 +67,6 @@ class Static(BaseModel):
     logout_endpoint: str = "/logout"
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
-    landing_page: Dict[str, List[Dict[str, str]]] = None
 
 
 class Session(BaseModel):

@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from pystream.logger import logger
-from pystream.models import config, scheduler, squire
+from pystream.models import config
 from pystream.routers import auth, basics, video
 
 app = FastAPI()
@@ -26,10 +26,9 @@ def startup_tasks() -> None:
         ])
     kwargs = dict(allow_origins=origins)
     app.add_middleware(CORSMiddleware, **kwargs)
-    squire.scanner()
 
 
-async def start(**kwargs) -> None:
+def start(**kwargs) -> None:
     """Starter function for the streaming API.
 
     Args:
@@ -54,19 +53,7 @@ async def start(**kwargs) -> None:
         "log_config": log_config,
         "workers": config.env.workers
     }
-    uvicorn_config = uvicorn.Config(**argument_dict)
-    uvicorn_server = uvicorn.Server(config=uvicorn_config)
 
     # Run startup tasks
     startup_tasks()
-    if config.env.scan_interval:
-        # Initiate background task with repeated timer
-        logger.info("'%s' will be scanned every %s seconds", config.env.video_source, config.env.scan_interval)
-        background_task = scheduler.RepeatedTimer(function=squire.scanner, interval=config.env.scan_interval)
-        background_task.start()  # Start background task
-    else:
-        logger.info("'%s' will be scanned in realtime", config.env.video_source)
-        background_task = None
-    await uvicorn_server.serve()  # Await uvicorn server
-    if background_task:
-        background_task.stop()  # Stop background task when server process has finished
+    uvicorn.run(**argument_dict)

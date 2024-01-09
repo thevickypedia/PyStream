@@ -29,11 +29,11 @@ async def index(request: Request,
     """
     await authenticator.verify(credentials)
     squire.log_connection(request)
-    config.env.scan_interval or squire.scanner()
+    landing_page = squire.get_all_stream_content()
     return templates.TemplateResponse(
         name=config.fileio.list_files,
         context={"request": request, "logout": config.static.logout_endpoint,
-                 "files": config.static.landing_page['files'], "directories": config.static.landing_page['directories']}
+                 "files": landing_page['files'], "directories": landing_page['directories']}
     )
 
 

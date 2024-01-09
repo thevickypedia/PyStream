@@ -112,11 +112,6 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
     return None, None
 
 
-def scanner() -> None:
-    """Update the shared static object member to response from stream all content."""
-    config.static.landing_page = get_all_stream_content()
-
-
 def remove_thumbnail(img_path: pathlib.PosixPath) -> None:
     """Triggered by timer to remove the thumbnail file.
 

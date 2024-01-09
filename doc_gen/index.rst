@@ -42,13 +42,6 @@ Images
    :members:
    :undoc-members:
 
-Scheduler
-=========
-
-.. automodule:: pystream.models.scheduler
-   :members:
-   :undoc-members:
-
 Squire
 ======
 

@@ -57,10 +57,9 @@
 </pre></div>
 </div>
 </section>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">asyncio</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<section id="sample-usage">
+<h2>Sample Usage<a class="headerlink" href="#sample-usage" title="Permalink to this heading">¶</a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">pystream</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
@@ -71,7 +70,7 @@
     <span class="p">)</span>
     <span class="c1"># Add the following to host on local IP address, skip for localhost (127.0.0.1)</span>
     <span class="c1"># kwargs[&quot;video_host&quot;] = pystream.utils.get_local_ip()</span>
-    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">pystream</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+    <span class="n">pystream</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 </pre></div>
 </div>
 <section id="env-variables">
@@ -97,13 +96,7 @@ Set the env var <code class="docutils literal notranslate"><span class="pre">env
 <li><p><strong>WORKERS</strong>: Number of workers to spin up the <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> server. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
 <li><p><strong>WEBSITE</strong>: Website to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
 <li><p><strong>AUTO_THUMBNAIL</strong>: Boolean flag to auto generate thumbnail images for preview. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
-<li><p><strong>SCAN_INTERVAL</strong>: Interval in seconds to scan <code class="docutils literal notranslate"><span class="pre">VIDEO_SOURCE</span></code> in the background. Defaults traditional scan at run time.</p></li>
 </ul>
-<blockquote>
-<div><p>:bulb:   When <code class="docutils literal notranslate"><span class="pre">SCAN_INTERVAL</span></code> is set to <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">VIDEO_SOURCE</span></code> will be scanned in real time whenever the user
-loads the landing page. Setting a <code class="docutils literal notranslate"><span class="pre">SCAN_INTERVAL</span></code> will scan the <code class="docutils literal notranslate"><span class="pre">VIDEO_SOURCE</span></code> in background and reduce runtime
-delays in case of complex directory structure.</p>
-</div></blockquote>
 </section>
 </section>
 <section id="coding-standards">
@@ -164,7 +157,7 @@ markdown files (including Wiki pages)</p>
     <ul>
 <li><a class="reference internal" href="#">Video Streaming</a><ul>
 <li><a class="reference internal" href="#install">Install</a></li>
-<li><a class="reference internal" href="#usage">Usage</a><ul>
+<li><a class="reference internal" href="#sample-usage">Sample Usage</a><ul>
 <li><a class="reference internal" href="#env-variables">Env Variables</a></li>
 </ul>
 </li>

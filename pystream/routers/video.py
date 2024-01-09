@@ -75,6 +75,7 @@ async def stream_video(request: Request,
         )
     if pure_path.exists():
         prev_, next_ = squire.get_iter(pure_path)
+        # fixme: perhaps, remove previous and next buttons in template instead of defaulting to #
         attrs = {
             "request": request, "title": video_path,
             "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
