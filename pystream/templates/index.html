@@ -129,12 +129,16 @@
         <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
     </p>
 </video>
+{% if previous %}
 <button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous }}">
     <i class="fa fa-backward"></i> Previous
 </button>
+{% endif %}
+{% if next %}
 <button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next }}">
     Next <i class="fa fa-forward"></i>
 </button>
+{% endif %}
 <br><br>
 </div>
 <script>
