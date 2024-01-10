@@ -94,22 +94,18 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
         Tuple of previous file and next file.
     """
     dir_content = sorted(os.listdir(filename.parent), key=lambda x: natural_sort_key(x))
-    for idx, file in enumerate(dir_content):
-        if file == filename.name:
-            try:
-                previous_ = dir_content[idx - 1]
-            except IndexError:
-                previous_ = None
-            try:
-                next_ = dir_content[idx + 1]
-            except IndexError:
-                next_ = None
-            if pathlib.PosixPath(previous_).suffix not in config.env.file_formats:
-                previous_ = None
-            if pathlib.PosixPath(next_).suffix not in config.env.file_formats:
-                next_ = None
-            return previous_, next_
-    return None, None
+    idx = dir_content.index(filename.name)
+    try:
+        previous_ = dir_content[idx - 1]
+        assert pathlib.PosixPath(previous_).suffix in config.env.file_formats
+    except (IndexError, AssertionError):
+        previous_ = None
+    try:
+        next_ = dir_content[idx + 1]
+        assert pathlib.PosixPath(next_).suffix in config.env.file_formats
+    except (IndexError, AssertionError):
+        next_ = None
+    return previous_, next_
 
 
 def remove_thumbnail(img_path: pathlib.PosixPath) -> None:
