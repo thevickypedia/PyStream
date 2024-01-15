@@ -42,7 +42,26 @@ async def preview_loader(request: Request, img_path: str,
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
 
 
-@router.get("/%s/{video_path:path}" % config.static.vault, response_model=None)
+@router.get("/%s/{track_path:path}" % config.static.track, response_model=None)
+async def track_loader(request: Request, track_path: str,
+                       credentials: HTTPBasicCredentials = Depends(auth.security)) -> FileResponse:
+    """Returns the file for subtitles.
+
+    Args:
+        request: Takes the ``Request`` class as an argument.
+        track_path: Path of the subtitle track that has to be rendered.
+        credentials: HTTPBasicCredentials for authentication.
+
+    Returns:
+        FileResponse:
+        FileResponse for subtitle track.
+    """
+    await authenticator.verify(credentials)
+    squire.log_connection(request)
+    return FileResponse(html.unescape(track_path))
+
+
+@router.get("/%s/{video_path:path}" % config.static.stream, response_model=None)
 async def stream_video(request: Request,
                        video_path: str,
                        credentials: HTTPBasicCredentials = Depends(auth.security)) -> auth.templates.TemplateResponse:
@@ -89,6 +108,9 @@ async def stream_video(request: Request,
             if os.path.isfile(pys_preview) or Images(filepath=pure_path).generate_preview(pys_preview):
                 preview_src = pys_preview
         attrs['preview'] = urlparse.quote(f"/{config.static.preview}/{preview_src}")
+        sub = os.path.join(pure_path.parent, pure_path.name.replace(pure_path.suffix, '.vtt'))
+        if os.path.isfile(sub):
+            attrs['track'] = urlparse.quote(f"/{config.static.track}/{sub}")
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 

@@ -123,6 +123,7 @@
          }
        }'>
     <source id="video-source" type="video/mp4" src=""/>
+    <track id="subtitles" kind="subtitles" src="" srclang="en"/>
     <p class="vjs-no-js">
         To view this video please enable JavaScript, and consider upgrading to a
         web browser that
@@ -143,8 +144,9 @@
 </div>
 <script>
     let origin = window.location.origin; // Get the current origin using JavaScript
-    let path = "{{ path }}"; // Get the path variable from Jinja template
-    let preview = "{{ preview }}";  // Get the preview variable from Jinja template
+    let path = "{{ path }}";
+    let preview = "{{ preview }}";
+    let track = "{{ track }}";
 
     // Construct the source URL for video/preview by combining origin and path/preview
     let videoSource = origin + path;
@@ -153,6 +155,10 @@
     // Set the video source URL for the video-source element
     let videoElement = document.getElementById("video-source");
     videoElement.setAttribute("src", videoSource);
+
+    // Set the subtitles URL for the video
+    let trackElement = document.getElementById("subtitles");
+    trackElement.setAttribute("src", track);
 
     let videoPlayer = document.getElementById("video-player");
     // Set the preview source URL for the video-player element

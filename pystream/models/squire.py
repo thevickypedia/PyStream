@@ -72,12 +72,12 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
                 continue
             if pathlib.PurePath(file_).suffix in config.env.file_formats:
                 if path := __path.replace(str(config.env.video_source), "").lstrip(os.path.sep):
-                    entry = {"name": path, "path": os.path.join(config.static.vault, path)}
+                    entry = {"name": path, "path": os.path.join(config.static.stream, path)}
                     if entry in structure['directories']:
                         continue
                     structure['directories'].append(entry)
                 else:
-                    structure['files'].append({"name": file_, "path": os.path.join(config.static.vault, file_)})
+                    structure['files'].append({"name": file_, "path": os.path.join(config.static.stream, file_)})
     structure['files'] = sorted(structure['files'], key=lambda x: natural_sort_key(x['name']))
     structure['directories'] = sorted(structure['directories'], key=lambda x: natural_sort_key(x['name']))
     return structure
