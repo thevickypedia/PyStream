@@ -76,8 +76,8 @@
 <section id="env-variables">
 <h3>Env Variables<a class="headerlink" href="#env-variables" title="Permalink to this heading">¶</a></h3>
 <blockquote>
-<div><p>:bulb:   Environment variables can be loaded from any file. <em>Defaults to <code class="docutils literal notranslate"><span class="pre">.env</span></code></em><br>
-Set the env var <code class="docutils literal notranslate"><span class="pre">env_file</span></code> to the filename to use custom <code class="docutils literal notranslate"><span class="pre">.env</span></code> files</p>
+<div><p>:bulb:   Environment variables can be loaded from any file. <em>Filename defaults to <code class="docutils literal notranslate"><span class="pre">.env</span></code></em><br>
+To use custom filenames, set the env var <code class="docutils literal notranslate"><span class="pre">env_file</span></code> as <code class="docutils literal notranslate"><span class="pre">key</span></code> and the <em>filename</em> as its <code class="docutils literal notranslate"><span class="pre">value</span></code></p>
 </div></blockquote>
 <p><strong>Mandatory</strong></p>
 <ul class="simple">
@@ -94,7 +94,7 @@ Set the env var <code class="docutils literal notranslate"><span class="pre">env
 <li><p><strong>VIDEO_PORT</strong>: Port number to host the application. Defaults to <code class="docutils literal notranslate"><span class="pre">8000</span></code></p></li>
 <li><p><strong>FILE_FORMATS</strong>: Sequence of supported video file formats. Defaults to <code class="docutils literal notranslate"><span class="pre">(.mp4,</span> <span class="pre">.mov)</span></code></p></li>
 <li><p><strong>WORKERS</strong>: Number of workers to spin up the <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> server. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
-<li><p><strong>WEBSITE</strong>: Website to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
+<li><p><strong>WEBSITE</strong>: List of websites (<em>supports regex</em>) to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
 <li><p><strong>AUTO_THUMBNAIL</strong>: Boolean flag to auto generate thumbnail images for preview. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 </ul>
 </section>

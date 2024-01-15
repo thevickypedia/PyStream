@@ -1,10 +1,10 @@
 import os
 import socket
 from ipaddress import IPv4Address
-from typing import Sequence, Union
+from typing import List, Sequence, Union
 
-from pydantic import (BaseModel, DirectoryPath, Field, HttpUrl, PositiveInt,
-                      SecretStr, field_validator)
+from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
+                      field_validator)
 from pydantic_settings import BaseSettings
 
 
@@ -24,7 +24,7 @@ class EnvConfig(BaseSettings):
     file_formats: Sequence[str] = (".mov", ".mp4")
 
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
-    website: Union[HttpUrl, None] = None
+    website: Union[List[str], None] = []
     auto_thumbnail: bool = True
 
     class Config:
@@ -40,6 +40,16 @@ class EnvConfig(BaseSettings):
     def parse_video_host(cls, value: IPv4Address) -> str:
         """Returns the string notion of IPv4Address object."""
         return str(value)
+
+    # noinspection PyMethodParameters
+    @field_validator("website", mode='before', check_fields=True)
+    def parse_website(cls, value: str) -> List[str]:
+        """Evaluates the string as a list and returns the list of strings."""
+        if not value:
+            return []
+        val = eval(value)
+        assert isinstance(val, list)
+        return val
 
 
 class FileIO(BaseModel):

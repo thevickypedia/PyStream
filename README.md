@@ -32,8 +32,8 @@ if __name__ == '__main__':
 ```
 
 ### Env Variables
-> :bulb: &nbsp; Environment variables can be loaded from any file. _Defaults to `.env`_<br>
-> Set the env var `env_file` to the filename to use custom `.env` files
+> :bulb: &nbsp; Environment variables can be loaded from any file. _Filename defaults to `.env`_<br>
+> To use custom filenames, set the env var `env_file` as `key` and the _filename_ as its `value`
 
 **Mandatory**
 - **USERNAME**: Any username of choice.
@@ -46,7 +46,7 @@ if __name__ == '__main__':
 - **VIDEO_PORT**: Port number to host the application. Defaults to `8000`
 - **FILE_FORMATS**: Sequence of supported video file formats. Defaults to `(.mp4, .mov)`
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
-- **WEBSITE**: Website to add to CORS configuration. _Required only if tunneled via CDN_
+- **WEBSITE**: List of websites (_supports regex_) to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
 
 ## Coding Standards

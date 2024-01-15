@@ -15,17 +15,11 @@ app.include_router(video.router)
 # noinspection HttpUrlsUsage
 def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
+    logger.info('Setting CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
-    if config.env.website:
-        logger.info('Setting CORS policy.')
-        origins.extend([
-            f"http://{config.env.website.host}",
-            f"https://{config.env.website.host}",
-            f"http://{config.env.website.host}/*",
-            f"https://{config.env.website.host}/*"
-        ])
-    kwargs = dict(allow_origins=origins)
-    app.add_middleware(CORSMiddleware, **kwargs)
+    origins.extend(config.env.website)
+    origins.extend(map((lambda x: x + '/*'), config.env.website))
+    app.add_middleware(CORSMiddleware, allow_origins=origins)
 
 
 def start(**kwargs) -> None:
