@@ -56,6 +56,13 @@ Stream
    :members:
    :undoc-members:
 
+Subtitles
+=========
+
+.. automodule:: pystream.models.subtitles
+   :members:
+   :undoc-members:
+
 Routers
 =======
 Authentication

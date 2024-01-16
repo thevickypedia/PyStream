@@ -76,7 +76,7 @@ class Images:
         """Generate preview image for a video.
 
         Args:
-            path: Path to store the preview image.
+            path: Filepath to store the preview image.
             at_second: Time in seconds at which the image should be captured for preview.
 
         Returns:
@@ -84,10 +84,6 @@ class Images:
             Returns a boolean flag to indicate success/failure.
         """
         seconds, video_time = self.get_video_length()
-        if os.path.isdir(path):
-            raise IsADirectoryError("Requires a filepath, received a directory path.")
-        if os.path.isfile(path):
-            logger.warning("%s will be overwritten", path)
         if at_second:
             assert at_second <= seconds, f"Frame at {at_second}s is beyond the video duration of {seconds}s"
         else:

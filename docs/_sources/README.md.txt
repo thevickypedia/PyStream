@@ -17,6 +17,7 @@ python -m pip install stream-localhost
 
 ## Sample Usage
 ```python
+import asyncio
 import os
 import pystream
 
@@ -28,7 +29,7 @@ if __name__ == '__main__':
     )
     # Add the following to host on local IP address, skip for localhost (127.0.0.1)
     # kwargs["video_host"] = pystream.utils.get_local_ip()
-    pystream.start(**kwargs)
+    asyncio.run(pystream.start(**kwargs))
 ```
 
 ### Env Variables

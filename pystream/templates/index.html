@@ -84,7 +84,7 @@
     <style>
         #video-container {
             position: relative;
-            width: 70%;  /* fixme: 50 works for 24" and 27" screens, 70 works for mobile phones (choose a side) */
+            width: 70%; /* fixme: 50 works for 24" and 27" screens, 70 works for mobile phones (choose a side) */
             height: 100%;
             margin-left: auto;
             margin-right: auto;
@@ -105,15 +105,15 @@
 <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
 <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
 <br><br>
-<h1>{{title}}</h1>
+<h1>{{ title }}</h1>
 <div id="video-container">
-<video id="video-player"
-       class="video-js"
-       preload="auto"
-       controls muted="muted"
-       style="position: relative; margin-left: auto; margin-right: auto; display: block"
-       poster=""
-       data-setup='{
+    <video id="video-player"
+           class="video-js"
+           preload="auto"
+           controls muted="muted"
+           style="position: relative; margin-left: auto; margin-right: auto; display: block"
+           poster=""
+           data-setup='{
          "playbackRates": [1, 1.5, 2, 5],
          "controlBar": {
            "skipButtons": {
@@ -122,25 +122,25 @@
            }
          }
        }'>
-    <source id="video-source" type="video/mp4" src=""/>
-    <track id="subtitles" kind="subtitles" src="" srclang="en"/>
-    <p class="vjs-no-js">
-        To view this video please enable JavaScript, and consider upgrading to a
-        web browser that
-        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-    </p>
-</video>
-{% if previous %}
-<button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous }}">
-    <i class="fa fa-backward"></i> Previous
-</button>
-{% endif %}
-{% if next %}
-<button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next }}">
-    Next <i class="fa fa-forward"></i>
-</button>
-{% endif %}
-<br><br>
+        <source id="video-source" type="video/mp4" src=""/>
+        <track id="subtitles" kind="subtitles" src="" srclang="en"/>
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a
+            web browser that
+            <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+    </video>
+    {% if previous %}
+        <button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous }}">
+            <i class="fa fa-backward"></i> Previous
+        </button>
+    {% endif %}
+    {% if next %}
+        <button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next }}">
+            Next <i class="fa fa-forward"></i>
+        </button>
+    {% endif %}
+    <br><br>
 </div>
 <script>
     let origin = window.location.origin; // Get the current origin using JavaScript
@@ -176,7 +176,6 @@
     function goBack() {
         window.history.back();
     }
-
 </script>
 </body>
 </html>

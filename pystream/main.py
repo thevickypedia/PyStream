@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,8 +14,7 @@ app.include_router(basics.router)
 app.include_router(video.router)
 
 
-# noinspection HttpUrlsUsage
-def startup_tasks() -> None:
+async def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
     logger.info('Setting CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
@@ -22,7 +23,19 @@ def startup_tasks() -> None:
     app.add_middleware(CORSMiddleware, allow_origins=origins)
 
 
-def start(**kwargs) -> None:
+async def shutdown_tasks() -> None:
+    """Tasks that need to run during the API shutdown."""
+    logger.info('Deleting %d files created during runtime.', len(config.static.deletions))
+    logger.debug(config.static.deletions)
+    for file in config.static.deletions:
+        if file.exists():
+            logger.debug("Deleting file: %s", file)
+            os.remove(file)
+        else:
+            logger.warning("File '%s' does not exist", file)
+
+
+async def start(**kwargs) -> None:
     """Starter function for the streaming API.
 
     Args:
@@ -47,7 +60,12 @@ def start(**kwargs) -> None:
         "log_config": log_config,
         "workers": config.env.workers
     }
+    uvicorn_config = uvicorn.Config(**argument_dict)
+    uvicorn_server = uvicorn.Server(config=uvicorn_config)
 
     # Run startup tasks
-    startup_tasks()
-    uvicorn.run(**argument_dict)
+    logger.info("Initiating startup tasks")
+    await startup_tasks()
+    await uvicorn_server.serve()  # Await uvicorn server
+    logger.info("Initiating shutdown tasks")
+    await shutdown_tasks()

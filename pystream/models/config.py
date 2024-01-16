@@ -1,7 +1,8 @@
 import os
+import pathlib
 import socket
 from ipaddress import IPv4Address
-from typing import List, Sequence, Union
+from typing import List, Sequence, Set, Union
 
 from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
                       field_validator)
@@ -48,8 +49,11 @@ class EnvConfig(BaseSettings):
         if not value:
             return []
         val = eval(value)
-        assert isinstance(val, list)
-        return val
+        if isinstance(val, list):
+            return val
+        raise ValueError(
+            f"Invalid value for website, must be a list of strings, got {type(val)}"
+        )
 
 
 class FileIO(BaseModel):
@@ -78,6 +82,7 @@ class Static(BaseModel):
     logout_endpoint: str = "/logout"
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
+    deletions: Set[pathlib.PosixPath] = set()
 
 
 class Session(BaseModel):

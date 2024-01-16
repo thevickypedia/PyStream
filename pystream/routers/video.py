@@ -1,7 +1,6 @@
 import html
 import os
 import pathlib
-import threading
 from typing import Optional, Union
 from urllib import parse as urlparse
 
@@ -10,8 +9,8 @@ from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 from fastapi.security import HTTPBasicCredentials
 
 from pystream.logger import logger
-from pystream.models import authenticator, config, squire, stream
-from pystream.models.images import Images
+from pystream.models import (authenticator, config, images, squire, stream,
+                             subtitles)
 from pystream.routers import auth
 
 router = APIRouter()
@@ -35,8 +34,7 @@ async def preview_loader(request: Request, img_path: str,
     squire.log_connection(request)
     img_path = pathlib.PosixPath(html.unescape(img_path))
     if img_path.exists():
-        # Image is required only for caching in the browser, so it is not required after it has been rendered
-        threading.Timer(interval=5, function=squire.remove_thumbnail, args=(img_path,)).start()
+        config.static.deletions.add(img_path)
         return FileResponse(img_path)
     logger.critical("'%s' not found", img_path)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{img_path!r} NOT FOUND")
@@ -105,12 +103,20 @@ async def stream_video(request: Request,
             # Uses preview file if exists at source, else tries to create one at video_source (reuses when refreshed)
             pys_preview = os.path.join(pure_path.parent,
                                        f"_{pure_path.name.replace(pure_path.suffix, '_pys_preview.jpg')}")
-            if os.path.isfile(pys_preview) or Images(filepath=pure_path).generate_preview(pys_preview):
+            if os.path.isfile(pys_preview) or images.Images(filepath=pure_path).generate_preview(pys_preview):
                 preview_src = pys_preview
         attrs['preview'] = urlparse.quote(f"/{config.static.preview}/{preview_src}")
-        sub = os.path.join(pure_path.parent, pure_path.name.replace(pure_path.suffix, '.vtt'))
-        if os.path.isfile(sub):
-            attrs['track'] = urlparse.quote(f"/{config.static.track}/{sub}")
+        sfx = pathlib.PosixPath(str(os.path.join(pure_path.parent, pure_path.name.replace(pure_path.suffix, ''))))
+        vtt = sfx.with_suffix('.vtt')
+        srt = sfx.with_suffix('.srt')
+        if vtt.exists():
+            attrs['track'] = urlparse.quote(f"/{config.static.track}/{vtt}")
+        elif srt.exists():
+            logger.info("Converting '%s.srt' to '%s.vtt' for subtitles", sfx.name, sfx.name)
+            await subtitles.srt_to_vtt(srt)
+            if vtt.exists():
+                config.static.deletions.add(vtt)
+                attrs['track'] = urlparse.quote(f"/{config.static.track}/{vtt}")
         return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 
