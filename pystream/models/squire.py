@@ -49,7 +49,7 @@ def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[
     """
     files = []
     for file_ in os.listdir(parent):
-        if file_.startswith('_'):
+        if file_.startswith('_') or file_.startswith('.'):
             continue
         if pathlib.PurePath(file_).suffix in config.env.file_formats:
             files.append({"name": file_, "path": os.path.join(subdir, file_)})
@@ -68,7 +68,7 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
         if __path.endswith('__'):
             continue
         for file_ in __file:
-            if file_.startswith('_'):
+            if file_.startswith('_') or file_.startswith('.'):
                 continue
             if pathlib.PurePath(file_).suffix in config.env.file_formats:
                 if path := __path.replace(str(config.env.video_source), "").lstrip(os.path.sep):
