@@ -3,7 +3,7 @@ import os
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from pystream.logger import logger
 from pystream.models import config
@@ -28,10 +28,12 @@ async def redirect_exception_handler(request: Request, exception: config.Redirec
         JSONResponse:
         Returns the JSONResponse with content, status code and cookie.
     """
-    logger.info("Exception headers: %s", request.headers)
-    logger.info("Exception cookies: %s", request.cookies)
-    # fixme: Set conditional to return JSONResponse only if request.url.path matches config.static.login_endpoint
-    response = JSONResponse(content={"redirect_url": exception.location}, status_code=200)
+    logger.debug("Exception headers: %s", request.headers)
+    logger.debug("Exception cookies: %s", request.cookies)
+    if request.url.path == config.static.login_endpoint:
+        response = JSONResponse(content={"redirect_url": exception.location}, status_code=200)
+    else:
+        response = RedirectResponse(url=exception.location)
     if exception.detail:
         response.set_cookie("detail", exception.detail.upper())
     return response

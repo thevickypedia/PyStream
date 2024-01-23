@@ -1,9 +1,10 @@
+import os
 import time
-from typing import Union
 
 import jwt
 from fastapi import APIRouter, Cookie, Request, status
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, JSONResponse
+from jinja2 import Template
 
 from pystream.logger import logger
 from pystream.models import authenticator, config, squire
@@ -56,7 +57,7 @@ async def login(request: Request) -> JSONResponse:
 
 
 @router.get("%s" % config.static.logout_endpoint, response_model=None)
-async def logout(request: Request, session_token: str = Cookie(None)) -> Union[RedirectResponse, JSONResponse]:
+async def logout(request: Request, session_token: str = Cookie(None)) -> HTMLResponse:
     """Terminates the user's session by deleting the cookie and redirecting back to login page upon refresh.
 
     Args:
@@ -64,19 +65,24 @@ async def logout(request: Request, session_token: str = Cookie(None)) -> Union[R
         session_token: Session token set after verifying username and password.
 
     Returns:
-        Union[RedirectResponse, JSONResponse]:
-        JSONResponse to delete the cookie and send logout confirmation, RedirectResponse to navigate to login page.
+        HTMLResponse:
+        HTML page for logout with content rendered based on current login status.
     """
-    # todo: serve an HTML page for logout as well
+    with open(os.path.join(config.template_storage, "logout.html")) as log_file:
+        logout_template: Template = Template(log_file.read())
     if session_token:
         logger.info("%s logged out", request.client.host)
         if config.session.info.get(request.client.host):
             del config.session.info[request.client.host]
         else:
             logger.warning("Session information for %s was never stored or no video was played.", request.client.host)
-        response = JSONResponse(content="Logged out successfully. Refresh the page to navigate to login.")
+        response = HTMLResponse(logout_template.render(
+            detail="You have been logged out successfully.", show_login=False
+        ))
         response.delete_cookie("session_token")
     else:
         logger.info("Redirecting connection from %s to login page", request.client.host)
-        response = RedirectResponse("/")  # redirect to root page for login
+        response = HTMLResponse(logout_template.render(
+            detail="You were never logged in. Please click the button below to proceed.", show_login=True
+        ))
     return response
