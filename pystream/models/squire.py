@@ -4,9 +4,13 @@ import re
 from typing import Dict, List, Tuple, Union
 
 from fastapi import Request
+from fastapi.templating import Jinja2Templates
 
 from pystream.logger import logger
 from pystream.models import config
+
+
+templates = Jinja2Templates(directory=os.path.join(pathlib.Path(__file__).parent.parent, "templates"))
 
 
 def log_connection(request: Request) -> None:

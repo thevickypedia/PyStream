@@ -4,33 +4,32 @@ import pathlib
 from typing import Optional, Union
 from urllib import parse as urlparse
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, Header, HTTPException, Request, status, Cookie
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
-from fastapi.security import HTTPBasicCredentials
 
 from pystream.logger import logger
 from pystream.models import (authenticator, config, images, squire, stream,
                              subtitles)
-from pystream.routers import auth
 
 router = APIRouter()
 
 
 @router.get("/%s/{img_path:path}" % config.static.preview, response_model=None)
-async def preview_loader(request: Request, img_path: str,
-                         credentials: HTTPBasicCredentials = Depends(auth.security)) -> FileResponse:
+async def preview_loader(request: Request,
+                         img_path: str,
+                         session_token: str = Cookie(None)) -> FileResponse:
     """Returns the file for preview image.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         img_path: Path of the image file that has to be rendered.
-        credentials: HTTPBasicCredentials for authentication.
+        session_token: Token setup for each session.
 
     Returns:
         FileResponse:
         FileResponse for preview image.
     """
-    await authenticator.verify(credentials)
+    await authenticator.verify_token(session_token)
     squire.log_connection(request)
     img_path = pathlib.PosixPath(html.unescape(img_path))
     if img_path.exists():
@@ -41,20 +40,21 @@ async def preview_loader(request: Request, img_path: str,
 
 
 @router.get("/%s/{track_path:path}" % config.static.track, response_model=None)
-async def track_loader(request: Request, track_path: str,
-                       credentials: HTTPBasicCredentials = Depends(auth.security)) -> FileResponse:
+async def track_loader(request: Request,
+                       track_path: str,
+                       session_token: str = Cookie(None)) -> FileResponse:
     """Returns the file for subtitles.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         track_path: Path of the subtitle track that has to be rendered.
-        credentials: HTTPBasicCredentials for authentication.
+        session_token: Token setup for each session.
 
     Returns:
         FileResponse:
         FileResponse for subtitle track.
     """
-    await authenticator.verify(credentials)
+    await authenticator.verify_token(session_token)
     squire.log_connection(request)
     return FileResponse(html.unescape(track_path))
 
@@ -62,31 +62,32 @@ async def track_loader(request: Request, track_path: str,
 @router.get("/%s/{video_path:path}" % config.static.stream, response_model=None)
 async def stream_video(request: Request,
                        video_path: str,
-                       credentials: HTTPBasicCredentials = Depends(auth.security)) -> auth.templates.TemplateResponse:
+                       session_token: str = Cookie(None)) -> squire.templates.TemplateResponse:
     """Returns the template for streaming page.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         video_path: Path of the video file that has to be rendered.
-        credentials: HTTPBasicCredentials for authentication.
+        session_token: Token setup for each session.
 
     Returns:
         templates.TemplateResponse:
         Template response for streaming page.
     """
-    await authenticator.verify(credentials)
+    await authenticator.verify_token(session_token)
     squire.log_connection(request)
     pure_path = config.env.video_source / video_path
     if pure_path.is_dir():
         # Use only the final dir in the path, since rest of it will be loaded in the login page itself
         # Not doing this will result in redundant path, like /home/GOT/season1/season1/episode1.mp4 resulting in 404
         child_dir = pathlib.Path(video_path).parts[-1]
-        return auth.templates.TemplateResponse(
-            name=config.fileio.list_files,
+        return squire.templates.TemplateResponse(
+            name=config.fileio.listing,
             context={
                 "request": request,
                 "dir_name": child_dir,  # For GOT/season1/episode1.mp4, this will just display 'season1' in landing page
                 "files": squire.get_dir_stream_content(pure_path, child_dir),
+                "home": config.static.home_endpoint,
                 "logout": config.static.logout_endpoint
             }
         )
@@ -94,6 +95,7 @@ async def stream_video(request: Request,
         prev_, next_ = squire.get_iter(pure_path)
         attrs = {
             "request": request, "title": video_path,
+            "home": config.static.home_endpoint, "logout": config.static.logout_endpoint,
             "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
             "previous": prev_, "next": next_
         }
@@ -117,27 +119,27 @@ async def stream_video(request: Request,
             if vtt.exists():
                 config.static.deletions.add(vtt)
                 attrs['track'] = urlparse.quote(f"/{config.static.track}/{vtt}")
-        return auth.templates.TemplateResponse(name=config.fileio.index, headers=None, context=attrs)
+        return squire.templates.TemplateResponse(name=config.fileio.landing, headers=None, context=attrs)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Video file {video_path!r} not found")
 
 
 # noinspection PyShadowingBuiltins
 @router.get("%s" % config.static.streaming_endpoint, response_model=None, include_in_schema=False)
-async def video_endpoint(request: Request, range: Optional[str] = Header(None),
-                         credentials: HTTPBasicCredentials = Depends(auth.security)) \
-        -> Union[RedirectResponse, StreamingResponse]:
+async def video_endpoint(request: Request,
+                         range: Optional[str] = Header(None),
+                         session_token: str = Cookie(None)) -> Union[RedirectResponse, StreamingResponse]:
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
         request: Takes the ``Request`` class as an argument.
         range: Header information.
-        credentials: HTTPBasicCredentials for authentication.
+        session_token: Token setup for each session.
 
     Returns:
         Union[RedirectResponse, StreamingResponse]:
         Streams the video name received as cookie.
     """
-    await authenticator.verify(credentials)
+    await authenticator.verify_token(session_token)
     squire.log_connection(request)
     if not range or not range.startswith("bytes"):
         logger.info("/video endpoint accessed directly. Redirecting to login page.")

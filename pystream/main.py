@@ -41,7 +41,6 @@ async def start(**kwargs) -> None:
     Args:
         **kwargs: Keyword arguments to load the env config.
     """
-    # todo: Implement websockets to set a counter clock and logout automatically after a set timeout
     # Load and validate env vars/arguments
     config.env = config.EnvConfig(**kwargs)
 

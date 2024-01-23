@@ -18,10 +18,12 @@ class EnvConfig(BaseSettings):
 
     username: str
     password: SecretStr
+    secret: SecretStr
     video_source: DirectoryPath
 
     video_host: IPv4Address = socket.gethostbyname("localhost")
     video_port: PositiveInt = 8000
+    session_duration: int = Field(default=3_600, ge=300)  # Defaults to 1 hour, should at least be 5 minutes
     file_formats: Sequence[str] = (".mov", ".mp4")
 
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
@@ -64,7 +66,8 @@ class FileIO(BaseModel):
     """
 
     index: str = "index.html"
-    list_files: str = "list_files.html"
+    listing: str = "list.html"
+    landing: str = "land.html"
 
 
 class Static(BaseModel):
@@ -78,7 +81,8 @@ class Static(BaseModel):
     stream: str = "stream"
     preview: str = "preview"
     query_param: str = "file"
-    index_endpoint: str = "/index"
+    home_endpoint: str = "/home"
+    login_endpoint: str = "/login"
     logout_endpoint: str = "/logout"
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
@@ -93,6 +97,11 @@ class Session(BaseModel):
     """
 
     info: dict = {}
+
+
+class WebToken(BaseModel):
+    credentials: str
+    timestamp: int
 
 
 env = EnvConfig

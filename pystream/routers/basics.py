@@ -1,9 +1,11 @@
 import os
 
-from fastapi import APIRouter
+import requests
+import starlette.routing
+from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse, RedirectResponse
 
-from pystream.models import config
+from pystream.models import config, squire
 
 router = APIRouter()
 
@@ -21,11 +23,16 @@ async def get_favicon() -> FileResponse:
 
 
 @router.get("/", include_in_schema=False)
-async def root() -> RedirectResponse:
+async def root(request: Request) -> RedirectResponse:
     """Reads the root request to render HTMl page.
 
     Returns:
         RedirectResponse:
         Redirects to login page.
     """
-    return RedirectResponse(url=config.static.index_endpoint, headers=None)
+    squire.log_connection(request)
+    # fixme: investigate why url_for(signin) stopped working suddenly
+    return squire.templates.TemplateResponse(
+        name=config.fileio.index,
+        context={"request": request, "signin": config.static.login_endpoint}
+    )
