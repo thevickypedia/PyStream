@@ -8,6 +8,7 @@
     <meta name="author" content="Vignesh Rao">
     <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
     <meta content="width=device-width, initial-scale=1" name="viewport">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
     <!-- Font Awesome icons -->
@@ -88,12 +89,12 @@
     </div>
     <div class="content">
         <!-- <form action="{ url_for('signin') }" method="post"> -->
-        <form action="{{ signin }}" method="post">
+        <form>
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
-            <button type="submit">Sign In</button>
+            <button type="submit" onclick="submitToAPI(event)">Sign In</button>
         </form>
     </div>
 </div>
@@ -104,5 +105,56 @@
     window.addEventListener('popstate', function (event) {
         history.pushState(null, document.title, location.href);
     });
+</script>
+<!-- handle authentication from login page -->
+<script>
+    function submitToAPI(event) {
+        event.preventDefault();
+        const username = $("#username").val();
+        const password = $("#password").val();
+        if (username === "" || password === "") {
+            alert("ERROR: Username and password are required to authenticate your request!");
+            return false;
+        }
+        function ConvertStringToHex(str) {
+            let arr = [];
+            for (let i = 0; i < str.length; i++) {
+                arr[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
+            }
+            return "\\u" + arr.join("\\u");
+        }
+        let hex_user = ConvertStringToHex(username);
+        let hex_pass = ConvertStringToHex(password);
+        let origin = window.location.origin
+        $.ajax({
+            method: "POST",
+            url: origin.concat("{{ signin }}"),
+            headers: {
+                'accept': 'application/json',
+                'Authorization': btoa(hex_user + ":" + hex_pass)
+            },
+            crossDomain: "true",
+            contentType: "application/json; charset=utf-8",
+            success: function (data) {
+                // Check if the response contains a redirect URL
+                if (data.redirect_url) {
+                    // Manually handle the redirect
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Handle success if needed
+                    console.log(data);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error(`Status: ${textStatus}, Error: ${errorThrown}`);
+                if (jqXHR.hasOwnProperty("responseJSON")) {
+                    alert(jqXHR.responseJSON.detail);
+                } else {
+                    alert(errorThrown);
+                }
+            }
+        });
+    }
+
 </script>
 </html>

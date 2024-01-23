@@ -10,13 +10,16 @@ from pystream.logger import logger
 from pystream.models import config
 
 
-async def verify_login(username: str, password: str) -> JSONResponse:
+async def verify_login(credentials) -> JSONResponse:
     """Verifies authentication.
 
     Returns:
         JSONResponse:
         Returns JSON response with content and status code.
     """
+    decoded_auth = base64.b64decode(credentials).decode('utf-8')
+    auth = bytes(decoded_auth, "utf-8").decode(encoding="unicode_escape")
+    username, password = auth.split(':')
     if not username or not password:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -35,8 +38,7 @@ async def verify_login(username: str, password: str) -> JSONResponse:
             status_code=200,
         )
 
-    logger.error("Incorrect username or password")
-    logger.error(__dict__)
+    logger.error("Incorrect username [%s] or password [%s]", username, password)
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Incorrect username or password",
@@ -61,6 +63,5 @@ async def verify_token(token: str):
     except jwt.InvalidSignatureError as error:
         logger.error(error)
         raise go_home
-    username, password = base64.b64decode(decoded.credentials).decode("UTF-8").split(':')
-    await verify_login(username, password)
+    await verify_login(decoded.credentials)
     await verify_timestamp(decoded.timestamp)

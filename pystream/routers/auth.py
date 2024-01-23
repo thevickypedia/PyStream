@@ -1,8 +1,7 @@
 import time
-import jwt
-import base64
 
-from fastapi import APIRouter, Request, Form, Cookie, status
+import jwt
+from fastapi import APIRouter, Request, Cookie, status
 from fastapi.responses import RedirectResponse, JSONResponse
 
 from pystream.logger import logger
@@ -24,16 +23,18 @@ async def home_page(request: Request, session_token: str = Cookie(None)):
 
 
 @router.post("%s" % config.static.login_endpoint, response_model=None)
-async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    # todo: change form auth to bearer auth
+async def login(request: Request):
     squire.log_connection(request)
-    await authenticator.verify_login(username, password)
-    # fixme: investigate if adding username and password to jwt any good, or switch to token based auth
-    response = RedirectResponse(config.static.home_endpoint, status_code=status.HTTP_303_SEE_OTHER)
-    encoded_credentials = base64.b64encode(bytes(f"{username}:{password}", "UTF-8")).decode("UTF-8")
-    encoded_jwt = jwt.encode(payload={"credentials": encoded_credentials, "timestamp": int(time.time())},
+    authorization = request.headers.get('authorization')
+    await authenticator.verify_login(authorization)
+    # todo: instead of storing authorization to cookie
+    #  create a db, assign a token to the user and set that token as cookie
+    # Since JavaScript cannot handle RedirectResponse from FastAPI
+    # Solution is to revert to Form, but that won't allow header auth and additional customization done by JavaScript
+    response = JSONResponse(content={"redirect_url": config.static.home_endpoint}, status_code=status.HTTP_200_OK)
+    encoded_jwt = jwt.encode(payload={"credentials": authorization, "timestamp": int(time.time())},
                              key=config.env.secret.get_secret_value(), algorithm="HS256")
-    response.set_cookie("session_token", encoded_jwt)
+    response.set_cookie("session_token", encoded_jwt, httponly=True)
     return response
 
 

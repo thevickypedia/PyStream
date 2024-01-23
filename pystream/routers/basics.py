@@ -1,7 +1,5 @@
 import os
 
-import requests
-import starlette.routing
 from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse, RedirectResponse
 
@@ -31,7 +29,6 @@ async def root(request: Request) -> RedirectResponse:
         Redirects to login page.
     """
     squire.log_connection(request)
-    # fixme: investigate why url_for(signin) stopped working suddenly
     return squire.templates.TemplateResponse(
         name=config.fileio.index,
         context={"request": request, "signin": config.static.login_endpoint}
