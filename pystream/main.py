@@ -1,8 +1,9 @@
 import os
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from pystream.logger import logger
 from pystream.models import config
@@ -14,13 +15,35 @@ app.include_router(basics.router)
 app.include_router(video.router)
 
 
+# Exception handler for RedirectException
+@app.exception_handler(config.RedirectException)
+async def redirect_exception_handler(request: Request, exception: config.RedirectException) -> JSONResponse:
+    """Custom exception handler to handle redirect.
+
+    Args:
+        request: Takes the ``Request`` object as an argument.
+        exception: Takes the ``RedirectException`` object inherited from ``Exception`` as an argument.
+
+    Returns:
+        JSONResponse:
+        Returns the JSONResponse with content, status code and cookie.
+    """
+    logger.info("Exception headers: %s", request.headers)
+    logger.info("Exception cookies: %s", request.cookies)
+    # fixme: Set conditional to return JSONResponse only if request.url.path matches config.static.login_endpoint
+    response = JSONResponse(content={"redirect_url": exception.location}, status_code=200)
+    if exception.detail:
+        response.set_cookie("detail", exception.detail.upper())
+    return response
+
+
 async def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
     logger.info('Setting CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
     origins.extend(config.env.website)
     origins.extend(map((lambda x: x + '/*'), config.env.website))
-    app.add_middleware(CORSMiddleware, allow_origins=origins)
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"])
 
 
 async def shutdown_tasks() -> None:

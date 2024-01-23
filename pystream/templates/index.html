@@ -52,6 +52,9 @@
         label {
             margin-top: 10px;
             color: #000000;
+            font-size: large;
+            font-family: 'Courier New', sans-serif;
+            font-weight: normal;
         }
 
         input {
@@ -59,11 +62,6 @@
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4CAF50;
         }
 
         button {
@@ -141,6 +139,7 @@
                     // Manually handle the redirect
                     window.location.href = data.redirect_url;
                 } else {
+                    console.log("Unhandled good response data")
                     // Handle success if needed
                     console.log(data);
                 }

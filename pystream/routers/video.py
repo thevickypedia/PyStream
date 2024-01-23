@@ -4,7 +4,7 @@ import pathlib
 from typing import Optional, Union
 from urllib import parse as urlparse
 
-from fastapi import APIRouter, Header, HTTPException, Request, status, Cookie
+from fastapi import APIRouter, Cookie, Header, HTTPException, Request, status
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 
 from pystream.logger import logger
@@ -21,7 +21,7 @@ async def preview_loader(request: Request,
     """Returns the file for preview image.
 
     Args:
-        request: Takes the ``Request`` class as an argument.
+        request: Takes the ``Request`` object as an argument.
         img_path: Path of the image file that has to be rendered.
         session_token: Token setup for each session.
 
@@ -46,7 +46,7 @@ async def track_loader(request: Request,
     """Returns the file for subtitles.
 
     Args:
-        request: Takes the ``Request`` class as an argument.
+        request: Takes the ``Request`` object as an argument.
         track_path: Path of the subtitle track that has to be rendered.
         session_token: Token setup for each session.
 
@@ -66,13 +66,13 @@ async def stream_video(request: Request,
     """Returns the template for streaming page.
 
     Args:
-        request: Takes the ``Request`` class as an argument.
+        request: Takes the ``Request`` object as an argument.
         video_path: Path of the video file that has to be rendered.
         session_token: Token setup for each session.
 
     Returns:
         templates.TemplateResponse:
-        Template response for streaming page.
+        Returns the listing page for video streaming.
     """
     await authenticator.verify_token(session_token)
     squire.log_connection(request)
@@ -94,7 +94,7 @@ async def stream_video(request: Request,
     if pure_path.exists():
         prev_, next_ = squire.get_iter(pure_path)
         attrs = {
-            "request": request, "title": video_path,
+            "request": request, "video_title": video_path,
             "home": config.static.home_endpoint, "logout": config.static.logout_endpoint,
             "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
             "previous": prev_, "next": next_
@@ -131,7 +131,7 @@ async def video_endpoint(request: Request,
     """Streams the video file by sending bytes using StreamingResponse.
 
     Args:
-        request: Takes the ``Request`` class as an argument.
+        request: Takes the ``Request`` object as an argument.
         range: Header information.
         session_token: Token setup for each session.
 

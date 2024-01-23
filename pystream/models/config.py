@@ -1,12 +1,16 @@
 import os
 import pathlib
+import random
 import socket
+import string
 from ipaddress import IPv4Address
-from typing import List, Sequence, Set, Union
+from typing import List, Optional, Sequence, Set, Union
 
 from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
                       field_validator)
 from pydantic_settings import BaseSettings
+
+template_storage = os.path.join(pathlib.Path(__file__).parent.parent, "templates")
 
 
 class EnvConfig(BaseSettings):
@@ -87,6 +91,10 @@ class Static(BaseModel):
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
     deletions: Set[pathlib.PosixPath] = set()
+    # todo: Allow multiple users, and create multiple session tokens during startup
+    # Use a single session token, since currently this project only allows one username and password
+    # Random string ensures, that users are forced to login when the server restarts
+    session_token: str = "".join(random.choices(string.ascii_letters + string.digits, k=32))
 
 
 class Session(BaseModel):
@@ -97,11 +105,43 @@ class Session(BaseModel):
     """
 
     info: dict = {}
+    invalid: dict = {}
 
 
 class WebToken(BaseModel):
-    credentials: str
+    """Object to store and validate JWT objects.
+
+    >>> WebToken
+
+    """
+
+    token: str
     timestamp: int
+
+
+class RedirectException(Exception):
+    """Custom ``RedirectException`` raised within the API since HTTPException doesn't support returning HTML content.
+
+    >>> RedirectException
+
+    See Also:
+        - RedirectException allows the API to redirect on demand in cases where returning is not a solution.
+        - There are alternatives to raise HTML content as an exception but none work with our use-case with JavaScript.
+        - This way of exception handling comes handy for many unexpected scenarios.
+
+    References:
+        https://fastapi.tiangolo.com/tutorial/handling-errors/#install-custom-exception-handlers
+    """
+
+    def __init__(self, location: str, detail: Optional[str] = ""):
+        """Instantiates the ``RedirectException`` object with the required parameters.
+
+        Args:
+            location: Location for redirect.
+            detail: Reason for redirect.
+        """
+        self.location = location
+        self.detail = detail
 
 
 env = EnvConfig
