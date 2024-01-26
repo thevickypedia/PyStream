@@ -20,8 +20,8 @@ class EnvConfig(BaseSettings):
 
     """
 
-    apikey: str
-    shared_secret: SecretStr
+    username: str
+    password: SecretStr
     token: SecretStr
     video_source: DirectoryPath
 
