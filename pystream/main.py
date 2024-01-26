@@ -45,7 +45,10 @@ async def startup_tasks() -> None:
     origins = ["http://localhost.com", "https://localhost.com"]
     origins.extend(config.env.website)
     origins.extend(map((lambda x: x + '/*'), config.env.website))
-    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"])
+    # noinspection PyTypeChecker
+    app.add_middleware(CORSMiddleware,
+                       allow_origins=origins, allow_methods=["GET", "POST"],
+                       allow_credentials=True, allow_headers=["*"])  # fixme: set specific headers
 
 
 async def shutdown_tasks() -> None:

@@ -20,9 +20,9 @@ class EnvConfig(BaseSettings):
 
     """
 
-    username: str
-    password: SecretStr
-    secret: SecretStr
+    apikey: str
+    shared_secret: SecretStr
+    token: SecretStr
     video_source: DirectoryPath
 
     video_host: IPv4Address = socket.gethostbyname("localhost")
@@ -106,6 +106,7 @@ class Session(BaseModel):
 
     info: dict = {}
     invalid: dict = {}
+    mapping: dict = {}
 
 
 class WebToken(BaseModel):

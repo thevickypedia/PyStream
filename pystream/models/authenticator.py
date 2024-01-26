@@ -44,11 +44,13 @@ async def verify_login(request: Request) -> JSONResponse:
             headers=None
         )
 
-    username_validation = secrets.compare_digest(username, config.env.username)
-    password_validation = secrets.compare_digest(password, config.env.password.get_secret_value())
+    username_validation = secrets.compare_digest(username, config.env.apikey)
+    password_validation = secrets.compare_digest(password, config.env.shared_secret.get_secret_value())
 
     if username_validation and password_validation:
         config.session.invalid[request.client.host] = 0
+        # Store session token for each apikey
+        config.session.mapping[config.env.apikey] = config.static.session_token
         return JSONResponse(content={"authenticated": True}, status_code=200)
 
     logger.error("Incorrect username [%s] or password [%s]", username, password)
@@ -72,7 +74,7 @@ async def verify_token(token: str) -> None:
     if not token:
         raise config.RedirectException(location="/error", detail="Invalid session token")
     try:
-        decoded = config.WebToken(**jwt.decode(jwt=token, key=config.env.secret.get_secret_value(), algorithms="HS256"))
+        decoded = config.WebToken(**jwt.decode(jwt=token, key=config.env.token.get_secret_value(), algorithms="HS256"))
     except (jwt.InvalidSignatureError, ValidationError) as error:
         logger.error(error)
         raise config.RedirectException(location="/error", detail="Invalid session token")

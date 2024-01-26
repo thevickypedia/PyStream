@@ -12,6 +12,20 @@ from pystream.models import authenticator, config, squire
 router = APIRouter()
 
 
+def get_expiry(lease: int) -> str:
+    """Get expiry datetime as string using max age.
+
+    Args:
+        lease: Number of seconds until expiry.
+
+    Returns:
+        str:
+        Returns the date and time of expiry in GMT.
+    """
+    end = time.gmtime(time.time() + lease)
+    return time.strftime('%a, %d-%b-%Y %T GMT', end)
+
+
 @router.get("%s" % config.static.home_endpoint, response_model=None)
 async def home_page(request: Request, session_token: str = Cookie(None)) -> squire.templates.TemplateResponse:
     """Serves the home/index page for the UI.
@@ -47,12 +61,15 @@ async def login(request: Request) -> JSONResponse:
     """
     squire.log_connection(request)
     await authenticator.verify_login(request)
-    # Since JavaScript cannot handle RedirectResponse from FastAPI
+    # AJAX calls follow redirect and return the response instead of replacing the URL
     # Solution is to revert to Form, but that won't allow header auth and additional customization done by JavaScript
     response = JSONResponse(content={"redirect_url": config.static.home_endpoint}, status_code=status.HTTP_200_OK)
     encoded_jwt = jwt.encode(payload={"token": config.static.session_token, "timestamp": int(time.time())},
-                             key=config.env.secret.get_secret_value(), algorithm="HS256")
-    response.set_cookie("session_token", encoded_jwt, httponly=True)
+                             key=config.env.token.get_secret_value(), algorithm="HS256")
+    response.set_cookie("session_token", encoded_jwt,
+                        max_age=config.env.session_duration,
+                        expires=get_expiry(config.env.session_duration),
+                        httponly=True)
     return response
 
 
