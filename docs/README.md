@@ -39,7 +39,6 @@ if __name__ == '__main__':
 **Mandatory**
 - **USERNAME**: Any username of choice.
 - **PASSWORD**: Any password of choice.
-- **SECRET**: Any private key to encode and decode JWT.
 - **VIDEO_SOURCE**: Source path for video files.
 > :bulb: &nbsp; Files starting with `_` _(underscore)_ and `.` _(dot)_ will be ignored
 

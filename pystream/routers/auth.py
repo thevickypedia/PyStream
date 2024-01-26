@@ -1,7 +1,6 @@
 import os
 import time
 
-import jwt
 from fastapi import APIRouter, Cookie, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
 from jinja2 import Template
@@ -65,11 +64,10 @@ async def login(request: Request) -> JSONResponse:
     # AJAX calls follow redirect and return the response instead of replacing the URL
     # Solution is to revert to Form, but that won't allow header auth and additional customization done by JavaScript
     response = JSONResponse(content={"redirect_url": config.static.home_endpoint}, status_code=status.HTTP_200_OK)
-    # todo: switch jwt to symmetric key encryption/decryption
-    encoded_jwt = jwt.encode(payload=auth_payload, key=config.env.token.get_secret_value(), algorithm="HS256")
     expiration = get_expiry(config.env.session_duration)
     logger.info("Session for '%s' will be valid until %s", auth_payload['username'], expiration)
-    response.set_cookie("session_token", encoded_jwt,
+    response.set_cookie(key="session_token",
+                        value=config.static.cipher_suite.encrypt(str(auth_payload).encode("utf-8")).decode(),
                         max_age=config.env.session_duration,
                         expires=expiration,
                         httponly=True)

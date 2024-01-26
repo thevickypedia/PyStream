@@ -3,7 +3,7 @@ import secrets
 import time
 from typing import Dict
 
-import jwt
+from cryptography.fernet import InvalidSignature, InvalidToken
 from fastapi import HTTPException, Request, status
 from pydantic import ValidationError
 
@@ -69,20 +69,20 @@ async def verify_login(request: Request) -> Dict[str, str]:
 
 
 async def verify_token(token: str) -> None:
-    """Decodes the JWT and validates the session token and expiration.
+    """Decrypts the symmetric encrypted token and validates the session token and expiration.
 
     Args:
-        token: JSON web token.
-
-    Raises:
-        RedirectException:
+        token: Symmetric encrypted key.
     """
     if not token:
         logger.warning("No session token was received")
         raise config.RedirectException(location="/error", detail="Invalid session token")
     try:
-        decoded = config.WebToken(**jwt.decode(jwt=token, key=config.env.token.get_secret_value(), algorithms="HS256"))
-    except (jwt.InvalidSignatureError, ValidationError) as error:
+        decoded = config.WebToken(**eval(config.static.cipher_suite.decrypt(token).decode()))
+    except (InvalidToken, InvalidSignature):
+        logger.error("Invalid token or signature")
+        raise config.RedirectException(location="/error", detail="Invalid session token")
+    except ValidationError as error:
         logger.error(error)
         raise config.RedirectException(location="/error", detail="Invalid session token")
     if not secrets.compare_digest(decoded.token, config.session.mapping.get(decoded.username, '')):

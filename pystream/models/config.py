@@ -4,6 +4,7 @@ import socket
 from ipaddress import IPv4Address
 from typing import Dict, List, Optional, Sequence, Set, Union
 
+from cryptography.fernet import Fernet
 from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
                       field_validator)
 from pydantic_settings import BaseSettings
@@ -19,7 +20,6 @@ class EnvConfig(BaseSettings):
     """
 
     authorization: List[Dict[str, SecretStr]]
-    token: SecretStr
     video_source: DirectoryPath
     users_allowed: List[str] = []
 
@@ -89,6 +89,12 @@ class Static(BaseModel):
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
     deletions: Set[pathlib.PosixPath] = set()
+    cipher_suite: Fernet = Fernet(Fernet.generate_key())
+
+    class Config:
+        """Static configuration."""
+
+        arbitrary_types_allowed = True
 
 
 class Session(BaseModel):
@@ -104,7 +110,7 @@ class Session(BaseModel):
 
 
 class WebToken(BaseModel):
-    """Object to store and validate JWT objects.
+    """Object to store and validate the symmetric ecrypted payload.
 
     >>> WebToken
 
