@@ -1,5 +1,3 @@
-import asyncio
-import os
 import pathlib
 
 
@@ -47,19 +45,9 @@ async def vtt_to_srt(filename: pathlib.PosixPath):
                 break
         else:
             raise RuntimeError
-        text = '\n'.join(lines[idx+1:])
+        text = '\n'.join(lines[idx + 1:])
         srt_timecode = line if ' --> ' in line else line.replace('-->', ' --> ')
         srt_content += f"{subtitle_counter}\n{srt_timecode}\n{text}\n\n"
         subtitle_counter += 1
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(srt_content)
-
-
-if __name__ == '__main__':
-    path = os.path.expanduser('~/Desktop/Streaming/got/Season 2')
-    for file in os.listdir(path):
-        if file.endswith('.vtt'):
-            sub_path = pathlib.PosixPath(os.path.join(path, file))
-            asyncio.run(vtt_to_srt(sub_path))
-            if os.path.exists(sub_path.with_suffix('.srt')):
-                os.remove(sub_path)

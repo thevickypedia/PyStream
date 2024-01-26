@@ -15,7 +15,8 @@ class RootFilter(logging.Filter):
         - The method ``filter(record)``, that examines the log record and returns True to log it or False to discard it.
     """
 
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(self,
+               record: logging.LogRecord) -> bool:
         """Filter out logging at ``/`` from log streams.
 
         Args:

@@ -1,10 +1,8 @@
 import os
 import pathlib
-import random
 import socket
-import string
 from ipaddress import IPv4Address
-from typing import List, Optional, Sequence, Set, Union
+from typing import Dict, List, Optional, Sequence, Set, Union
 
 from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
                       field_validator)
@@ -20,10 +18,10 @@ class EnvConfig(BaseSettings):
 
     """
 
-    username: str
-    password: SecretStr
+    authorization: List[Dict[str, SecretStr]]
     token: SecretStr
     video_source: DirectoryPath
+    users_allowed: List[str] = []
 
     video_host: IPv4Address = socket.gethostbyname("localhost")
     video_port: PositiveInt = 8000
@@ -91,10 +89,6 @@ class Static(BaseModel):
     streaming_endpoint: str = "/video"
     chunk_size: PositiveInt = 1024 * 1024
     deletions: Set[pathlib.PosixPath] = set()
-    # todo: Allow multiple users, and create multiple session tokens during startup
-    # Use a single session token, since currently this project only allows one username and password
-    # Random string ensures, that users are forced to login when the server restarts
-    session_token: str = "".join(random.choices(string.ascii_letters + string.digits, k=32))
 
 
 class Session(BaseModel):
@@ -116,8 +110,10 @@ class WebToken(BaseModel):
 
     """
 
-    token: str
-    timestamp: int
+    # Use a minimum length so empty tokens cannot get passed when assigning default value for a dict value
+    token: str = Field(..., min_length=1)
+    username: str = Field(..., min_length=1)
+    timestamp: int = Field(..., gt=0)
 
 
 class RedirectException(Exception):
@@ -134,7 +130,9 @@ class RedirectException(Exception):
         https://fastapi.tiangolo.com/tutorial/handling-errors/#install-custom-exception-handlers
     """
 
-    def __init__(self, location: str, detail: Optional[str] = ""):
+    def __init__(self,
+                 location: str,
+                 detail: Optional[str] = ""):
         """Instantiates the ``RedirectException`` object with the required parameters.
 
         Args:

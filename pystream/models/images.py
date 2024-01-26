@@ -15,7 +15,8 @@ class Images:
 
     """
 
-    def __init__(self, filepath: pathlib.PosixPath):
+    def __init__(self,
+                 filepath: pathlib.PosixPath):
         """Instantiates the object using opencv's VideoCapture object.
 
         Args:
@@ -24,7 +25,9 @@ class Images:
         self.filepath = filepath
         self.video_capture = cv2.VideoCapture(str(self.filepath))
 
-    def generate_thumbnails(self, interval: int = 1, output_dir: pathlib.PosixPath = None) -> bool:
+    def generate_thumbnails(self,
+                            interval: int = 1,
+                            output_dir: pathlib.PosixPath = None) -> bool:
         """Generate thumbnails for a video file.
 
         Args:
@@ -72,7 +75,9 @@ class Images:
         video_time = datetime.timedelta(seconds=seconds)
         return seconds, video_time
 
-    def generate_preview(self, path: str, at_second: int = None) -> bool:
+    def generate_preview(self,
+                         path: str,
+                         at_second: int = None) -> bool:
         """Generate preview image for a video.
 
         Args:

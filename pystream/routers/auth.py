@@ -27,7 +27,8 @@ def get_expiry(lease: int) -> str:
 
 
 @router.get("%s" % config.static.home_endpoint, response_model=None)
-async def home_page(request: Request, session_token: str = Cookie(None)) -> squire.templates.TemplateResponse:
+async def home_page(request: Request,
+                    session_token: str = Cookie(None)) -> squire.templates.TemplateResponse:
     """Serves the home/index page for the UI.
 
     Args:
@@ -60,21 +61,24 @@ async def login(request: Request) -> JSONResponse:
         Returns the JSONResponse with content, status code and cookie.
     """
     squire.log_connection(request)
-    await authenticator.verify_login(request)
+    auth_payload = await authenticator.verify_login(request)
     # AJAX calls follow redirect and return the response instead of replacing the URL
     # Solution is to revert to Form, but that won't allow header auth and additional customization done by JavaScript
     response = JSONResponse(content={"redirect_url": config.static.home_endpoint}, status_code=status.HTTP_200_OK)
-    encoded_jwt = jwt.encode(payload={"token": config.static.session_token, "timestamp": int(time.time())},
-                             key=config.env.token.get_secret_value(), algorithm="HS256")
+    # todo: switch jwt to symmetric key encryption/decryption
+    encoded_jwt = jwt.encode(payload=auth_payload, key=config.env.token.get_secret_value(), algorithm="HS256")
+    expiration = get_expiry(config.env.session_duration)
+    logger.info("Session for '%s' will be valid until %s", auth_payload['username'], expiration)
     response.set_cookie("session_token", encoded_jwt,
                         max_age=config.env.session_duration,
-                        expires=get_expiry(config.env.session_duration),
+                        expires=expiration,
                         httponly=True)
     return response
 
 
 @router.get("%s" % config.static.logout_endpoint, response_model=None)
-async def logout(request: Request, session_token: str = Cookie(None)) -> HTMLResponse:
+async def logout(request: Request,
+                 session_token: str = Cookie(None)) -> HTMLResponse:
     """Terminates the user's session by deleting the cookie and redirecting back to login page upon refresh.
 
     Args:

@@ -17,7 +17,8 @@ app.include_router(video.router)
 
 # Exception handler for RedirectException
 @app.exception_handler(config.RedirectException)
-async def redirect_exception_handler(request: Request, exception: config.RedirectException) -> JSONResponse:
+async def redirect_exception_handler(request: Request,
+                                     exception: config.RedirectException) -> JSONResponse:
     """Custom exception handler to handle redirect.
 
     Args:
@@ -46,9 +47,7 @@ async def startup_tasks() -> None:
     origins.extend(config.env.website)
     origins.extend(map((lambda x: x + '/*'), config.env.website))
     # noinspection PyTypeChecker
-    app.add_middleware(CORSMiddleware,
-                       allow_origins=origins, allow_methods=["GET", "POST"],
-                       allow_credentials=True, allow_headers=["*"])  # fixme: set specific headers
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_credentials=True)
 
 
 async def shutdown_tasks() -> None:
@@ -71,6 +70,11 @@ async def start(**kwargs) -> None:
     """
     # Load and validate env vars/arguments
     config.env = config.EnvConfig(**kwargs)
+    config.env.users_allowed = sum([list(user.keys()) for user in config.env.authorization], [])
+    if dupe := set(x for x in config.env.users_allowed if config.env.users_allowed.count(x) > 1):
+        raise ValueError(
+            f"authorization\n\tInput list should have dictionaries with unique keys\n\tduplicate(s): {dupe}"
+        )
 
     # Configure uvicorn server with custom logging
     log_config = uvicorn.config.LOGGING_CONFIG

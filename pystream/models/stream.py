@@ -9,7 +9,8 @@ from pystream.models import config
 
 
 def send_bytes_range_requests(file_obj: BinaryIO,
-                              start_range: int, end_range: int) -> AsyncIterable[Union[str, ByteString]]:
+                              start_range: int,
+                              end_range: int) -> AsyncIterable[Union[str, ByteString]]:
     """Send a file in chunks using Range Requests specification RFC7233.
 
     Args:
@@ -55,7 +56,8 @@ def get_range_header(range_header: str,
     return start_range, end_range
 
 
-def range_requests_response(range_header: str, file_path: str) -> StreamingResponse:
+def range_requests_response(range_header: str,
+                            file_path: str) -> StreamingResponse:
     """Returns StreamingResponse using Range Requests of a given file.
 
     Args:
