@@ -56,7 +56,9 @@ async def track_loader(request: Request,
     """
     await authenticator.verify_token(session_token)
     squire.log_connection(request)
-    return FileResponse(html.unescape(track_path))
+    if pathlib.Path(track_path).exists():
+        return FileResponse(html.unescape(track_path))
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"File at path {track_path!r} does not exist.")
 
 
 @router.get("/%s/{video_path:path}" % config.static.stream, response_model=None)

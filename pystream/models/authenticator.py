@@ -26,8 +26,11 @@ async def failed_auth_counter(request: Request) -> None:
 
 async def extract_credentials(request: Request) -> List[str]:
     """Extract the credentials from ``Authorization`` headers and decode it before returning as a list of strings."""
+    auth_header = request.headers.get("authorization", "")
     # decode the Base64-encoded ASCII string
-    decoded_auth = await secure.base64_decode(request.headers.get("authorization", ""))
+    if not auth_header:
+        await raise_error(request)
+    decoded_auth = await secure.base64_decode(auth_header)
     # convert hex to a string
     auth = await secure.hex_decode(decoded_auth)
     return auth.split(',')
