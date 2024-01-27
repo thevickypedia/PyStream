@@ -7,7 +7,7 @@
 [![Pypi-format](https://img.shields.io/pypi/format/stream-localhost)](https://pypi.org/project/stream-localhost/#files)
 [![Pypi-status](https://img.shields.io/pypi/status/stream-localhost)][pypi]
 
-# Video Streaming
+# PyStream
 Python module to, stream videos via authenticated sessions using FastAPI
 
 ## Install
@@ -23,9 +23,8 @@ import pystream
 
 if __name__ == '__main__':
     kwargs = dict(
-        username="foo",
-        password="bar",
-        video_source=os.path.join(os.path.expanduser('~'), 'Downloads'),
+        authorization=[{"Alan Turing": "Pr0gRamM1ng"}, {"Linus Torvalds": "LinuxOS"}],
+        video_source=os.path.join(os.path.expanduser('~'), 'Downloads')
     )
     # Add the following to host on local IP address, skip for localhost (127.0.0.1)
     # kwargs["video_host"] = pystream.utils.get_local_ip()
@@ -37,8 +36,7 @@ if __name__ == '__main__':
 > To use custom filenames, set the env var `env_file` as `key` and the _filename_ as its `value`
 
 **Mandatory**
-- **USERNAME**: Any username of choice.
-- **PASSWORD**: Any password of choice.
+- **AUTHORIZATION**: List of dictionaries with `username` as key and `password` as value.
 - **VIDEO_SOURCE**: Source path for video files.
 > :bulb: &nbsp; Files starting with `_` _(underscore)_ and `.` _(dot)_ will be ignored
 

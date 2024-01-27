@@ -63,7 +63,7 @@ async def verify_login(request: Request) -> Dict[str, Union[str, int]]:
     hex_pass = await secure.hex_encode(password.get_secret_value())
     message = f"{hex_user}{hex_pass}{timestamp}"
     expected_signature = await secure.calculate_hash(message)
-    if signature == expected_signature:
+    if secrets.compare_digest(signature, expected_signature):
         config.session.invalid[request.client.host] = 0
         key = squire.keygen()
         # Store session token for each apikey
@@ -79,7 +79,7 @@ async def verify_token(token: str) -> None:
         token: Symmetric encrypted key.
     """
     if not token:
-        logger.warning("No session token was received")
+        logger.warning("Session token was missing/revoked")
         raise config.RedirectException(location="/error", detail="Invalid session token")
     try:
         decoded = config.WebToken(**eval(config.static.cipher_suite.decrypt(token).decode()))
@@ -88,5 +88,6 @@ async def verify_token(token: str) -> None:
         raise config.RedirectException(location="/error", detail="Invalid session token")
     if not secrets.compare_digest(decoded.token, config.session.mapping.get(decoded.username, '')):
         raise config.RedirectException(location="/error", detail="Invalid session token")
+    # Max time and expiry for session token is set in the Cookie, but this is a fallback mechanism to avoid tampering
     if time.time() - decoded.timestamp > config.env.session_duration:
         raise config.RedirectException(location="/error", detail="Session expired")

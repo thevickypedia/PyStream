@@ -11,6 +11,7 @@ Stream-Localhost - A secured interface to stream videos
    :caption: Read Me:
 
    README
+   authentication
 
 Main Module
 ===========
