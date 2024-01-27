@@ -42,7 +42,13 @@ async def redirect_exception_handler(request: Request,
 
 async def startup_tasks() -> None:
     """Tasks that need to run during the API startup."""
-    logger.info('Setting CORS policy.')
+    logger.info("Validating authorization keys")
+    config.env.users_allowed = sum([list(user.keys()) for user in config.env.authorization], [])
+    if dupe := set(x for x in config.env.users_allowed if config.env.users_allowed.count(x) > 1):
+        raise ValueError(
+            f"authorization\n\tInput list should have dictionaries with unique keys\n\tduplicate(s): {dupe}"
+        )
+    logger.info('Setting up CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
     origins.extend(config.env.website)
     origins.extend(map((lambda x: x + '/*'), config.env.website))
@@ -70,11 +76,6 @@ async def start(**kwargs) -> None:
     """
     # Load and validate env vars/arguments
     config.env = config.EnvConfig(**kwargs)
-    config.env.users_allowed = sum([list(user.keys()) for user in config.env.authorization], [])
-    if dupe := set(x for x in config.env.users_allowed if config.env.users_allowed.count(x) > 1):
-        raise ValueError(
-            f"authorization\n\tInput list should have dictionaries with unique keys\n\tduplicate(s): {dupe}"
-        )
 
     # Configure uvicorn server with custom logging
     log_config = uvicorn.config.LOGGING_CONFIG

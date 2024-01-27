@@ -106,7 +106,7 @@
 </script>
 <!-- handle authentication from login page -->
 <script>
-    function submitToAPI(event) {
+    async function submitToAPI(event) {
         event.preventDefault();
         const username = $("#username").val();
         const password = $("#password").val();
@@ -114,22 +114,33 @@
             alert("ERROR: Username and password are required to authenticate your request!");
             return false;
         }
-        function ConvertStringToHex(str) {
+        async function ConvertStringToHex(str) {
             let arr = [];
             for (let i = 0; i < str.length; i++) {
                 arr[i] = ("00" + str.charCodeAt(i).toString(16)).slice(-4);
             }
             return "\\u" + arr.join("\\u");
         }
-        let hex_user = ConvertStringToHex(username);
-        let hex_pass = ConvertStringToHex(password);
+        async function CalculateHash(username, password, timestamp) {
+            const message = username + password + timestamp;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+        let hex_user = await ConvertStringToHex(username);
+        let hex_pass = await ConvertStringToHex(password);
+        let timestamp = Math.round(new Date().getTime() / 1000);
+        let hash = await CalculateHash(hex_user, hex_pass, timestamp)
+        let authHeaderValue = hex_user + ',' + hash + ',' + timestamp;
         let origin = window.location.origin
         $.ajax({
             method: "POST",
             url: origin.concat("{{ signin }}"),
             headers: {
                 'accept': 'application/json',
-                'Authorization': btoa(hex_user + ":" + hex_pass)
+                'Authorization': btoa(authHeaderValue)
             },
             crossDomain: "true",
             contentType: "application/json; charset=utf-8",
