@@ -1,6 +1,6 @@
 import secrets
 import time
-from typing import Dict, List, NoReturn
+from typing import Dict, List, NoReturn, Union
 
 from cryptography.fernet import InvalidSignature, InvalidToken
 from fastapi import HTTPException, Request, status
@@ -44,7 +44,7 @@ async def raise_error(request) -> NoReturn:
     )
 
 
-async def verify_login(request: Request) -> Dict[str, str]:
+async def verify_login(request: Request) -> Dict[str, Union[str, int]]:
     """Verifies authentication and generates session token for each user.
 
     Returns:
@@ -68,7 +68,7 @@ async def verify_login(request: Request) -> Dict[str, str]:
         key = squire.keygen()
         # Store session token for each apikey
         config.session.mapping[username] = key
-        return {"username": username, "token": key, "timestamp": int(time.time())}
+        return {"username": username, "token": key, "timestamp": int(timestamp)}
     await raise_error(request)
 
 
