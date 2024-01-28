@@ -92,13 +92,18 @@ async def stream_video(request: Request,
             }
         )
     if pure_path.exists():
-        prev_, next_ = squire.get_iter(pure_path)
         attrs = {
             "request": request, "video_title": video_path,
             "home": config.static.home_endpoint, "logout": config.static.logout_endpoint,
-            "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}",
-            "previous": prev_, "next": next_
+            "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}"
         }
+        prev_, next_ = squire.get_iter(pure_path)
+        if prev_:
+            attrs["previous"] = urlparse.quote(prev_)
+            attrs["previous_title"] = prev_
+        if next_:
+            attrs["next"] = urlparse.quote(next_)
+            attrs["next_title"] = next_
         # set default to avoid broken image sign in thumbnail
         preview_src = os.path.join(pathlib.PurePath(__file__).parent, "blank.jpg")
         if config.env.auto_thumbnail:

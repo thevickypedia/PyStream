@@ -96,17 +96,19 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
         Tuple[str, str]:
         Tuple of previous file and next file.
     """
-    dir_content = sorted(os.listdir(filename.parent), key=lambda x: natural_sort_key(x))
+    # Extract only the file formats that are supported
+    dir_content = sorted(
+        (file for file in os.listdir(filename.parent) if pathlib.PosixPath(file).suffix in config.env.file_formats),
+        key=lambda x: natural_sort_key(x)
+    )
     idx = dir_content.index(filename.name)
     try:
         previous_ = dir_content[idx - 1]
-        assert pathlib.PosixPath(previous_).suffix in config.env.file_formats
-    except (IndexError, AssertionError):
+    except IndexError:
         previous_ = None
     try:
         next_ = dir_content[idx + 1]
-        assert pathlib.PosixPath(next_).suffix in config.env.file_formats
-    except (IndexError, AssertionError):
+    except IndexError:
         next_ = None
     return previous_, next_
 
