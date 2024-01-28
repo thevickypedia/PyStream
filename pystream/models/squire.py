@@ -3,6 +3,7 @@ import pathlib
 import re
 import secrets
 from typing import Dict, List, Tuple, Union
+from urllib import parse as urlparse
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -100,12 +101,12 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
     dir_content = sorted(os.listdir(filename.parent), key=lambda x: natural_sort_key(x))
     idx = dir_content.index(filename.name)
     try:
-        previous_ = dir_content[idx - 1]
+        previous_ = urlparse.quote(dir_content[idx - 1])
         assert pathlib.PosixPath(previous_).suffix in config.env.file_formats
     except (IndexError, AssertionError):
         previous_ = None
     try:
-        next_ = dir_content[idx + 1]
+        next_ = urlparse.quote(dir_content[idx + 1])
         assert pathlib.PosixPath(next_).suffix in config.env.file_formats
     except (IndexError, AssertionError):
         next_ = None
