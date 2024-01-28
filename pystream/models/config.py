@@ -1,8 +1,9 @@
+import json
 import os
 import pathlib
 import socket
 from ipaddress import IPv4Address
-from typing import Dict, List, Optional, Sequence, Set, Union
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from cryptography.fernet import Fernet
 from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
@@ -12,6 +13,25 @@ from pydantic_settings import BaseSettings
 template_storage = os.path.join(pathlib.Path(__file__).parent.parent, "templates")
 
 
+def as_dict(pairs: List[Tuple[str, str]]) -> Dict[str, SecretStr]:
+    """Custom decoder for ``json.loads`` passed via ``object_pairs_hook`` raising error on duplicate keys.
+
+    Args:
+        pairs: Takes the ordered list of pairs as an argument.
+
+    Returns:
+        Dict[str, SecretStr]:
+        A dictionary of key as string and value as a secret.
+    """
+    dictionary = {}
+    for key, value in pairs:
+        if key in dictionary:
+            raise ValueError(f"Duplicate key: {key!r}")
+        else:
+            dictionary[key.strip()] = SecretStr(value.strip())
+    return dictionary
+
+
 class EnvConfig(BaseSettings):
     """Configure all env vars and validate using ``pydantic`` to share across modules.
 
@@ -19,9 +39,8 @@ class EnvConfig(BaseSettings):
 
     """
 
-    authorization: List[Dict[str, SecretStr]]
+    authorization: Any
     video_source: DirectoryPath
-    users_allowed: List[str] = []
 
     video_host: IPv4Address = socket.gethostbyname("localhost")
     video_port: PositiveInt = 8000
@@ -39,6 +58,22 @@ class EnvConfig(BaseSettings):
         env_file = os.environ.get("env_file") or os.environ.get("ENV_FILE") or ".env"
         extra = "ignore"  # Ignores additional environment variables present in env files
         hide_input_in_errors = True  # Avoids revealing sensitive information in validation error messages
+
+    # noinspection PyMethodParameters
+    @field_validator("authorization", mode='before', check_fields=False)
+    def parse_authorization(cls, value: Any) -> Dict[str, SecretStr]:
+        """Validates the authorization parameter."""
+        val = json.loads(value, object_pairs_hook=as_dict)
+        if isinstance(val, dict):
+            r = {}
+            for k, v in val.items():
+                if len(k) < 3:
+                    raise ValueError(f"[{k}: {v}] username should be at least 4 or more characters")
+                if len(v) < 8:
+                    raise ValueError(f"[{k}: {v}] password should be at least 8 or more characters")
+                r[k] = v
+            return r
+        raise ValueError("input should be a valid dictionary with username as key and password as value")
 
     # noinspection PyMethodParameters
     @field_validator("video_host", mode='after', check_fields=True)

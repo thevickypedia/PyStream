@@ -70,7 +70,7 @@
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">authorization</span><span class="o">=</span><span class="p">[{</span><span class="s2">&quot;Alan Turing&quot;</span><span class="p">:</span> <span class="s2">&quot;Pr0gRamM1ng&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;Linus Torvalds&quot;</span><span class="p">:</span> <span class="s2">&quot;LinuxOS&quot;</span><span class="p">}],</span>
+        <span class="n">authorization</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Alan Turing&quot;</span><span class="p">:</span> <span class="s2">&quot;Pr0gRamM1ng&quot;</span><span class="p">,</span> <span class="s2">&quot;Linus Torvalds&quot;</span><span class="p">:</span> <span class="s2">&quot;LinuxOS&quot;</span><span class="p">},</span>
         <span class="n">video_source</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;Downloads&#39;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="c1"># Add the following to host on local IP address, skip for localhost (127.0.0.1)</span>
@@ -86,7 +86,7 @@ To use custom filenames, set the env var <code class="docutils literal notransla
 </div></blockquote>
 <p><strong>Mandatory</strong></p>
 <ul class="simple">
-<li><p><strong>AUTHORIZATION</strong>: List of dictionaries with <code class="docutils literal notranslate"><span class="pre">username</span></code> as key and <code class="docutils literal notranslate"><span class="pre">password</span></code> as value.</p></li>
+<li><p><strong>AUTHORIZATION</strong>: Dictionary of key-value pairs with <code class="docutils literal notranslate"><span class="pre">username</span></code> as key and <code class="docutils literal notranslate"><span class="pre">password</span></code> as value.</p></li>
 <li><p><strong>VIDEO_SOURCE</strong>: Source path for video files.</p></li>
 </ul>
 <blockquote>

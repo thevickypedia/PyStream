@@ -55,15 +55,12 @@ async def verify_login(request: Request) -> Dict[str, Union[str, int]]:
         Returns a dictionary with the payload required to create the session token.
     """
     username, signature, timestamp = await extract_credentials(request)
-    if username not in config.env.users_allowed:
-        await raise_error(request)
-    for item in config.env.authorization:
-        if password := item.get(username):
-            break
+    if password := config.env.authorization.get(username):
+        hex_user = await secure.hex_encode(username)
+        hex_pass = await secure.hex_encode(password.get_secret_value())
     else:
+        logger.warning("User '%s' not allowed", username)
         await raise_error(request)
-    hex_user = await secure.hex_encode(username)
-    hex_pass = await secure.hex_encode(password.get_secret_value())
     message = f"{hex_user}{hex_pass}{timestamp}"
     expected_signature = await secure.calculate_hash(message)
     if secrets.compare_digest(signature, expected_signature):
