@@ -2,6 +2,7 @@
 
 [![book](https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg)][gha_pages]
 [![pypi](https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml/badge.svg)][gha_pypi]
+[![none-shall-pass](https://github.com/thevickypedia/pystream/actions/workflows/markdown.yml/badge.svg)][gha_none_shall_pass]
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/stream-localhost)][pypi]
 [![Pypi-format](https://img.shields.io/pypi/format/stream-localhost)](https://pypi.org/project/stream-localhost/#files)
@@ -102,6 +103,7 @@ Licensed under the [MIT License][license]
 [release-notes]: https://github.com/thevickypedia/pystream/blob/master/release_notes.rst
 [gha_pages]: https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment
 [gha_pypi]: https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml
+[gha_none_shall_pass]: https://github.com/thevickypedia/pystream/actions/workflows/markdown.yml
 [google-docs]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 [isort]: https://pycqa.github.io/isort/
