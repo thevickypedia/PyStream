@@ -1,6 +1,19 @@
 Release Notes
 =============
 
+v1.1 (01/28/2024)
+-----------------
+- Fix missing navigation buttons due to unsupported files in directory
+
+v1.0 (01/25/2024)
+-----------------
+- Improved security with session-based authentication
+- Increased server-side control, robust session management and sensitive data protection
+- Improves user experience with HTML responses instead of JSON objects and plain text
+- Includes support for subtitles, along with auto-converting ``.srt`` to ``.vtt``
+- Supports multiple video file formats, and websites for CORS
+- Includes more options in the video player with seek, next and previous buttons
+
 v0.0.2 (12/10/2023)
 -------------------
 - Includes performance improvements
