@@ -129,12 +129,12 @@
         </p>
     </video>
     {% if previous %}
-        <button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous }}">
+        <button class="iter" style="float: left" onclick="window.location='{{ previous }}'" title="{{ previous_title }}">
             <i class="fa fa-backward"></i> Previous
         </button>
     {% endif %}
     {% if next %}
-        <button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next }}">
+        <button class="iter" style="float: right" onclick="window.location='{{ next }}'" title="{{ next_title }}">
             Next <i class="fa fa-forward"></i>
         </button>
     {% endif %}

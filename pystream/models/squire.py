@@ -1,9 +1,7 @@
 import os
 import pathlib
 import re
-import secrets
 from typing import Dict, List, Tuple, Union
-from urllib import parse as urlparse
 
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -41,8 +39,7 @@ def natural_sort_key(filename: str) -> List[Union[int, str]]:
     return [int(part) if part.isdigit() else part.lower() for part in parts]
 
 
-def get_dir_stream_content(parent: pathlib.PosixPath,
-                           subdir: str) -> List[Dict[str, str]]:
+def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
     """Get the video files inside a particular directory.
 
     Args:
@@ -84,8 +81,9 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
                     structure['directories'].append(entry)
                 else:
                     structure['files'].append({"name": file_, "path": os.path.join(config.static.stream, file_)})
-    return dict(files=sorted(structure['files'], key=lambda x: natural_sort_key(x['name'])),
-                directories=sorted(structure['directories'], key=lambda x: natural_sort_key(x['name'])))
+    structure['files'] = sorted(structure['files'], key=lambda x: natural_sort_key(x['name']))
+    structure['directories'] = sorted(structure['directories'], key=lambda x: natural_sort_key(x['name']))
+    return structure
 
 
 def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, None]]:
@@ -98,17 +96,19 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
         Tuple[str, str]:
         Tuple of previous file and next file.
     """
-    dir_content = sorted(os.listdir(filename.parent), key=lambda x: natural_sort_key(x))
+    # Extract only the file formats that are supported
+    dir_content = sorted(
+        (file for file in os.listdir(filename.parent) if pathlib.PosixPath(file).suffix in config.env.file_formats),
+        key=lambda x: natural_sort_key(x)
+    )
     idx = dir_content.index(filename.name)
     try:
-        previous_ = urlparse.quote(dir_content[idx - 1])
-        assert pathlib.PosixPath(previous_).suffix in config.env.file_formats
-    except (IndexError, AssertionError):
+        previous_ = dir_content[idx - 1]
+    except IndexError:
         previous_ = None
     try:
-        next_ = urlparse.quote(dir_content[idx + 1])
-        assert pathlib.PosixPath(next_).suffix in config.env.file_formats
-    except (IndexError, AssertionError):
+        next_ = dir_content[idx + 1]
+    except IndexError:
         next_ = None
     return previous_, next_
 
@@ -123,13 +123,3 @@ def remove_thumbnail(img_path: pathlib.PosixPath) -> None:
         os.remove(img_path)
     else:
         logger.warning("%s was removed before hand." % img_path)
-
-
-def keygen() -> str:
-    """Generate session token from secrets module, so that users are forced to log in when the server restarts.
-
-    Returns:
-        str:
-        Returns a URL safe 64-bit token.
-    """
-    return secrets.token_urlsafe(64)

@@ -8,7 +8,7 @@
 [![Pypi-format](https://img.shields.io/pypi/format/stream-localhost)](https://pypi.org/project/stream-localhost/#files)
 [![Pypi-status](https://img.shields.io/pypi/status/stream-localhost)][pypi]
 
-# PyStream
+# Video Streaming
 Python module to, stream videos via authenticated sessions using FastAPI
 
 ## Install
@@ -24,8 +24,9 @@ import pystream
 
 if __name__ == '__main__':
     kwargs = dict(
-        authorization={"Alan Turing": "Pr0gRamM1ng", "Linus Torvalds": "LinuxOS"},
-        video_source=os.path.join(os.path.expanduser('~'), 'Downloads')
+        username="foo",
+        password="bar",
+        video_source=os.path.join(os.path.expanduser('~'), 'Downloads'),
     )
     # Add the following to host on local IP address, skip for localhost (127.0.0.1)
     # kwargs["video_host"] = pystream.utils.get_local_ip()
@@ -33,11 +34,13 @@ if __name__ == '__main__':
 ```
 
 ### Env Variables
-> :bulb: &nbsp; Environment variables can be loaded from any file. _Filename defaults to `.env`_<br>
-> To use custom filenames, set the env var `env_file` as `key` and the _filename_ as its `value`
+> :bulb: &nbsp; Environment variables can _(optionally)_ be loaded from any file.<br>
+> Refer the [wiki page][wiki] for more information.
 
 **Mandatory**
-- **AUTHORIZATION**: Dictionary of key-value pairs with `username` as key and `password` as value.
+- **USERNAME**: Any username of choice.
+- **PASSWORD**: Any password of choice.
+- **SECRET**: Any private key to encode and decode JWT.
 - **VIDEO_SOURCE**: Source path for video files.
 > :bulb: &nbsp; Files starting with `_` _(underscore)_ and `.` _(dot)_ will be ignored
 
@@ -106,3 +109,4 @@ Licensed under the [MIT License][license]
 [isort]: https://pycqa.github.io/isort/
 [sphinx]: https://www.sphinx-doc.org/en/master/man/sphinx-autogen.html
 [runbook]: https://thevickypedia.github.io/pystream/
+[wiki]: https://github.com/thevickypedia/pystream/wiki
