@@ -1,6 +1,7 @@
 import os
 import pathlib
 import re
+import secrets
 from typing import Dict, List, Tuple, Union
 
 from fastapi import Request
@@ -39,7 +40,8 @@ def natural_sort_key(filename: str) -> List[Union[int, str]]:
     return [int(part) if part.isdigit() else part.lower() for part in parts]
 
 
-def get_dir_stream_content(parent: pathlib.PosixPath, subdir: str) -> List[Dict[str, str]]:
+def get_dir_stream_content(parent: pathlib.PosixPath,
+                           subdir: str) -> List[Dict[str, str]]:
     """Get the video files inside a particular directory.
 
     Args:
@@ -81,9 +83,8 @@ def get_all_stream_content() -> Dict[str, List[Dict[str, str]]]:
                     structure['directories'].append(entry)
                 else:
                     structure['files'].append({"name": file_, "path": os.path.join(config.static.stream, file_)})
-    structure['files'] = sorted(structure['files'], key=lambda x: natural_sort_key(x['name']))
-    structure['directories'] = sorted(structure['directories'], key=lambda x: natural_sort_key(x['name']))
-    return structure
+    return dict(files=sorted(structure['files'], key=lambda x: natural_sort_key(x['name'])),
+                directories=sorted(structure['directories'], key=lambda x: natural_sort_key(x['name'])))
 
 
 def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, None]]:
@@ -123,3 +124,13 @@ def remove_thumbnail(img_path: pathlib.PosixPath) -> None:
         os.remove(img_path)
     else:
         logger.warning("%s was removed before hand." % img_path)
+
+
+def keygen() -> str:
+    """Generate session token from secrets module, so that users are forced to log in when the server restarts.
+
+    Returns:
+        str:
+        Returns a URL safe 64-bit token.
+    """
+    return secrets.token_urlsafe(64)
