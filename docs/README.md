@@ -34,8 +34,8 @@ if __name__ == '__main__':
 ```
 
 ### Env Variables
-> :bulb: &nbsp; Environment variables can be loaded from any file. _Filename defaults to `.env`_<br>
-> To use custom filenames, set the env var `env_file` as `key` and the _filename_ as its `value`
+> :bulb: &nbsp; Environment variables can _(optionally)_ be loaded from any file.<br>
+> Refer the [wiki page][wiki] for more information.
 
 **Mandatory**
 - **USERNAME**: Any username of choice.
@@ -109,3 +109,4 @@ Licensed under the [MIT License][license]
 [isort]: https://pycqa.github.io/isort/
 [sphinx]: https://www.sphinx-doc.org/en/master/man/sphinx-autogen.html
 [runbook]: https://thevickypedia.github.io/pystream/
+[wiki]: https://github.com/thevickypedia/pystream/wiki
