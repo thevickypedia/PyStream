@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Video Streaming &#8212; Stream  documentation</title>
+    <title>PyStream &#8212; Stream  documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/classic.css" />
     
@@ -18,6 +18,7 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Authentication" href="authentication.html" />
     <link rel="prev" title="Stream-Localhost - A secured interface to stream videos" href="index.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -30,10 +31,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="index.html" title="Stream-Localhost - A secured interface to stream videos"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stream  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Video Streaming</a></li> 
+        <li class="nav-item nav-item-this"><a href="">PyStream</a></li> 
       </ul>
     </div>  
 
@@ -49,8 +53,8 @@
 <p><a class="reference external" href="https://pypi.org/project/stream-localhost"><img alt="PyPI version shields.io" src="https://img.shields.io/pypi/v/stream-localhost" /></a>
 <a class="reference external" href="https://pypi.org/project/stream-localhost/#files"><img alt="Pypi-format" src="https://img.shields.io/pypi/format/stream-localhost" /></a>
 <a class="reference external" href="https://pypi.org/project/stream-localhost"><img alt="Pypi-status" src="https://img.shields.io/pypi/status/stream-localhost" /></a></p>
-<section id="video-streaming">
-<h1>Video Streaming<a class="headerlink" href="#video-streaming" title="Permalink to this heading">¶</a></h1>
+<section id="pystream">
+<h1>PyStream<a class="headerlink" href="#pystream" title="Permalink to this heading">¶</a></h1>
 <p>Python module to, stream videos via authenticated sessions using FastAPI</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h2>
@@ -66,9 +70,8 @@
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span>
-        <span class="n">password</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">,</span>
-        <span class="n">video_source</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;Downloads&#39;</span><span class="p">),</span>
+        <span class="n">authorization</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Alan Turing&quot;</span><span class="p">:</span> <span class="s2">&quot;Pr0gRamM1ng&quot;</span><span class="p">,</span> <span class="s2">&quot;Linus Torvalds&quot;</span><span class="p">:</span> <span class="s2">&quot;LinuxOS&quot;</span><span class="p">},</span>
+        <span class="n">video_source</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;Downloads&#39;</span><span class="p">)</span>
     <span class="p">)</span>
     <span class="c1"># Add the following to host on local IP address, skip for localhost (127.0.0.1)</span>
     <span class="c1"># kwargs[&quot;video_host&quot;] = pystream.utils.get_local_ip()</span>
@@ -83,9 +86,7 @@ Refer the <a class="reference external" href="https://github.com/thevickypedia/p
 </div></blockquote>
 <p><strong>Mandatory</strong></p>
 <ul class="simple">
-<li><p><strong>USERNAME</strong>: Any username of choice.</p></li>
-<li><p><strong>PASSWORD</strong>: Any password of choice.</p></li>
-<li><p><strong>SECRET</strong>: Any private key to encode and decode JWT.</p></li>
+<li><p><strong>AUTHORIZATION</strong>: Dictionary of key-value pairs with <code class="docutils literal notranslate"><span class="pre">username</span></code> as key and <code class="docutils literal notranslate"><span class="pre">password</span></code> as value.</p></li>
 <li><p><strong>VIDEO_SOURCE</strong>: Source path for video files.</p></li>
 </ul>
 <blockquote>
@@ -158,7 +159,7 @@ markdown files (including Wiki pages)</p>
   <div>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
-<li><a class="reference internal" href="#">Video Streaming</a><ul>
+<li><a class="reference internal" href="#">PyStream</a><ul>
 <li><a class="reference internal" href="#install">Install</a></li>
 <li><a class="reference internal" href="#sample-usage">Sample Usage</a><ul>
 <li><a class="reference internal" href="#env-variables">Env Variables</a></li>
@@ -179,6 +180,11 @@ markdown files (including Wiki pages)</p>
     <h4>Previous topic</h4>
     <p class="topless"><a href="index.html"
                           title="previous chapter">Stream-Localhost - A secured interface to stream videos</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="authentication.html"
+                          title="next chapter">Authentication</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -211,10 +217,13 @@ markdown files (including Wiki pages)</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
+          <a href="authentication.html" title="Authentication"
+             >next</a> |</li>
+        <li class="right" >
           <a href="index.html" title="Stream-Localhost - A secured interface to stream videos"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Stream  documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Video Streaming</a></li> 
+        <li class="nav-item nav-item-this"><a href="">PyStream</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

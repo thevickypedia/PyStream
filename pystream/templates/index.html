@@ -9,6 +9,7 @@
     <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
     <!-- Font Awesome icons -->
@@ -125,9 +126,17 @@
             const message = username + password + timestamp;
             const encoder = new TextEncoder();
             const data = encoder.encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-512', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            if (crypto.subtle === undefined) {
+                const wordArray = CryptoJS.lib.WordArray.create(data);
+                const hash = CryptoJS.SHA512(wordArray);
+                // Convert the hash to a hexadecimal string and return it
+                return hash.toString(CryptoJS.enc.Hex);
+            } else {
+                const hashBuffer = await crypto.subtle.digest('SHA-512', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                // Convert each byte to a hexadecimal string, pad with zeros, and join them to form the final hash
+                return hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            }
         }
         let hex_user = await ConvertStringToHex(username);
         let hex_pass = await ConvertStringToHex(password);

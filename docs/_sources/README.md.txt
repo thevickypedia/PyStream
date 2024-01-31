@@ -1,14 +1,14 @@
 **Deployments**
 
-[![book](https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg)][gha_pages]
-[![pypi](https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml/badge.svg)][gha_pypi]
-[![none-shall-pass](https://github.com/thevickypedia/pystream/actions/workflows/markdown.yml/badge.svg)][gha_none_shall_pass]
+[![book][gha_pages_badge]][gha_pages]
+[![pypi][gha_pypi_badge]][gha_pypi]
+[![none-shall-pass][gha_none_shall_pass_badge]][gha_none_shall_pass]
 
 [![PyPI version shields.io](https://img.shields.io/pypi/v/stream-localhost)][pypi]
 [![Pypi-format](https://img.shields.io/pypi/format/stream-localhost)](https://pypi.org/project/stream-localhost/#files)
 [![Pypi-status](https://img.shields.io/pypi/status/stream-localhost)][pypi]
 
-# Video Streaming
+# PyStream
 Python module to, stream videos via authenticated sessions using FastAPI
 
 ## Install
@@ -24,9 +24,8 @@ import pystream
 
 if __name__ == '__main__':
     kwargs = dict(
-        username="foo",
-        password="bar",
-        video_source=os.path.join(os.path.expanduser('~'), 'Downloads'),
+        authorization={"Alan Turing": "Pr0gRamM1ng", "Linus Torvalds": "LinuxOS"},
+        video_source=os.path.join(os.path.expanduser('~'), 'Downloads')
     )
     # Add the following to host on local IP address, skip for localhost (127.0.0.1)
     # kwargs["video_host"] = pystream.utils.get_local_ip()
@@ -38,9 +37,7 @@ if __name__ == '__main__':
 > Refer the [wiki page][wiki] for more information.
 
 **Mandatory**
-- **USERNAME**: Any username of choice.
-- **PASSWORD**: Any password of choice.
-- **SECRET**: Any private key to encode and decode JWT.
+- **AUTHORIZATION**: Dictionary of key-value pairs with `username` as key and `password` as value.
 - **VIDEO_SOURCE**: Source path for video files.
 > :bulb: &nbsp; Files starting with `_` _(underscore)_ and `.` _(dot)_ will be ignored
 
@@ -102,8 +99,11 @@ Licensed under the [MIT License][license]
 [pypi-repo]: https://packaging.python.org/tutorials/packaging-projects/
 [release-notes]: https://github.com/thevickypedia/pystream/blob/master/release_notes.rst
 [gha_pages]: https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment
+[gha_pages_badge]: https://github.com/thevickypedia/pystream/actions/workflows/pages/pages-build-deployment/badge.svg
 [gha_pypi]: https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml
+[gha_pypi_badge]: https://github.com/thevickypedia/pystream/actions/workflows/python-publish.yml/badge.svg
 [gha_none_shall_pass]: https://github.com/thevickypedia/pystream/actions/workflows/markdown.yml
+[gha_none_shall_pass_badge]: https://github.com/thevickypedia/pystream/actions/workflows/markdown.yml/badge.svg
 [google-docs]: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
 [pep8]: https://www.python.org/dev/peps/pep-0008/
 [isort]: https://pycqa.github.io/isort/
