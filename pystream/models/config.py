@@ -63,17 +63,20 @@ class EnvConfig(BaseSettings):
     @field_validator("authorization", mode='before', check_fields=False)
     def parse_authorization(cls, value: Any) -> Dict[str, SecretStr]:
         """Validates the authorization parameter."""
-        val = json.loads(value, object_pairs_hook=as_dict)
-        if isinstance(val, dict):
-            r = {}
-            for k, v in val.items():
-                if len(k) < 3:
-                    raise ValueError(f"[{k}: {v}] username should be at least 4 or more characters")
-                if len(v) < 8:
-                    raise ValueError(f"[{k}: {v}] password should be at least 8 or more characters")
-                r[k] = v
-            return r
-        raise ValueError("input should be a valid dictionary with username as key and password as value")
+        if isinstance(value, dict):
+            val = value
+        else:
+            val = json.loads(value, object_pairs_hook=as_dict)
+            if not isinstance(val, dict):
+                raise ValueError("input should be a valid dictionary with username as key and password as value")
+        r = {}
+        for k, v in val.items():
+            if len(k) < 3:
+                raise ValueError(f"[{k}: {v}] username should be at least 4 or more characters")
+            if len(v) < 8:
+                raise ValueError(f"[{k}: {v}] password should be at least 8 or more characters")
+            r[k] = v
+        return r
 
     # noinspection PyMethodParameters
     @field_validator("video_host", mode='after', check_fields=True)
