@@ -57,7 +57,7 @@ async def verify_login(request: Request) -> Dict[str, Union[str, int]]:
     username, signature, timestamp = await extract_credentials(request)
     if password := config.env.authorization.get(username):
         hex_user = await secure.hex_encode(username)
-        hex_pass = await secure.hex_encode(password.get_secret_value())
+        hex_pass = await secure.hex_encode(password)
     else:
         logger.warning("User '%s' not allowed", username)
         await raise_error(request)
