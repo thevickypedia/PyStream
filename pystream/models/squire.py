@@ -103,9 +103,14 @@ def get_iter(filename: pathlib.PurePath) -> Union[Tuple[str, str], Tuple[None, N
         key=lambda x: natural_sort_key(x)
     )
     idx = dir_content.index(filename.name)
-    try:
-        previous_ = dir_content[idx - 1]
-    except IndexError:
+    if idx > 0:  # 0-1 is -1, which will in turn fetch the last item from the list instead of leaving it blank
+        try:
+            previous_ = dir_content[idx - 1]
+            if previous_ == filename.name:  # This should be covered by > 0, but double check as a safety net
+                previous_ = None
+        except IndexError:
+            previous_ = None
+    else:
         previous_ = None
     try:
         next_ = dir_content[idx + 1]
