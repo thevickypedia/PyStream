@@ -13,22 +13,22 @@ from pydantic_settings import BaseSettings
 template_storage = os.path.join(pathlib.Path(__file__).parent.parent, "templates")
 
 
-def as_dict(pairs: List[Tuple[str, str]]) -> Dict[str, SecretStr]:
+def as_dict(pairs: List[Tuple[str, str]]) -> Dict[str, str]:
     """Custom decoder for ``json.loads`` passed via ``object_pairs_hook`` raising error on duplicate keys.
 
     Args:
         pairs: Takes the ordered list of pairs as an argument.
 
     Returns:
-        Dict[str, SecretStr]:
-        A dictionary of key as string and value as a secret.
+        Dict[str, str]:
+        A dictionary of key-value pairs.
     """
     dictionary = {}
     for key, value in pairs:
         if key in dictionary:
             raise ValueError(f"Duplicate key: {key!r}")
         else:
-            dictionary[key.strip()] = SecretStr(value.strip())
+            dictionary[key.strip()] = value.strip()
     return dictionary
 
 
@@ -39,6 +39,7 @@ class EnvConfig(BaseSettings):
 
     """
 
+    # type hint is set to Any to catch duplicate keys in env files, python's default behavior is to overwrite the values
     authorization: Any
     video_source: DirectoryPath
 
@@ -62,7 +63,7 @@ class EnvConfig(BaseSettings):
     # noinspection PyMethodParameters
     @field_validator("authorization", mode='before', check_fields=False)
     def parse_authorization(cls, value: Any) -> Dict[str, SecretStr]:
-        """Validates the authorization parameter."""
+        """Validates the authorization parameter and converts plain text passwords into ``SecretStr`` objects."""
         if isinstance(value, dict):
             val = value
         else:
@@ -70,11 +71,12 @@ class EnvConfig(BaseSettings):
             if not isinstance(val, dict):
                 raise ValueError("input should be a valid dictionary with username as key and password as value")
         r = {}
-        for k, v in val.items():
+        for k, v_ in val.items():
+            v = SecretStr(v_)
             if len(k) < 4:
-                raise ValueError(f"[{k}: {v}] username should be at least 4 or more characters")
+                raise ValueError(f"[{k}: {v}] username should be at least 4 or more characters, received {len(k)}")
             if len(v) < 8:
-                raise ValueError(f"[{k}: {v}] password should be at least 8 or more characters")
+                raise ValueError(f"[{k}: {v}] password should be at least 8 or more characters, received {len(v_)}")
             r[k] = v
         return r
 

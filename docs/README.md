@@ -33,7 +33,7 @@ if __name__ == '__main__':
 ```
 
 ### Env Variables
-> :bulb: &nbsp; Environment variables can _(optionally)_ be loaded from any file.<br>
+> :bulb: &nbsp; Environment variables can _(optionally)_ be loaded from any plain text file.<br>
 > Refer the [wiki page][wiki] for more information.
 
 **Mandatory**
