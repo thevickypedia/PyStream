@@ -38,7 +38,7 @@ dev = ["sphinx==5.1.1", "pre-commit", "recommonmark", "gitverse"]
 
 [project.urls]
 Homepage = "https://github.com/thevickypedia/pystream"
-Docs = "https://thevickypedia.github.io/pystream/"
+Docs = "https://thevickypedia.github.io/PyStream/"
 Source = "https://github.com/thevickypedia/pystream"
 "Bug Tracker" = "https://github.com/thevickypedia/pystream/issues"
 "Release Notes" = "https://github.com/thevickypedia/pystream/blob/main/release_notes.rst"

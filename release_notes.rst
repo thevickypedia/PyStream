@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+v2.0 (02/13/2024)
+-----------------
+- Redefines authentication allowing multi-user signon
+- Validates each user's session-token using symmetric encryption
+- Uses signature-authentication for username and password validation
+- Includes other minor bug fixes and performance improvements
+
 v1.1 (01/28/2024)
 -----------------
 - Fix missing navigation buttons due to unsupported files in directory
