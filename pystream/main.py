@@ -91,10 +91,6 @@ async def start(**kwargs) -> None:
     }
 
     if config.env.cert_file and config.env.key_file:  # Additional config for HTTPS
-        if config.env.video_port != 443:
-            logger.warning("cert_file and key_file were detected, but port was set to %d, swapping it to HTTPS [443]",
-                           config.env.video_port)
-        argument_dict["port"] = 443
         argument_dict["ssl_keyfile"] = config.env.key_file
         argument_dict["ssl_certfile"] = config.env.cert_file
         uvicorn_config = uvicorn.Config(**argument_dict)
@@ -102,11 +98,12 @@ async def start(**kwargs) -> None:
         # app.add_middleware(HTTPSRedirectMiddleware)
         # is an alternate option but it won't have the server listening on port 80
         # so only internal relative links for CSS and JS will work, not user level redirect
-        http_redirect = dict(app=f"{secure.__name__}:app", port=80, host=config.env.video_host)
-        process = Process(target=uvicorn.run, kwargs=(http_redirect))
-        process.start()
-        logger.info("SSL redirect service started on PID: %d", process.pid)
-    elif argument_dict["port"] == 443:
+        if config.env.video_port == 443:
+            http_redirect = dict(app=f"{secure.__name__}:app", port=80, host=config.env.video_host)
+            process = Process(target=uvicorn.run, kwargs=(http_redirect))
+            process.start()
+            logger.info("SSL redirect service started on PID: %d", process.pid)
+    elif config.env.video_port == 443:
         raise RuntimeWarning(
             "'video_port' was set to 443, however 'cert_file' and 'key_file' are missing."
         )
@@ -123,7 +120,7 @@ async def start(**kwargs) -> None:
         await uvicorn_server.serve()
     except ssl.SSLError as error:
         logger.critical(error)
-        if argument_dict["port"] == 443:
+        if config.env.video_port == 443:
             logger.error("Failed to start server on HTTPS")
             process.kill()
             raise
@@ -131,6 +128,6 @@ async def start(**kwargs) -> None:
     logger.info("Initiating shutdown tasks")
     await shutdown_tasks()
 
-    if argument_dict["port"] == 443:
+    if config.env.video_port == 443:
         logger.info("Shutting down SSL redirect service")
         process.kill()
