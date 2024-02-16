@@ -86,6 +86,13 @@ Basics
    :members:
    :undoc-members:
 
+Secure
+======
+
+.. automodule:: pystream.routers.secure
+   :members:
+   :undoc-members:
+
 Video
 =====
 

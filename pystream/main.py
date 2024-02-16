@@ -1,4 +1,6 @@
 import os
+import ssl
+from multiprocessing import Process
 
 import uvicorn
 from fastapi import FastAPI, Request
@@ -7,7 +9,7 @@ from fastapi.responses import JSONResponse, RedirectResponse
 
 from pystream.logger import logger
 from pystream.models import config
-from pystream.routers import auth, basics, video
+from pystream.routers import auth, basics, secure, video
 
 app = FastAPI()
 app.include_router(auth.router)
@@ -87,12 +89,48 @@ async def start(**kwargs) -> None:
         "log_config": log_config,
         "workers": config.env.workers
     }
-    uvicorn_config = uvicorn.Config(**argument_dict)
+
+    if config.env.cert_file and config.env.key_file:  # Additional config for HTTPS
+        if config.env.video_port != 443:
+            logger.warning("cert_file and key_file were detected, but port was set to %d, swapping it to HTTPS [443]",
+                           config.env.video_port)
+        argument_dict["port"] = 443
+        argument_dict["ssl_keyfile"] = config.env.key_file
+        argument_dict["ssl_certfile"] = config.env.cert_file
+        uvicorn_config = uvicorn.Config(**argument_dict)
+        # Initiate a dedicated server listening to port 80 and redirect it to 443
+        # app.add_middleware(HTTPSRedirectMiddleware)
+        # is an alternate option but it won't have the server listening on port 80
+        # so only internal relative links for CSS and JS will work, not user level redirect
+        http_redirect = dict(app=f"{secure.__name__}:app", port=80, host=config.env.video_host)
+        process = Process(target=uvicorn.run, kwargs=(http_redirect))
+        process.start()
+        logger.info("SSL redirect service started on PID: %d", process.pid)
+    elif argument_dict["port"] == 443:
+        raise RuntimeWarning(
+            "'video_port' was set to 443, however 'cert_file' and 'key_file' are missing."
+        )
+    else:
+        uvicorn_config = uvicorn.Config(**argument_dict)
     uvicorn_server = uvicorn.Server(config=uvicorn_config)
 
     # Run startup tasks
     logger.info("Initiating startup tasks")
     await startup_tasks()
-    await uvicorn_server.serve()  # Await uvicorn server
+
+    # Await uvicorn server and handle SSL errors during startup
+    try:
+        await uvicorn_server.serve()
+    except ssl.SSLError as error:
+        logger.critical(error)
+        if argument_dict["port"] == 443:
+            logger.error("Failed to start server on HTTPS")
+            process.kill()
+            raise
+
     logger.info("Initiating shutdown tasks")
     await shutdown_tasks()
+
+    if argument_dict["port"] == 443:
+        logger.info("Shutting down SSL redirect service")
+        process.kill()

@@ -13,7 +13,7 @@ Python module to, stream videos via authenticated sessions using FastAPI
 
 ## Install
 ```shell
-python -m pip install stream-localhost
+pip install stream-localhost
 ```
 
 ## Sample Usage
@@ -48,6 +48,9 @@ if __name__ == '__main__':
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
 - **WEBSITE**: List of websites (_supports regex_) to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
+- **KEY_FILE**: Path to the private key file for SSL certificate. Defaults to `None`
+- **CERT_FILE**: Path to the full chain file for SSL certificate. Defaults to `None`
+> :bulb: &nbsp; `KEY_FILE` and `CERT_FILE` becomes mandatory when `VIDEO_PORT` is set to `443`
 
 ## Coding Standards
 Docstring format: [`Google`][google-docs] <br>
@@ -56,7 +59,7 @@ Styling conventions: [`PEP 8`][pep8] and [`isort`][isort]
 ## [Release Notes][release-notes]
 **Requirement**
 ```shell
-python -m pip install gitverse
+pip install gitverse
 ```
 
 **Usage**

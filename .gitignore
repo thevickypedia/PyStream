@@ -1,9 +1,20 @@
+__pycache__/
+
+# Jetbrains
 .idea
+
+# Python venv
 venv
+
+# Default env file
 .env
-temp.py
-test.py
+
+# Sphinx docs
 source
 doc_gen/_build
 doc_gen/_static
-__pycache__/
+
+# Temporary scratch pads
+temp*.py
+test.py
+*.json

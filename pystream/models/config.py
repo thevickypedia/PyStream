@@ -6,8 +6,8 @@ from ipaddress import IPv4Address
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
 from cryptography.fernet import Fernet
-from pydantic import (BaseModel, DirectoryPath, Field, PositiveInt, SecretStr,
-                      field_validator)
+from pydantic import (BaseModel, DirectoryPath, Field, FilePath, PositiveInt,
+                      SecretStr, field_validator)
 from pydantic_settings import BaseSettings
 
 template_storage = os.path.join(pathlib.Path(__file__).parent.parent, "templates")
@@ -51,6 +51,8 @@ class EnvConfig(BaseSettings):
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
     website: Union[List[str], None] = []
     auto_thumbnail: bool = True
+    key_file: Union[FilePath, None] = None
+    cert_file: Union[FilePath, None] = None
 
     class Config:
         """Environment variables configuration."""

@@ -54,7 +54,7 @@
 <p>Python module to, stream videos via authenticated sessions using FastAPI</p>
 <section id="install">
 <h2>Install<a class="headerlink" href="#install" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>stream-localhost
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>stream-localhost
 </pre></div>
 </div>
 </section>
@@ -96,7 +96,12 @@ Refer the <a class="reference external" href="https://github.com/thevickypedia/p
 <li><p><strong>WORKERS</strong>: Number of workers to spin up the <code class="docutils literal notranslate"><span class="pre">uvicorn</span></code> server. Defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code></p></li>
 <li><p><strong>WEBSITE</strong>: List of websites (<em>supports regex</em>) to add to CORS configuration. <em>Required only if tunneled via CDN</em></p></li>
 <li><p><strong>AUTO_THUMBNAIL</strong>: Boolean flag to auto generate thumbnail images for preview. Defaults to <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><strong>KEY_FILE</strong>: Path to the private key file for SSL certificate. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+<li><p><strong>CERT_FILE</strong>: Path to the full chain file for SSL certificate. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
 </ul>
+<blockquote>
+<div><p>:bulb:   <code class="docutils literal notranslate"><span class="pre">KEY_FILE</span></code> and <code class="docutils literal notranslate"><span class="pre">CERT_FILE</span></code> becomes mandatory when <code class="docutils literal notranslate"><span class="pre">VIDEO_PORT</span></code> is set to <code class="docutils literal notranslate"><span class="pre">443</span></code></p>
+</div></blockquote>
 </section>
 </section>
 <section id="coding-standards">
@@ -107,7 +112,7 @@ Styling conventions: <a class="reference external" href="https://www.python.org/
 <section id="release-notes">
 <h2><a class="reference external" href="https://github.com/thevickypedia/pystream/blob/master/release_notes.rst">Release Notes</a><a class="headerlink" href="#release-notes" title="Permalink to this heading">¶</a></h2>
 <p><strong>Requirement</strong></p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>gitverse
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>gitverse
 </pre></div>
 </div>
 <p><strong>Usage</strong></p>
