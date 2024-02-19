@@ -67,11 +67,14 @@ async def login(request: Request) -> JSONResponse:
     response = JSONResponse(content={"redirect_url": config.static.home_endpoint}, status_code=status.HTTP_200_OK)
     expiration = get_expiry(lease_start=auth_payload['timestamp'], lease_duration=config.env.session_duration)
     logger.info("Session for '%s' will be valid until %s", auth_payload['username'], expiration)
-    response.set_cookie(key="session_token",
-                        value=config.static.cipher_suite.encrypt(str(auth_payload).encode("utf-8")).decode(),
-                        max_age=config.env.session_duration,
-                        expires=expiration,
-                        httponly=True)
+    cookie_kwargs = dict(key="session_token",
+                         value=config.static.cipher_suite.encrypt(str(auth_payload).encode("utf-8")).decode(),
+                         max_age=config.env.session_duration,
+                         expires=expiration,
+                         httponly=True)
+    if config.env.secure_session:
+        cookie_kwargs["secure"] = True
+    response.set_cookie(**cookie_kwargs)
     return response
 
 

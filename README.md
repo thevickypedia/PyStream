@@ -48,6 +48,8 @@ if __name__ == '__main__':
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
 - **WEBSITE**: List of websites (_supports regex_) to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
+- **SECURE_SESSION**: Boolean flag to secure the cookie `session_token` to restrict serving **_ONLY_** via **HTTPS**.
+Defaults to `False`
 - **KEY_FILE**: Path to the private key file for SSL certificate. Defaults to `None`
 - **CERT_FILE**: Path to the full chain file for SSL certificate. Defaults to `None`
 > :bulb: &nbsp; `KEY_FILE` and `CERT_FILE` becomes mandatory when `VIDEO_PORT` is set to `443`

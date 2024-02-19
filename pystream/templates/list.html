@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html>
+<!--suppress JSUnresolvedLibraryURL -->
+<html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>FastAPI video streaming</title>
     <meta property="og:type" content="VideoStreaming">
     <meta name="keywords" content="Python, streaming, fastapi, JavaScript, HTML, CSS">
     <meta name="author" content="Vignesh Rao">
-    <meta name="image" property="og:image" content="https://thevickypedia.com/img/apple-touch-icon.jpg">
     <meta content="width=device-width, initial-scale=1" name="viewport">
     <!-- Disables 404 for favicon.ico which is a logo on top of the webpage tab -->
     <link rel="shortcut icon" href="#">
@@ -14,32 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- CSS and JS for night mode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script type="text/javascript" src="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.js" defer></script>
-    <link rel="stylesheet" href="https://rawgit.com/thevickypedia/open-source/main/nightmode/night.css">
-    <noscript>
-        <style>
-            body {
-                width: 100%;
-                height: 100%;
-                overflow: hidden;
-            }
-        </style>
-        <div style="position: fixed; text-align:center;
-                height: 100%; width: 100%; background-image: url('https://vigneshrao.com/img/auth_server/bg.jpg')">
-            <h2 style="margin-top:5%">This page requires JavaScript
-                to be enabled.
-                <br><br>
-                Please refer <a href="https://www.enable-javascript.com/">enable-javascript</a> for how to.
-            </h2>
-            <p>
-                <img src="https://vigneshrao.com/img/auth_server/javascript.gif" width="230" height="200"
-                     alt="loader" class="center">
-            </p>
-            <form>
-                <button type="submit" onClick="<meta httpEquiv='refresh' content='0'>">RETRY</button>
-            </form>
-        </div>
-    </noscript>
+    <script type="text/javascript" src="https://thevickypedia.github.io/open-source/nightmode/night.js" defer></script>
+    <link rel="stylesheet" type="text/css" href="https://thevickypedia.github.io/open-source/nightmode/night.css">
     <!-- Button CSS -->
     <style>
         body {
@@ -47,7 +23,7 @@
             padding: 0.5%  /* 0.5% away from any surrounding elements */
         }
         .home {
-            position: absolute; /* relative or fixed or absolute; */
+            position: absolute;
             top: 3.8%;
             right: 218px;
             border: none;
@@ -56,7 +32,7 @@
             cursor: pointer;
         }
         .back {
-            position: absolute; /* relative or fixed or absolute; */
+            position: absolute;
             top: 3.8%;
             right: 130px;
             border: none;
@@ -65,7 +41,7 @@
             cursor: pointer;
         }
         .logout {
-            position: absolute; /* relative or fixed or absolute; */
+            position: absolute;
             top: 3.8%;
             right: 30px;
             border: none;
@@ -80,68 +56,90 @@
         a:link { color: blue; }
         a:visited { color: blue; }
         ol {
-          list-style: none;
-          counter-reset: list-counter;
+            list-style: none;
+            counter-reset: list-counter;
         }
         li {
-          counter-increment: list-counter;
-          margin: 0.25rem;
+            counter-increment: list-counter;
+            margin: 0.25rem;
         }
         li::before {
-          content: counter(list-counter);
-          background: #4169E1;
-          width: 2rem;
-          height: 2rem;
-          border-radius: 50%;
-          display: inline-block;
-          line-height: 2rem;
-          color: white;
-          text-align: center;
-          margin-right: 0.5rem;
+            content: counter(list-counter);
+            background: #4169E1;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: inline-block;
+            line-height: 2rem;
+            color: white;
+            text-align: center;
+            margin-right: 0.5rem;
         }
         body {
             font-family: 'PT Serif', serif;
         }
     </style>
 </head>
+<noscript>
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+    </style>
+    <div style="position: fixed; text-align:center; height: 100%; width: 100%; background-color: #151515;">
+        <h2 style="margin-top:5%">This page requires JavaScript
+            to be enabled.
+            <br><br>
+            Please refer <a href="https://www.enable-javascript.com/">enable-javascript</a> for how to.
+        </h2>
+        <form>
+            <button type="submit" onClick="<meta httpEquiv='refresh' content='0'>">RETRY</button>
+        </form>
+    </div>
+</noscript>
 <body translate="no">
-<div class="toggler fa fa-moon-o"></div>
-<br><br>
-<h1>Video Streaming via FastAPI</h1>
-<hr>
-<button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
-<button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
-<button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
-{% if dir_name %}
-    <h3>{{dir_name}}</h3>
-{% else %}
-    <h3>Files</h3>
-{% endif %}
-<ol>
-    {% for file in files %}
-    <li><a href="{{file.path}}">{{file.name}}</a></li>
-    {% endfor %}
-</ol>
-{% if directories %}
-<h3>Directories</h3>
-<ol>
-    {% for directory in directories %}
-    <li><a href="{{directory.path}}">{{directory.name}}</a></li>
-    {% endfor %}
-</ol>
-{% endif %}
-<hr>
-<script>
-    function logOut() {
-        window.location.href = window.location.origin + "{{ logout }}";
-    }
-    function goHome() {
-        window.location.href = window.location.origin + "{{ home }}";
-    }
-    function goBack() {
-        window.history.back();
-    }
-
-</script>
+    <div class="toggler fa fa-moon-o"></div>
+    <br><br>
+    <h1>Video Streaming via FastAPI</h1>
+    <hr>
+    <button class="home" onclick="goHome()"><i class="fa fa-home"></i> Home</button>
+    <button class="back" onclick="goBack()"><i class="fa fa-backward"></i> Back</button>
+    <button class="logout" onclick="logOut()"><i class="fa fa-sign-out"></i> Logout</button>
+    {% if dir_name or files or directories %}
+        {% if dir_name %}
+            <h3>{{dir_name}}</h3>
+        {% else %}
+            <h3>Files</h3>
+        {% endif %}
+        <ol>
+        {% for file in files %}
+            <li><a href="{{file.path}}">{{file.name}}</a></li>
+        {% endfor %}
+        </ol>
+        {% if directories %}
+            <h3>Directories</h3>
+            <ol>
+            {% for directory in directories %}
+                <li><a href="{{directory.path}}">{{directory.name}}</a></li>
+            {% endfor %}
+            </ol>
+        {% endif %}
+    {% else %}
+        <h3 style="text-align: center">No content was rendered by the server</h3>
+    {% endif %}
+    <hr>
+    <script>
+        function logOut() {
+            window.location.href = window.location.origin + "{{ logout }}";
+        }
+        function goHome() {
+            window.location.href = window.location.origin + "{{ home }}";
+        }
+        function goBack() {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

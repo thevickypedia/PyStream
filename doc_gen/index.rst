@@ -42,13 +42,6 @@ Images
    :members:
    :undoc-members:
 
-Secure
-======
-
-.. automodule:: pystream.models.secure
-   :members:
-   :undoc-members:
-
 Squire
 ======
 

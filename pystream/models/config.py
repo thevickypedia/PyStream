@@ -53,6 +53,7 @@ class EnvConfig(BaseSettings):
     auto_thumbnail: bool = True
     key_file: Union[FilePath, None] = None
     cert_file: Union[FilePath, None] = None
+    secure_session: bool = False
 
     class Config:
         """Environment variables configuration."""
