@@ -49,7 +49,7 @@ class EnvConfig(BaseSettings):
     file_formats: Sequence[str] = (".mov", ".mp4")
 
     workers: int = Field(1, le=os.cpu_count(), ge=1, env="WORKERS")
-    website: Union[List[str], None] = []
+    websites: Union[List[str], None] = []
     auto_thumbnail: bool = True
     key_file: Union[FilePath, None] = None
     cert_file: Union[FilePath, None] = None
@@ -90,8 +90,8 @@ class EnvConfig(BaseSettings):
         return str(value)
 
     # noinspection PyMethodParameters
-    @field_validator("website", mode='before', check_fields=True)
-    def parse_website(cls, value: str) -> List[str]:
+    @field_validator("websites", mode='before', check_fields=True)
+    def parse_websites(cls, value: str) -> List[str]:
         """Evaluates the string as a list and returns the list of strings."""
         if not value:
             return []

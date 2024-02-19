@@ -46,8 +46,8 @@ async def startup_tasks() -> None:
     logger.info("Users allowed [%d]: %s", len(config.env.authorization), list(config.env.authorization.keys()))
     logger.info('Setting up CORS policy.')
     origins = ["http://localhost.com", "https://localhost.com"]
-    origins.extend(config.env.website)
-    origins.extend(map((lambda x: x + '/*'), config.env.website))
+    origins.extend(config.env.websites)
+    origins.extend(map((lambda x: x + '/*'), config.env.websites))
     # noinspection PyTypeChecker
     app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET", "POST"], allow_credentials=True)
 

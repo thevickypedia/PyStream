@@ -46,13 +46,13 @@ if __name__ == '__main__':
 - **VIDEO_PORT**: Port number to host the application. Defaults to `8000`
 - **FILE_FORMATS**: Sequence of supported video file formats. Defaults to `(.mp4, .mov)`
 - **WORKERS**: Number of workers to spin up the `uvicorn` server. Defaults to `1`
-- **WEBSITE**: List of websites (_supports regex_) to add to CORS configuration. _Required only if tunneled via CDN_
+- **WEBSITES**: List of websites (_supports regex_) to add to CORS configuration. _Required only if tunneled via CDN_
 - **AUTO_THUMBNAIL**: Boolean flag to auto generate thumbnail images for preview. Defaults to `True`
-- **SECURE_SESSION**: Boolean flag to secure the cookie `session_token` to restrict serving **_ONLY_** via **HTTPS**.
-Defaults to `False`
 - **KEY_FILE**: Path to the private key file for SSL certificate. Defaults to `None`
 - **CERT_FILE**: Path to the full chain file for SSL certificate. Defaults to `None`
-> :bulb: &nbsp; `KEY_FILE` and `CERT_FILE` becomes mandatory when `VIDEO_PORT` is set to `443`
+- **SECURE_SESSION**: Boolean flag to secure the cookie `session_token`. Defaults to `False`
+> :bulb: &nbsp; If `SECURE_SESSION` to set to `true`, the cookie `session_token` will only be sent via HTTPS<br>
+> This means that the server can **ONLY** be hosted via `HTTPS` or `localhost`
 
 ## Coding Standards
 Docstring format: [`Google`][google-docs] <br>
