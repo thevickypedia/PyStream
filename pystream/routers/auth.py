@@ -71,7 +71,8 @@ async def login(request: Request) -> JSONResponse:
                          value=config.static.cipher_suite.encrypt(str(auth_payload).encode("utf-8")).decode(),
                          max_age=config.env.session_duration,
                          expires=expiration,
-                         httponly=True)
+                         httponly=True,
+                         samesite="strict")
     if config.env.secure_session:
         cookie_kwargs["secure"] = True
     response.set_cookie(**cookie_kwargs)

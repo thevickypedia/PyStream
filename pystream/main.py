@@ -37,7 +37,7 @@ async def redirect_exception_handler(request: Request,
     else:
         response = RedirectResponse(url=exception.location)
     if exception.detail:
-        response.set_cookie("detail", exception.detail.upper())
+        response.set_cookie("detail", exception.detail.upper(), httponly=True, samesite="strict")
     return response
 
 

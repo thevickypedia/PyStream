@@ -95,7 +95,7 @@ async def stream_video(request: Request,
         )
     if pure_path.exists():
         attrs = {
-            "request": request, "video_title": video_path,
+            "request": request, "video_title": pure_path.name,
             "home": config.static.home_endpoint, "logout": config.static.logout_endpoint,
             "path": f"{config.static.streaming_endpoint}?{config.static.query_param}={urlparse.quote(str(pure_path))}"
         }
