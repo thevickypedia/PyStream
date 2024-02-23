@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+v2.1 (02/23/2024)
+-----------------
+- Improved overall security
+- Allows `PyStream` to run on HTTPS binding an SSL cert
+- Less cluttering of title in the video rendering page
+- Allows securing the `session_token`
+- Enables `samesite` argument with `strict` mode for cookies
+
 v2.0 (02/13/2024)
 -----------------
 - Redefines authentication allowing multi-user signon
